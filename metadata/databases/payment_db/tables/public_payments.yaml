@@ -1,0 +1,11 @@
+table:
+  name: payments
+  schema: public
+array_relationships:
+  - name: transaction_logs
+    using:
+      foreign_key_constraint_on:
+        column: payment_id
+        table:
+          name: transaction_logs
+          schema: public

@@ -1,0 +1,11 @@
+table:
+  name: guests
+  schema: public
+array_relationships:
+  - name: guest_preferences
+    using:
+      foreign_key_constraint_on:
+        column: guest_id
+        table:
+          name: guest_preferences
+          schema: public

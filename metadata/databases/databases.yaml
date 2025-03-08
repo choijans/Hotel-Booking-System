@@ -1,0 +1,29 @@
+- name: guest_db
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url:
+        from_env: GUEST_DATABASE_URL
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include guest_db/tables/tables.yaml"
+  functions: "!include guest_db/functions/functions.yaml"
+- name: payment_db
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url:
+        from_env: PAYMENT_DATABASE_URL
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include payment_db/tables/tables.yaml"
+- name: room_booking_db
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url:
+        from_env: ROOM_BOOKING_DATABASE_URL
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include room_booking_db/tables/tables.yaml"
+  functions: "!include room_booking_db/functions/functions.yaml"

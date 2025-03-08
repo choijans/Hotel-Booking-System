@@ -1,0 +1,3 @@
+- "!include public_bookings.yaml"
+- "!include public_room_types.yaml"
+- "!include public_rooms.yaml"

@@ -1,0 +1,15 @@
+table:
+  name: rooms
+  schema: public
+object_relationships:
+  - name: room_type
+    using:
+      foreign_key_constraint_on: type_id
+array_relationships:
+  - name: bookings
+    using:
+      foreign_key_constraint_on:
+        column: room_id
+        table:
+          name: bookings
+          schema: public

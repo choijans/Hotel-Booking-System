@@ -1,0 +1,7 @@
+table:
+  name: transaction_logs
+  schema: public
+object_relationships:
+  - name: payment
+    using:
+      foreign_key_constraint_on: payment_id

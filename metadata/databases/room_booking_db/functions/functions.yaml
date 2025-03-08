@@ -1,0 +1,4 @@
+- "!include public_get_all_bookings.yaml"
+- "!include public_get_all_rooms.yaml"
+- "!include public_get_available_rooms.yaml"
+- "!include public_get_booking_by_id.yaml"
