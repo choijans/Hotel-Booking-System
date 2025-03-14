@@ -111,6 +111,47 @@ services:
     depends_on:
       - room_booking_db
       - hasura
+  bookings_service:
+    build:
+      context: ./bookings_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4002:4002"
+    environment:
+      HASURA_URL: http://hasura:8080/v1/graphql
+      JWT_SECRET: "this_is_a_much_longer_super_secret_key_123!"
+    depends_on:
+      - hasura
+  payment_service:
+    build:
+      context: ./payments_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4003:4003"
+    environment:
+      PAYMENT_DATABASE_URL: postgres://postgres:password@payment_db:5432/payment
+      HASURA_URL: http://hasura:8080/v1/graphql
+      JWT_SECRET: "this_is_a_much_longer_super_secret_key_123!"
+    depends_on:
+      - payment_db
+      - hasura
+  guest_service:
+    build:
+      context: ./guest_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4004:4004"
+    environment:
+      GUEST_DATABASE_URL: postgres://postgres:password@guest_db:5432/guest
+      HASURA_URL: http://hasura:8080/v1/graphql
+      JWT_SECRET: "this_is_a_much_longer_super_secret_key_123!"
+    depends_on:
+      - guest_db
+      - hasura
+
 volumes:
   hasura_metadata_data:
   room_booking_data:
