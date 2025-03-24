@@ -41,10 +41,11 @@ func initDB() {
 
 func CorsMiddleware() *cors.Cors {
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete},
-		AllowCredentials: false,
+		AllowCredentials: true,
 	})
+	
 
 	return c
 }
@@ -80,6 +81,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(user, "huihuhduiu")
 	// Insert user into DB
 	_, err = db.Exec("INSERT INTO users (username, password, role) VALUES ($1, $2, $3)", user.Username, string(hashedPassword), user.Role)
 	if err != nil {
