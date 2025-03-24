@@ -151,7 +151,18 @@ services:
     depends_on:
       - guest_db
       - hasura
-
+  frontend-vacay:
+    build:
+      context: ./vaycay/vaycay
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5173:80"
+    environment:
+      REACT_APP_API_URL: "http://jwt-generator:4000"
+    depends_on:
+      - jwt-generator
+      - hasura
 volumes:
   hasura_metadata_data:
   room_booking_data:

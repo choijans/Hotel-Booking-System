@@ -7,10 +7,10 @@ import (
 	"log"
 	"net/http"
 	"time"
-
 	_ "github.com/lib/pq"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/rs/cors"
 )
 
 // Secret key for signing tokens (Use ENV variables in production)
@@ -37,6 +37,16 @@ func initDB() {
 	if err != nil {
 		log.Fatal("Error connecting to database:", err)
 	}
+}
+
+func CorsMiddleware() *cors.Cors {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete},
+		AllowCredentials: false,
+	})
+
+	return c
 }
 
 // Generate JWT token
@@ -143,11 +153,13 @@ func validateTokenHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	initDB()
 	defer db.Close()
-
+	
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/validate", validateTokenHandler)
 
+	corsHandler := CorsMiddleware().Handler(http.DefaultServeMux)
+
 	log.Println("Auth Service running on :4000")
-	log.Fatal(http.ListenAndServe(":4000", nil))
+	log.Fatal(http.ListenAndServe(":4000", corsHandler))
 }

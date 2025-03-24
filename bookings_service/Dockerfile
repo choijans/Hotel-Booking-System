@@ -1,4 +1,4 @@
-# Use latest Go version (>=1.24)
+
 FROM golang:1.24-bookworm as builder
 
 WORKDIR /app
