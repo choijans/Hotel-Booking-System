@@ -41,12 +41,11 @@ func initDB() {
 
 func CorsMiddleware() *cors.Cors {
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete},
+		AllowedOrigins:   []string{"http://localhost:5173"}, // Replace with your frontend's origin
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
 	})
-	
-
 	return c
 }
 
@@ -137,6 +136,11 @@ func validateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Remove "Bearer " prefix if present
+	if len(tokenStr) > 7 && tokenStr[:7] == "Bearer " {
+		tokenStr = tokenStr[7:]
+	}
+
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -161,7 +165,6 @@ func main() {
 	http.HandleFunc("/validate", validateTokenHandler)
 
 	corsHandler := CorsMiddleware().Handler(http.DefaultServeMux)
-
 	log.Println("Auth Service running on :4000")
 	log.Fatal(http.ListenAndServe(":4000", corsHandler))
 }
