@@ -10,27 +10,27 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gorilla/mux" // Ensure this package is installed
 )
 
 const hasuraURL = "http://hasura:8080/v1/graphql"
 
 type GraphQLRequest struct {
-	Query     string                 `json:"query"`
-	Variables map[string]interface{} `json:"variables,omitempty"`
+	Query     string         `json:"query"`
+	Variables map[string]any `json:"variables,omitempty"`
 }
 
 // Updated Room Struct
 type Room struct {
-	ID          int       `json:"room_id"`
-	Number      string    `json:"room_number"`
-	TypeID      int       `json:"type_id"`
-	Description string    `json:"description"`
-	Price       float64   `json:"price"`
-	Availability bool     `json:"availability"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           int       `json:"room_id"`
+	Number       string    `json:"room_number"`
+	TypeID       int       `json:"type_id"`
+	Description  string    `json:"description"`
+	Price        float64   `json:"price"`
+	Availability bool      `json:"availability"`
+	Status       string    `json:"status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func executeGraphQLQuery(query GraphQLRequest, jwtToken string) ([]byte, error) {
@@ -116,7 +116,7 @@ func getRoomByID(w http.ResponseWriter, r *http.Request) {
 
 	query := GraphQLRequest{
 		Query: `query ($room_id: Int!) { rooms(where: {room_id: {_eq: $room_id}}) { room_id room_number type_id description price availability status created_at updated_at } }`,
-		Variables: map[string]interface{}{
+		Variables: map[string]any{
 			"room_id": roomID,
 		},
 	}
@@ -264,5 +264,19 @@ func main() {
 	r.HandleFunc("/rooms/{id}", deleteRoom).Methods("DELETE")
 
 	log.Println("Room Service running on port 4001")
-	log.Fatal(http.ListenAndServe(":4001", r))
+	// Add CORS middleware to allow cross-origin requests
+	corsHandler := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	log.Fatal(http.ListenAndServe(":4001", corsHandler(r)))
 }

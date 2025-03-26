@@ -12,7 +12,7 @@ export const api = axios.create({
 // Function to set auth token for protected routes
 export const setAuthToken = (token) => {
   if (token) {
-    api.defaults.headers.common["Authorization"] = token;
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`; // Add "Bearer" prefix
     localStorage.setItem("token", token);
   } else {
     delete api.defaults.headers.common["Authorization"];
