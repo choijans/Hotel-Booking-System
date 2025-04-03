@@ -26,7 +26,7 @@ const Register = () => {
            backgroundSize: '100%'
          }}>
 
-      <nav className="bg-transparent absolute top-0 left-0 right-0 z-10">
+      {/* <nav className="bg-transparent absolute top-0 left-0 right-0 z-10">
         <div className="max-w-9xl px-2 sm:px-3 lg:px-4">
           <div className="flex justify-between h-16 items-center">
             
@@ -44,7 +44,7 @@ const Register = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Registration Form */}
       <div className="flex items-center justify-center min-h-screen pt-16"> {/* pt-16 to account for navbar height */}

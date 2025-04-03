@@ -10,27 +10,27 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gorilla/mux" // Ensure this package is installed
 )
 
 const hasuraURL = "http://hasura:8080/v1/graphql"
 
 type GraphQLRequest struct {
-	Query     string                 `json:"query"`
-	Variables map[string]interface{} `json:"variables,omitempty"`
+	Query     string         `json:"query"`
+	Variables map[string]any `json:"variables,omitempty"`
 }
 
 // Updated Room Struct
 type Room struct {
-	ID          int       `json:"room_id"`
-	Number      string    `json:"room_number"`
-	TypeID      int       `json:"type_id"`
-	Description string    `json:"description"`
-	Price       float64   `json:"price"`
-	Availability bool     `json:"availability"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           int       `json:"room_id"`
+	Number       string    `json:"room_number"`
+	TypeID       int       `json:"type_id"`
+	Description  string    `json:"description"`
+	Price        float64   `json:"price"`
+	Availability bool      `json:"availability"`
+	Status       string    `json:"status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func executeGraphQLQuery(query GraphQLRequest, jwtToken string) ([]byte, error) {
@@ -63,17 +63,30 @@ func executeGraphQLQuery(query GraphQLRequest, jwtToken string) ([]byte, error) 
 }
 
 func extractToken(r *http.Request) (string, error) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		return "", fmt.Errorf("missing Authorization token")
-	}
+
+	fmt.Println("=== Incoming Request Headers ===")
+    for name, values := range r.Header {
+        for _, value := range values {
+            fmt.Printf("%s: %s\n", name, value)
+        }
+    }
+
+    authHeader := r.Header.Get("Authorization")
+    if authHeader == "" {
+        fmt.Println("ERROR: Authorization header is missing")
+        return "", fmt.Errorf("missing Authorization token")
+    }
+
+    fmt.Printf("Authorization header value: %s\n", authHeader)
 
 	var token string
-	fmt.Sscanf(authHeader, "Bearer %s", &token)
-	if token == "" {
+	n, err := fmt.Sscanf(authHeader, "Bearer %s", &token)
+	if err != nil || n != 1 {
+		log.Printf("Failed to parse Authorization header: %s", authHeader)
 		return "", fmt.Errorf("invalid Authorization header format")
 	}
 
+	log.Printf("Extracted token: %s", token)
 	return token, nil
 }
 
@@ -86,7 +99,7 @@ func getRooms(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := GraphQLRequest{
-		Query: `{ rooms { room_id room_number type_id description price availability status created_at updated_at } }`,
+		Query: `{ rooms { room_id room_number type_id description price availability statuscd } }`,
 	}
 
 	body, err := executeGraphQLQuery(query, jwtToken)
@@ -100,35 +113,26 @@ func getRooms(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get a single room by ID
-func getRoomByID(w http.ResponseWriter, r *http.Request) {
-	jwtToken, err := extractToken(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
+func getRooms(w http.ResponseWriter, r *http.Request) {
+    jwtToken, err := extractToken(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusUnauthorized)
+        return
+    }
 
-	vars := mux.Vars(r)
-	roomID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid room ID", http.StatusBadRequest)
-		return
-	}
+    query := GraphQLRequest{
+        Query: `{ rooms { room_id room_number } }`, // Test with minimal fields
+    }
 
-	query := GraphQLRequest{
-		Query: `query ($room_id: Int!) { rooms(where: {room_id: {_eq: $room_id}}) { room_id room_number type_id description price availability status created_at updated_at } }`,
-		Variables: map[string]interface{}{
-			"room_id": roomID,
-		},
-	}
+    body, err := executeGraphQLQuery(query, jwtToken)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	body, err := executeGraphQLQuery(query, jwtToken)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(body)
+    // Forward the exact Hasura response (for debugging)
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(body) // Frontend will parse errors
 }
 
 // Create a new room
@@ -264,5 +268,21 @@ func main() {
 	r.HandleFunc("/rooms/{id}", deleteRoom).Methods("DELETE")
 
 	log.Println("Room Service running on port 4001")
-	log.Fatal(http.ListenAndServe(":4001", r))
+	// Add CORS middleware to allow cross-origin requests
+	corsHandler := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	log.Fatal(http.ListenAndServe(":4001", corsHandler(r)))
 }
