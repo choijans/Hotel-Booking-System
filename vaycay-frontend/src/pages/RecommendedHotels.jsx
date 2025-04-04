@@ -9,13 +9,17 @@ const RecommendedHotels = () => {
     useEffect(() => {
         const fetchHotels = async () => {
             try {
-                const token = localStorage.getItem("jwtToken"); // Assuming token is stored in localStorage
+                const token = localStorage.getItem("token"); // Correct key for token retrieval
+                console.log("Retrieved token:", token); // Log the token value
                 const response = await axios.get("http://localhost:4001/rooms", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                setHotels(Array.isArray(response.data.rooms) ? response.data.rooms : []);
+                console.log("API response data:", response.data); // Log the entire response data
+                const rooms = response.data.rooms || response.data.data?.rooms || [];
+                setHotels(Array.isArray(rooms) ? rooms : []);
+                console.log("Rooms array:", rooms); // Log the rooms array
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -38,7 +42,7 @@ const RecommendedHotels = () => {
                         <h2>Room {hotel.room_number}</h2>
                         <p>Type ID: {hotel.type_id}</p>
                         <p>Description: {hotel.description}</p>
-                        <p>Price: ${hotel.price.toFixed(2)}</p>
+                        <p>Price: ${typeof hotel.price === "number" ? hotel.price.toFixed(2) : "N/A"}</p>
                         <p>Availability: {hotel.availability ? "Available" : "Unavailable"}</p>
                         <p>Status: {hotel.status}</p>
                     </div>

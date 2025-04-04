@@ -1,11 +1,18 @@
-import Navbar from '../components/nav/navbar';
+import { Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthProvider'; // Import the AuthProvider context
+import GuestNav from '../components/nav/guestnav'; // Import the GuestNav component
 
-const BaseLayout = ({ children }) => {
+const BaseLayout = () => {
+  const { currentUser } = useAuth();
+
+  if (currentUser) return <Navigate to="/dashboard" />;
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <main className="pt-4">{children}</main>
-    </div>
+    <>
+      <GuestNav />
+      <Outlet />
+    </>
   );
 };
 

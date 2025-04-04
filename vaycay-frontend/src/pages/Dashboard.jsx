@@ -1,33 +1,41 @@
 import { useEffect, useState } from "react";
 import { api, setAuthToken } from "../api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
+
 
 const Dashboard = () => {
+  const { currentUser } = useAuth();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await api.get("/validate");
-        setUser(res.data);
-      } catch (err) {
+        const token = localStorage.getItem("token"); // Or useContext if stored elsewhere
+        const response = await fetch("http://localhost:4000/validate", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user:", error);
         navigate("/login");
       }
     };
 
-    fetchUser();
-  }, [navigate]);
+    if (currentUser) fetchUser();
+  }, [currentUser]);
 
   const handleLogout = () => {
     setAuthToken(null);
-    navigate("/login");
+    navigate("/dashboard");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
     
-      <nav className="bg-beige-600 shadow-md">
+      {/* <nav className="bg-beige-600 shadow-md">
         <div className="py-4 pl-12 pr-4 sm:pl-16 sm:pr-6 lg:pl-24 lg:pr-8 bg-beige-600 text-left">
           <div className="flex justify-between h-16 items-center">
             
@@ -44,7 +52,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Hero Section */}
       <div className="py-12 pl-12 pr-4 sm:pl-16 sm:pr-6 lg:pl-24 lg:pr-8 bg-beige-600 text-left">
@@ -146,12 +154,12 @@ const Dashboard = () => {
       </div>
 
       {/* User Debug Section */}
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      {/* <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold mb-4">User Dashboard</h2>
         <div className="bg-white p-4 rounded shadow">
           <pre className="text-sm">{JSON.stringify(user, null, 2)}</pre>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

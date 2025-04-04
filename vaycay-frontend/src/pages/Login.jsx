@@ -1,19 +1,33 @@
 import { useState } from "react";
 import { api, setAuthToken } from "../api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const { setCurrentUser } = useAuth();
   const navigate = useNavigate();
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post("/login", { username, password });
-      setAuthToken(res.data.token); // Save token
-      navigate("/dashboard"); // Redirect
+      console.log("Login response:", res.data);
+      
+      setAuthToken(res.data.token);
+      console.log("Token set");
+      
+      setCurrentUser(res.data.user);
+      console.log("User set in context:", res.data.user);
+      
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      console.log("User stored in localStorage");
+      
+      navigate("/dashboard");
+      console.log("Navigation triggered");
+      window.location.reload(); // Reload the page to reflect the new user state
     } catch (err) {
       setError("Invalid username or password");
     }
@@ -27,7 +41,7 @@ const Login = () => {
        backgroundSize: '100%' // Adjust percentage as needed
      }}>
       
-      <nav className="bg-transparent absolute top-0 left-0 right-0 z-10">
+      {/* <nav className="bg-transparent absolute top-0 left-0 right-0 z-10">
         <div className="max-w-9xl px-2 sm:px-3 lg:px-4">
           <div className="flex justify-between h-16 items-center">
             
@@ -45,7 +59,7 @@ const Login = () => {
             </div>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Login Form */}
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">

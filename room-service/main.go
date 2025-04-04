@@ -63,17 +63,30 @@ func executeGraphQLQuery(query GraphQLRequest, jwtToken string) ([]byte, error) 
 }
 
 func extractToken(r *http.Request) (string, error) {
+
+	fmt.Println("=== Incoming Request Headers ===")
+	for name, values := range r.Header {
+		for _, value := range values {
+			fmt.Printf("%s: %s\n", name, value)
+		}
+	}
+
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
+		fmt.Println("ERROR: Authorization header is missing")
 		return "", fmt.Errorf("missing Authorization token")
 	}
 
+	fmt.Printf("Authorization header value: %s\n", authHeader)
+
 	var token string
-	fmt.Sscanf(authHeader, "Bearer %s", &token)
-	if token == "" {
+	n, err := fmt.Sscanf(authHeader, "Bearer %s", &token)
+	if err != nil || n != 1 {
+		log.Printf("Failed to parse Authorization header: %s", authHeader)
 		return "", fmt.Errorf("invalid Authorization header format")
 	}
 
+	log.Printf("Extracted token: %s", token)
 	return token, nil
 }
 
@@ -86,7 +99,7 @@ func getRooms(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := GraphQLRequest{
-		Query: `{ rooms { room_id room_number type_id description price availability status created_at updated_at } }`,
+		Query: `{ rooms { room_id room_number type_id description price availability status } }`,
 	}
 
 	body, err := executeGraphQLQuery(query, jwtToken)
@@ -107,18 +120,8 @@ func getRoomByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	roomID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid room ID", http.StatusBadRequest)
-		return
-	}
-
 	query := GraphQLRequest{
-		Query: `query ($room_id: Int!) { rooms(where: {room_id: {_eq: $room_id}}) { room_id room_number type_id description price availability status created_at updated_at } }`,
-		Variables: map[string]any{
-			"room_id": roomID,
-		},
+		Query: `{ rooms { room_id room_number } }`, // Test with minimal fields
 	}
 
 	body, err := executeGraphQLQuery(query, jwtToken)
@@ -127,8 +130,9 @@ func getRoomByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Forward the exact Hasura response (for debugging)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(body)
+	w.Write(body) // Frontend will parse errors
 }
 
 // Create a new room
@@ -267,9 +271,11 @@ func main() {
 	// Add CORS middleware to allow cross-origin requests
 	corsHandler := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			if r.Method == "OPTIONS" {
 				w.WriteHeader(http.StatusOK)
 				return

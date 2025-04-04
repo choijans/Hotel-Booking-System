@@ -71,7 +71,6 @@ services:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: "supersecureadminsecret"
       HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"this_is_a_much_longer_super_secret_key_123!","claims_namespace_path":"$","claims_map":{"x-hasura-allowed-roles":{"path":"x-hasura-allowed-roles"},"x-hasura-default-role":{"path":"x-hasura-default-role"},"x-hasura-user-id":{"path":"sub"}}}'
-
       ROOM_BOOKING_DATABASE_URL: postgres://postgres:password@room_booking_db:5432/room_booking
       PAYMENT_DATABASE_URL: postgres://postgres:password@payment_db:5432/payment
       GUEST_DATABASE_URL: postgres://postgres:password@guest_db:5432/guest
@@ -97,6 +96,7 @@ services:
     depends_on:
       - auth_db
       - hasura
+
   room-service:
     build:
       context: ./room-service
@@ -111,6 +111,7 @@ services:
     depends_on:
       - room_booking_db
       - hasura
+
   bookings_service:
     build:
       context: ./bookings_service
@@ -123,6 +124,7 @@ services:
       JWT_SECRET: "this_is_a_much_longer_super_secret_key_123!"
     depends_on:
       - hasura
+
   payment_service:
     build:
       context: ./payments_service
@@ -137,6 +139,7 @@ services:
     depends_on:
       - payment_db
       - hasura
+
   guest_service:
     build:
       context: ./guest_service
