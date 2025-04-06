@@ -36,9 +36,9 @@ const AuthNav = ( ) => {
               <FaUserCircle className="text-2xl" />
             </Link>
 
-            {/* <button onClick={handleLogout} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+            <button onClick={handleLogout} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
               Logout
-            </button> */}
+            </button>
           </div>
         </div>
       </div>

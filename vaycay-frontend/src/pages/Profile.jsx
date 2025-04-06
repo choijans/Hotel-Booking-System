@@ -55,20 +55,20 @@ const Profile = () => {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="mt-1 text-gray-900">{user.full_name || "Summi Derama"}</p>
+                    <p className="mt-1 text-gray-900">{user.full_name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="mt-1 text-gray-900">{user.email || "summiderama@gmail.com"}</p>
+                    <p className="mt-1 text-gray-900">{user.email}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Contact Number</p>
-                    <p className="mt-1 text-gray-900">{user.phone || "09453453453"}</p>
+                    <p className="mt-1 text-gray-900">{user.phone}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
                     <p className="mt-1 text-gray-900">
-                      {user.address || "University of San Carlos-Talamban, Cebu City, Cebu"}
+                      {user.address}
                     </p>
                   </div>
                 </div>
