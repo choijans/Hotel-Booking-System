@@ -1,107 +1,127 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useAuth } from "../context/AuthProvider"; 
+import { Link } from "react-router-dom";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const { logout } = useAuth();
+  //static for now
+  const user = {
+    email: "summiderama@gmail.com",
+    phone: "09453453453",
+    address: "University of San Carlos - Talamban\nCebu City, Cebu",
+    payment_method: "Mastercard",
+    card_number: "7************3"
+  };
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
-        // Replace with your actual backend endpoint
-        const response = await axios.get("http://localhost:4000/api/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setUser(response.data);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch profile");
-        console.error("Profile fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [navigate]);
-
-  if (loading) return <div className="p-4">Loading profile...</div>;
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-  if (!user) return <div className="p-4">No user data found</div>;
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/"; 
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row gap-6">
+
+          <div className="w-full md:w-2/5 lg:w-2/5">
+            <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-6">Profile</h2>
+                <nav className="space-y-4">
+                  <Link 
+                    to="/profile" 
+                    className="block py-2 px-4 bg-teal-100 text-teal-800 rounded-md font-medium"
+                  >
+                    Profile
+                  </Link>
+                  <Link 
+                    to="/bookings" 
+                    className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    Bookings
+                  </Link>
+                  <Link 
+                    to="/transactions" 
+                    className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    Transaction History
+                  </Link>
+                  <Link 
+                    to="/support" 
+                    className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    Contact Support
+                  </Link>
+                  <Link 
+                    to="/faqs" 
+                    className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    FAQs
+                  </Link>
+                  <button onClick={handleLogout} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+                    Logout
+                  </button>
+                </nav>
+              </div>
+            </div>
           </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h2 className="text-lg font-medium text-gray-700 mb-2">Personal Information</h2>
-                <div className="space-y-4">
+
+          {/* Right Content - 60% width */}
+          <div className="w-full md:w-3/5 lg:w-3/5">
+            <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="p-6">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">Profile Information</h1>
+                
+                <div className="space-y-6">
+                  {/* Email */}
                   <div>
-                    <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="mt-1 text-gray-900">{user.full_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
+                    <h3 className="text-sm font-medium text-gray-500">Email</h3>
                     <p className="mt-1 text-gray-900">{user.email}</p>
                   </div>
+                  
+                  {/* Contact Number */}
                   <div>
-                    <p className="text-sm text-gray-500">Contact Number</p>
+                    <h3 className="text-sm font-medium text-gray-500">Contact Number</h3>
                     <p className="mt-1 text-gray-900">{user.phone}</p>
                   </div>
+                  
+                  {/* Address */}
                   <div>
-                    <p className="text-sm text-gray-500">Address</p>
-                    <p className="mt-1 text-gray-900">
-                      {user.address}
-                    </p>
+                    <h3 className="text-sm font-medium text-gray-500">Address</h3>
+                    <p className="mt-1 text-gray-900 whitespace-pre-line">{user.address}</p>
                   </div>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-lg font-medium text-gray-700 mb-2">Account Settings</h2>
-                <div className="space-y-4">
+                  
+                  {/* Password */}
                   <div>
-                    <p className="text-sm text-gray-500">Password</p>
-                    <p className="mt-1 text-gray-900">••••••••</p>
+                    <h3 className="text-sm font-medium text-gray-500">Password</h3>
+                    <p className="mt-1 text-gray-900">***********</p>
                     <button className="mt-2 text-sm text-teal-600 hover:text-teal-700">
                       Change Password
                     </button>
                   </div>
+                  
+                  {/* Payment Method */}
                   <div>
-                    <p className="text-sm text-gray-500">Payment Method</p>
-                    <p className="mt-1 text-gray-900">{user.payment_method || "Mastercard"}</p>
-                    <p className="mt-1 text-gray-900">
-                      {user.card_number ? `•••• •••• •••• ${user.card_number.slice(-4)}` : "•••• •••• •••• ••53"}
+                    <h3 className="text-sm font-medium text-gray-500">Payment Method</h3>
+                    <p className="mt-1 text-gray-900 flex items-center">
+                      <span className="mr-2">📞</span>
+                      {user.payment_method}
                     </p>
-                    <button className="mt-2 text-sm text-teal-600 hover:text-teal-700">
-                      Update Payment
-                    </button>
+                  </div>
+                  
+                  {/* Card Number */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Card Number</h3>
+                    <p className="mt-1 text-gray-900">{user.card_number}</p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="mt-8 flex justify-end">
-              <button className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-                Edit Profile
-              </button>
+                <div className="mt-8 flex justify-end">
+                  <button className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">
+                    Edit Profile
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
