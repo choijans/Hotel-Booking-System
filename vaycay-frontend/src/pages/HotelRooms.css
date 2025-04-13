@@ -1,0 +1,109 @@
+/* General Layout */
+.rooms-list {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .room-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Room Card */
+  .room-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+    padding: 15px;
+  }
+  
+  .room-card:hover {
+    transform: scale(1.02);
+  }
+  
+  .room-details {
+    text-align: left;
+  }
+  
+  .room-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .room-type {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  
+  .room-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .room-availability {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .room-availability.available {
+    color: green;
+  }
+  
+  .room-availability.unavailable {
+    color: red;
+  }
+  
+  /* Search Section */
+  .search-section-container {
+    background-color: #F6F3E9;
+    padding: 20px 0;
+  }
+  
+  .search-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .search-fields {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .search-field,
+  .date-field,
+  .number-field {
+    flex: 1;
+  }
+  
+  .search-field input,
+  .date-field input,
+  .number-field input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .search-button {
+    background: #219995;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background: #1b7a7a;
+  }

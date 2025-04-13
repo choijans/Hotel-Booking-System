@@ -1,32 +1,32 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthProvider";
+import AuthLayout from "./layout/authlayout";
+import BaseLayout from "./layout/baselayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
 import RecommendedHotels from "./pages/RecommendedHotels";
-import PrivateRoute from "./components/PrivateRoute";
-import BaseLayout from "./layout/baselayout";
-import AuthLayout from "./layout/authlayout";
-import { AuthProvider } from "./context/AuthProvider";
+import HotelRooms from "./pages/HotelRooms";
+import RoomBooking from "./pages/RoomBooking"; // Import the RoomBooking component
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Protected routes with auth navigation */}
+          {/* Protected routes */}
           <Route element={<AuthLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} /> {/* Same component */}
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/hotels" element={<RecommendedHotels />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/hotels/:hotelId/rooms" element={<HotelRooms />} />
+            <Route path="/rooms/:roomId/book" element={<RoomBooking />} /> {/* Add this route */}
           </Route>
 
-          {/* Auth pages with guest navigation */}
+          {/* Public routes */}
           <Route element={<BaseLayout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/hotels" element={<RecommendedHotels />} />
           </Route>
         </Routes>
       </Router>

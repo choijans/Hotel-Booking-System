@@ -1,6 +1,23 @@
 -- +goose Up
 -- SQL statements for migrating up
 
+CREATE TABLE locations (
+    location_id SERIAL PRIMARY KEY,
+    location_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE hotels (
+    hotel_id SERIAL PRIMARY KEY,
+    hotel_name VARCHAR(100) NOT NULL,
+    location_id INTEGER NOT NULL REFERENCES locations(location_id) ON DELETE CASCADE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE room_types (
     type_id SERIAL PRIMARY KEY,
     type_name VARCHAR(50) NOT NULL,
@@ -10,6 +27,7 @@ CREATE TABLE room_types (
 CREATE TABLE rooms (
     room_id SERIAL PRIMARY KEY,
     room_number VARCHAR(10) NOT NULL UNIQUE,
+    hotel_id INTEGER NOT NULL REFERENCES hotels(hotel_id) ON DELETE CASCADE,
     type_id INTEGER NOT NULL REFERENCES room_types(type_id),
     description TEXT,
     price DECIMAL(10, 2),
@@ -38,3 +56,5 @@ CREATE TABLE bookings (
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS rooms;
 DROP TABLE IF EXISTS room_types;
+DROP TABLE IF EXISTS hotels;
+DROP TABLE IF EXISTS locations;

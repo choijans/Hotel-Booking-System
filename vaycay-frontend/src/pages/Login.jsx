@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, setAuthToken } from "../api";
+import { authApi, setAuthToken } from "../api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 
@@ -13,21 +13,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/login", { username, password });
+      const res = await authApi.post("/login", { username, password });
       console.log("Login response:", res.data);
-      
-      setAuthToken(res.data.token);
-      console.log("Token set");
-      
-      setCurrentUser(res.data.user);
-      console.log("User set in context:", res.data.user);
-      
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      console.log("User stored in localStorage");
-      
-      navigate("/dashboard");
-      console.log("Navigation triggered");
-      window.location.reload(); // Reload the page to reflect the new user state
+  
+      setAuthToken(res.data.token); // Set the token in Axios and localStorage
+      setCurrentUser(res.data.user); // Set the user details in context
+      localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user details in localStorage
+  
+      navigate("/dashboard"); // Redirect to the dashboard
     } catch (err) {
       setError("Invalid username or password");
     }

@@ -7,10 +7,11 @@ import (
 	"log"
 	"net/http"
 	"time"
-	_ "github.com/lib/pq"
+
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
+	_ "github.com/lib/pq"
 	"github.com/rs/cors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Secret key for signing tokens (Use ENV variables in production)
@@ -32,7 +33,6 @@ func initDB() {
 	var err error
 	connStr := "postgres://postgres:password@auth_db:5432/auth?sslmode=disable"
 
-
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Error connecting to database:", err)
@@ -52,12 +52,12 @@ func CorsMiddleware() *cors.Cors {
 // Generate JWT token
 func generateToken(userID, role string) (string, error) {
 	claims := jwt.MapClaims{
-		"sub": userID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"sub":                    userID,
+		"exp":                    time.Now().Add(time.Hour * 24).Unix(),
 		"x-hasura-allowed-roles": []string{"user", "admin"},
-		"x-hasura-default-role":   role,
-		"x-hasura-user-id":        userID,
-		"x-hasura-role":           role,
+		"x-hasura-default-role":  role,
+		"x-hasura-user-id":       userID,
+		"x-hasura-role":          role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -123,9 +123,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return token
+	// Return token and user details
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": token})
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token": token,
+		"user": map[string]interface{}{
+			"id":   storedUser.ID,
+			"role": storedUser.Role,
+		},
+	})
 }
 
 // Token validation endpoint
@@ -159,7 +165,7 @@ func validateTokenHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	initDB()
 	defer db.Close()
-	
+
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/validate", validateTokenHandler)

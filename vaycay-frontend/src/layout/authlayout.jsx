@@ -1,21 +1,22 @@
-
-import { useAuth } from '../context/AuthProvider'; // Import the AuthProvider context
-import { Outlet } from 'react-router-dom';
-import { Navigate } from 'react-router-dom'; // Import Navigate for redirection
-import AuthNav from '../components/nav/authnav'; // Import the AuthNav component
+import { useAuth } from "../context/AuthProvider";
+import { Outlet, Navigate } from "react-router-dom";
+import AuthNav from "../components/nav/authnav"; // Import AuthNav
 
 const AuthLayout = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
 
-  if (!currentUser) return <Navigate to="/login" />;
+  if (loading) return <div>Loading...</div>; // Show a loading state while initializing auth
+
+  if (!currentUser && !localStorage.getItem("token")) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <>
-      <AuthNav />
+      <AuthNav /> {/* Add the authenticated navigation bar */}
       <Outlet />
     </>
   );
 };
-
 
 export default AuthLayout;

@@ -1,0 +1,50 @@
+.room-booking-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .room-details {
+    flex: 2;
+    margin-right: 20px;
+  }
+  
+  .room-description {
+    margin-top: 10px;
+  }
+  
+  .booking-form {
+    flex: 1;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .booking-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .booking-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .booking-form button {
+    width: 100%;
+    padding: 10px;
+    background: #219995;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .booking-form button:hover {
+    background: #1b7a7a;
+  }
