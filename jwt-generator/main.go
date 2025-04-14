@@ -64,32 +64,50 @@ func generateToken(userID, role string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-// Register user
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
+    var user User
+    err := json.NewDecoder(r.Body).Decode(&user)
+    if err != nil {
+        http.Error(w, "Invalid request", http.StatusBadRequest)
+        return
+    }
 
-	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		http.Error(w, "Error hashing password", http.StatusInternalServerError)
-		return
-	}
+    // Hash password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+    if err != nil {
+        http.Error(w, "Error hashing password", http.StatusInternalServerError)
+        return
+    }
 
-	fmt.Println(user, "huihuhduiu")
-	// Insert user into DB
-	_, err = db.Exec("INSERT INTO users (username, password, role) VALUES ($1, $2, $3)", user.Username, string(hashedPassword), user.Role)
-	if err != nil {
-		http.Error(w, "Error saving user", http.StatusInternalServerError)
-		return
-	}
+    // Insert user into DB and retrieve the generated ID
+    var userID int
+    err = db.QueryRow(
+        "INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id",
+        user.Username, string(hashedPassword), user.Role,
+    ).Scan(&userID)
+    if err != nil {
+        http.Error(w, "Error saving user", http.StatusInternalServerError)
+        return
+    }
 
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintln(w, "User registered successfully")
+    // Generate JWT
+    token, err := generateToken(fmt.Sprintf("%d", userID), user.Role)
+    if err != nil {
+        http.Error(w, "Error generating token", http.StatusInternalServerError)
+        return
+    }
+
+    // Return token and user details
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "token": token,
+        "user": map[string]interface{}{
+            "id":   userID,
+            "role": user.Role,
+        },
+    })
+
+	log.Println("Generated user ID:", userID)
 }
 
 // Login user

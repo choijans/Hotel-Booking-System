@@ -5,9 +5,11 @@ import BaseLayout from "./layout/baselayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import RecommendedHotels from "./pages/RecommendedHotels";
 import HotelRooms from "./pages/HotelRooms";
 import RoomBooking from "./pages/RoomBooking"; // Import the RoomBooking component
+import GuestProfile from "./pages/GuestProfile";
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/hotels" element={<RecommendedHotels />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/hotels/:hotelId/rooms" element={<HotelRooms />} />
             <Route path="/rooms/:roomId/book" element={<RoomBooking />} /> {/* Add this route */}
           </Route>
@@ -27,6 +30,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/guest_profile" element={<GuestProfile />} />
           </Route>
         </Routes>
       </Router>

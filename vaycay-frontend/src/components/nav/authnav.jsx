@@ -9,7 +9,9 @@ const AuthNav = ( ) => {
       <div className="py-4 pl-12 pr-4 sm:pl-16 sm:pr-6 lg:pl-24 lg:pr-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0 flex items-center">
-            <img className="h-16 w-auto" src="/src/assets/logo.png" alt="Vacay Logo" />
+            <Link to="/dashboard">
+              <img className="h-16 w-auto" src="/src/assets/logo.png" alt="Vacay Logo" />
+            </Link>
           </div>
           
           <div className="hidden md:flex space-x-8">

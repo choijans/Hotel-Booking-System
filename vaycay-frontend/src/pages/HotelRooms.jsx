@@ -68,7 +68,7 @@ const HotelRooms = () => {
   };
 
   const handleBookNow = (roomId) => {
-    navigate(`/rooms/${roomId}/book`);
+    navigate(`/rooms/${roomId}/book`); // Navigate to RoomBooking with room_id
   };
 
   if (loading) return <div className="loading-spinner"></div>;
@@ -167,7 +167,7 @@ const HotelRooms = () => {
               <div className="room-details">
                 <h3 className="room-name">Room {room.room_number}</h3>
                 <p className="room-type"><strong>Type:</strong> {room.room_type?.type_name || "Unknown Type"}</p>
-                <p className="room-price"><strong>Price:</strong> ${room.price}</p>
+                <p className="room-price"><strong>Price:</strong> PHP {room.price}</p>
                 <p className={`room-availability ${room.availability ? "available" : "unavailable"}`}>
                   {room.availability ? "Available" : "Unavailable"}
                 </p>

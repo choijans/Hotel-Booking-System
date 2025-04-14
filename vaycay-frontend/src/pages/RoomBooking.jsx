@@ -4,98 +4,47 @@ import { hotelApi } from "../api";
 import "./RoomBooking.css";
 
 const RoomBooking = () => {
-  const { roomId } = useParams();
+  const { roomId } = useParams(); // Extract room_id from URL
   const navigate = useNavigate();
   const [roomDetails, setRoomDetails] = useState(null);
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [guests, setGuests] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch room details from the API
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const response = await hotelApi.post("", {
-          query: `
-            query GetRoomDetails($room_id: Int!) {
-              rooms_by_pk(room_id: $room_id) {
-                room_id
-                room_number
-                description
-                price
-                availability
-                status
-                room_type {
-                  type_name
-                  description
-                }
-                hotel {
-                  hotel_name
-                  location {
-                    location_name
-                  }
-                }
-                bookings {
-                  check_in_date
-                  check_out_date
-                }
-              }
-            }
-          `,
-          variables: { room_id: parseInt(roomId) },
+        const response = await hotelApi.get("/getroomdetails", {
+          params: { room_id: roomId }, // Pass room_id as a parameter
         });
-
-        setRoomDetails(response.data.data.rooms_by_pk);
+  
+        // Log the full API response for debugging
+        console.log("API Response:", response.data);
+  
+        // Check if the response contains the expected structure
+        if (response.data?.rooms_by_pk) {
+          setRoomDetails(response.data.rooms_by_pk); // Set room details
+        } else {
+          console.error("Unexpected API Response Structure:", response.data); // Log unexpected structure
+          throw new Error("Invalid response structure");
+        }
       } catch (err) {
         console.error("Error fetching room details:", err);
+        setError("Failed to fetch room details");
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchRoomDetails();
   }, [roomId]);
 
-  const handleBookNow = async () => {
-    try {
-      const response = await hotelApi.post("", {
-        query: `
-          mutation CreateBooking(
-            $room_id: Int!
-            $guest_id: Int!
-            $check_in_date: date!
-            $check_out_date: date!
-            $total_amount: numeric!
-          ) {
-            insert_bookings_one(object: {
-              room_id: $room_id,
-              guest_id: $guest_id,
-              check_in_date: $check_in_date,
-              check_out_date: $check_out_date,
-              total_amount: $total_amount,
-              status: "Pending",
-              payment_status: "Pending"
-            }) {
-              booking_id
-            }
-          }
-        `,
-        variables: {
-          room_id: parseInt(roomId),
-          guest_id: 1, // Replace with actual guest ID from authentication
-          check_in_date: checkInDate,
-          check_out_date: checkOutDate,
-          total_amount: totalPrice,
-        },
-      });
 
-      if (response.data.data.insert_bookings_one) {
-        alert("Booking successful!");
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      console.error("Error creating booking:", err);
-    }
-  };
-
+  // Calculate total price based on selected dates
   useEffect(() => {
     if (roomDetails && checkInDate && checkOutDate) {
       const nights =
@@ -104,19 +53,53 @@ const RoomBooking = () => {
     }
   }, [roomDetails, checkInDate, checkOutDate]);
 
-  if (!roomDetails) return <div>Loading...</div>;
+  const handleBookNow = async () => {
+    try {
+      const bookingData = {
+        room_id: parseInt(roomId),
+        guest_id: 1, // Replace with actual guest ID from authentication
+        check_in_date: checkInDate,
+        check_out_date: checkOutDate,
+        total_amount: totalPrice,
+        status: "Pending",
+        payment_status: "Pending",
+      };
+
+      const response = await hotelApi.post("/createbooking", bookingData);
+
+      if (response.data && response.data.booking_id) {
+        alert("Booking successful!");
+        navigate("/dashboard");
+      } else {
+        throw new Error("Booking failed");
+      }
+    } catch (err) {
+      console.error("Error creating booking:", err);
+      alert("Failed to create booking");
+    }
+  };
+
+  if (loading) return <div className="loading-spinner"></div>;
+  if (error) return <p className="error-message">Error: {error}</p>;
+  if (!roomDetails) return <div>No room details available.</div>;
 
   return (
     <div className="room-booking-container">
       <div className="room-details">
-        <h1>{roomDetails.room_type.type_name}</h1>
-        <p>📍 {roomDetails.hotel.hotel_name}, {roomDetails.hotel.location.location_name}</p>
+        <h1>{roomDetails.room_type?.type_name || "Room"}</h1>
+        <p>
+          📍 {roomDetails.hotel?.hotel_name},{" "}
+          {roomDetails.hotel?.location?.location_name}
+        </p>
         <p>PHP {roomDetails.price.toFixed(2)} Per Night</p>
         <div className="room-description">
           <p>{roomDetails.description}</p>
         </div>
         <div className="room-availability">
-          <p>Status: {roomDetails.availability ? "Available" : "Unavailable"}</p>
+          <p>
+            Status:{" "}
+            {roomDetails.availability ? "Available" : "Unavailable"}
+          </p>
         </div>
       </div>
 

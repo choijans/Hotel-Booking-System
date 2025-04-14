@@ -12,8 +12,11 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await authApi.post("/register", { username, password, role });
-      navigate("/login");
+      const response = await authApi.post("/register", { username, password, role });
+      const { token, user } = response.data;
+      localStorage.setItem("token", token); 
+      localStorage.setItem("userId", user.id);
+      navigate("/guest_profile"); 
     } catch (err) {
       setError("Registration failed");
     }
