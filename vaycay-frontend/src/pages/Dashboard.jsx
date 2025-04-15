@@ -68,11 +68,11 @@ const Dashboard = () => {
       {/* What is Vacay Section */}
       <div className="relative py-12 pl-12 pr-4 sm:pl-16 sm:pr-6 lg:pl-24 lg:pr-8 text-left">
       {/* Semi-transparent background image only */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center z-0 opacity-50"
-        style={{
-          backgroundImage: `url('/src/assets/bgbg.jpg')`
-        }}
+      <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{
+          backgroundImage: `linear-gradient(to right, white, rgba(255, 255, 255, 0)), url('/src/assets/bgbg.jpg')`,
+          }}
       ></div>
         <div className=" max-w-lg text-left relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">What is Vacay?</h2>
