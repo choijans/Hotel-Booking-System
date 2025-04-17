@@ -11,6 +11,7 @@ import HotelRooms from "./pages/HotelRooms";
 import RoomBooking from "./pages/RoomBooking"; // Import the RoomBooking component
 import GuestProfile from "./pages/GuestProfile";
 import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";    
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/hotels" element={<RecommendedHotels />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/aboutUs" element={<AboutUs />} />
+            <Route path="/contactUs" element={<Contact />} />
             <Route path="/hotels/:hotelId/rooms" element={<HotelRooms />} />
             <Route path="/rooms/:roomId/book" element={<RoomBooking />} /> {/* Add this route */}
           </Route>
@@ -34,6 +36,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/guest_profile" element={<GuestProfile />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
           </Route>
         </Routes>
       </Router>

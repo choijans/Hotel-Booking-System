@@ -127,48 +127,48 @@ const AboutUs = () => {
         </div>
   
         {/* Values Section */}
-<div className="py-16 px-4 sm:px-6 lg:px-8 bg-beige-600">
-  <div className="max-w-7xl mx-auto text-center">
-    <h2 className="text-4xl font-bold text-teal-600 mb-4">Our Values</h2>
-    <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-      These core principles guide everything we do at Vacay.
-    </p>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {[
-        {
-          title: "Trust & Transparency",
-          description:
-            "We believe in a living complexity that we are not our customers. No hidden fees, no misleading alternatives—just trust, information you can trust.",
-          img: "/src/assets/Check.png", // Path to check.png
-        },
-        {
-          title: "Customer-First Approach",
-          description:
-            "Every decision we make starts with one question: How does this benefit our customers? Your satisfaction is our top priority.",
-          img: "/src/assets/Arrow.png", // Path to arrow.png
-        },
-        {
-          title: "Passion for Travel",
-          description:
-            "We're travelers ourselves and understand what makes a stay memorable. This passion drives us to create exceptional experiences.",
-          img: "/src/assets/Play.png", // Path to play.png
-        },
-      ].map((value, index) => (
-        <div
-          key={index}
-          className="bg-white h-72 flex flex-col justify-center items-center p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-        >
-          {/* Image above the title */}
-          <div className="flex justify-center mb-4">
-            <img src={value.img} alt={value.title} className="h-12 w-12" />
+        <div className="py-16 px-4 sm:px-6 lg:px-8 bg-beige-600">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-4xl font-bold text-teal-600 mb-4">Our Values</h2>
+            <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+              These core principles guide everything we do at Vacay.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Trust & Transparency",
+                  description:
+                    "We believe in a living complexity that we are not our customers. No hidden fees, no misleading alternatives—just trust, information you can trust.",
+                  img: "/src/assets/Check.png", // Path to check.png
+                },
+                {
+                  title: "Customer-First Approach",
+                  description:
+                    "Every decision we make starts with one question: How does this benefit our customers? Your satisfaction is our top priority.",
+                  img: "/src/assets/Arrow.png", // Path to arrow.png
+                },
+                {
+                  title: "Passion for Travel",
+                  description:
+                    "We're travelers ourselves and understand what makes a stay memorable. This passion drives us to create exceptional experiences.",
+                  img: "/src/assets/Play.png", // Path to play.png
+                },
+              ].map((value, index) => (
+                <div
+                  key={index}
+                  className="bg-white h-72 flex flex-col justify-center items-center p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Image above the title */}
+                  <div className="flex justify-center mb-4">
+                    <img src={value.img} alt={value.title} className="h-12 w-12" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
+                  <p className="text-gray-600 text-center">{value.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
-          <p className="text-gray-600 text-center">{value.description}</p>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
       </div>
     );
   };

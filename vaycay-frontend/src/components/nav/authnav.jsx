@@ -21,8 +21,8 @@ const AuthNav = ( ) => {
             <a href="/aboutUs" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
               About us
             </a>
-            <a href="/contact" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
-              Contact
+            <a href="/contactUs" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+              Contact 
             </a>
             <Link 
               to="/profile" 
