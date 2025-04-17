@@ -58,7 +58,7 @@ const RoomBooking = () => {
     try {
       const bookingData = {
         room_id: parseInt(roomId),
-        guest_id: currentUser?.id, // Use the authenticated user's ID
+        guest_id: currentUser?.id, // Use the authenticated user's ID from the decoded token
         check_in_date: checkInDate,
         check_out_date: checkOutDate,
         total_amount: totalPrice, // Keep only the fields expected by the backend
@@ -70,7 +70,6 @@ const RoomBooking = () => {
   
       console.log("Booking Response:", response.data); // Debugging log
   
-      // Correctly check the response structure
       if (response.data?.insert_bookings_one?.booking_id) {
         alert("Booking successful!");
         navigate("/dashboard");

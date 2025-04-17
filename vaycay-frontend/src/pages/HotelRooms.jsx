@@ -187,3 +187,4 @@ const HotelRooms = () => {
 };
 
 export default HotelRooms;
+
