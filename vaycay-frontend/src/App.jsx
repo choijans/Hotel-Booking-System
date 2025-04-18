@@ -12,6 +12,8 @@ import RoomBooking from "./pages/RoomBooking"; // Import the RoomBooking compone
 import GuestProfile from "./pages/GuestProfile";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";    
+import PaymentScreen from "./pages/PaymentScreen";
+import ConfirmationPage from "./pages/ConfirmationPage";
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
             <Route path="/guest_profile" element={<GuestProfile />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/payment" element={<PaymentScreen />} />
+            <Route path="/confirmation" element={<ConfirmationPage />} />
           </Route>
         </Routes>
       </Router>

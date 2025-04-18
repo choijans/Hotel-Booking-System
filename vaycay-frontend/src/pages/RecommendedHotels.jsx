@@ -69,10 +69,10 @@ const RecommendedHotels = () => {
                   setSearchParams({ ...searchParams, destination: e.target.value })
                 }
               />
+              <button className="search-button" onClick={handleSearch}>
+                Search
+              </button>
             </div>
-            <button className="search-button" onClick={handleSearch}>
-              Search
-            </button>
           </div>
         </div>
       </div>

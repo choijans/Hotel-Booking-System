@@ -1,0 +1,596 @@
+{
+  "resource_version": 45,
+  "metadata": {
+    "version": 3,
+    "sources": [
+      {
+        "name": "auth_db",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "users",
+              "schema": "public"
+            },
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "role",
+                    "username",
+                    "id",
+                    "password"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "role",
+                    "username",
+                    "id",
+                    "password"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": "postgres://postgres:password@auth_db:5432/auth",
+            "isolation_level": "read-committed",
+            "use_prepared_statements": false
+          }
+        }
+      },
+      {
+        "name": "guest_db",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "guest_preferences",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "guest",
+                "using": {
+                  "foreign_key_constraint_on": "guest_id"
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "preference_type",
+                    "guest_id",
+                    "preference_id",
+                    "preference_value",
+                    "created_at",
+                    "updated_at"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "preference_type",
+                    "guest_id",
+                    "preference_id",
+                    "preference_value",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "guests",
+              "schema": "public"
+            },
+            "array_relationships": [
+              {
+                "name": "guest_preferences",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "guest_id",
+                    "table": {
+                      "name": "guest_preferences",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "full_name",
+                    "birthdate",
+                    "guest_id",
+                    "contact_info",
+                    "address",
+                    "created_at",
+                    "updated_at"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "full_name",
+                    "birthdate",
+                    "guest_id",
+                    "contact_info",
+                    "address",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "GUEST_DATABASE_URL"
+            },
+            "isolation_level": "read-committed",
+            "use_prepared_statements": false
+          }
+        }
+      },
+      {
+        "name": "payment_db",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "invoices",
+              "schema": "public"
+            }
+          },
+          {
+            "table": {
+              "name": "payments",
+              "schema": "public"
+            },
+            "array_relationships": [
+              {
+                "name": "transaction_logs",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "payment_id",
+                    "table": {
+                      "name": "transaction_logs",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "transaction_logs",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "payment",
+                "using": {
+                  "foreign_key_constraint_on": "payment_id"
+                }
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "PAYMENT_DATABASE_URL"
+            },
+            "isolation_level": "read-committed",
+            "use_prepared_statements": false
+          }
+        }
+      },
+      {
+        "name": "room_booking_db",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "bookings",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "room",
+                "using": {
+                  "foreign_key_constraint_on": "room_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "payment_status",
+                    "status",
+                    "check_in_date",
+                    "check_out_date",
+                    "booking_id",
+                    "guest_id",
+                    "room_id",
+                    "total_amount",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "hotels",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "location",
+                "using": {
+                  "foreign_key_constraint_on": "location_id"
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "rooms",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "hotel_id",
+                    "table": {
+                      "name": "rooms",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "hotel_name",
+                    "hotel_id",
+                    "location_id",
+                    "description",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "locations",
+              "schema": "public"
+            },
+            "array_relationships": [
+              {
+                "name": "hotels",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "location_id",
+                    "table": {
+                      "name": "hotels",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "location_name",
+                    "location_id",
+                    "description",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "room_types",
+              "schema": "public"
+            },
+            "array_relationships": [
+              {
+                "name": "rooms",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "type_id",
+                    "table": {
+                      "name": "rooms",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "type_name",
+                    "type_id",
+                    "description"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "rooms",
+              "schema": "public"
+            },
+            "object_relationships": [
+              {
+                "name": "hotel",
+                "using": {
+                  "foreign_key_constraint_on": "hotel_id"
+                }
+              },
+              {
+                "name": "room_type",
+                "using": {
+                  "foreign_key_constraint_on": "type_id"
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "bookings",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "room_id",
+                    "table": {
+                      "name": "bookings",
+                      "schema": "public"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "availability",
+                    "room_number",
+                    "status",
+                    "hotel_id",
+                    "room_id",
+                    "type_id",
+                    "price",
+                    "description",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "ROOM_BOOKING_DATABASE_URL"
+            },
+            "isolation_level": "read-committed",
+            "use_prepared_statements": false
+          }
+        }
+      }
+    ],
+    "query_collections": [
+      {
+        "name": "allowed-queries",
+        "definition": {
+          "queries": [
+            {
+              "name": "GetAllHotels",
+              "query": "query GetAllHotels {\r\n  hotels {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "GetRoomsByHotel",
+              "query": "query GetRoomsByHotel($hotel_id: Int!) {\r\n  rooms(where: {hotel_id: {_eq: $hotel_id}}) {\r\n    room_id\r\n    room_number\r\n    description\r\n    price\r\n    availability\r\n    status\r\n    room_type {\r\n      type_name\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "GetAllLocations",
+              "query": "query GetAllLocations {\r\n  locations {\r\n    location_id\r\n    location_name\r\n    description\r\n  }\r\n}"
+            },
+            {
+              "name": "GetBookingsByRoom",
+              "query": "query GetBookingsByRoom($room_id: Int!) {\r\n  bookings(where: {room_id: {_eq: $room_id}}) {\r\n    booking_id\r\n    guest_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n  }\r\n}"
+            },
+            {
+              "name": "GetRoomDetails",
+              "query": "query GetRoomDetails($room_id: Int!) {\r\n  rooms_by_pk(room_id: $room_id) {\r\n    room_id\r\n    room_number\r\n    description\r\n    price\r\n    availability\r\n    status\r\n    room_type {\r\n      type_name\r\n      description\r\n    }\r\n    hotel {\r\n      hotel_name\r\n      location {\r\n        location_name\r\n      }\r\n    }\r\n    bookings {\r\n      check_in_date\r\n      check_out_date\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "CreateBooking",
+              "query": "mutation CreateBooking(\r\n  $room_id: Int!\r\n  $guest_id: Int!\r\n  $check_in_date: date!\r\n  $check_out_date: date!\r\n  $total_amount: numeric!\r\n) {\r\n  insert_bookings_one(object: {\r\n    room_id: $room_id,\r\n    guest_id: $guest_id,\r\n    check_in_date: $check_in_date,\r\n    check_out_date: $check_out_date,\r\n    total_amount: $total_amount,\r\n    status: \"Pending\",\r\n    payment_status: \"Pending\"\r\n  }) {\r\n    booking_id\r\n  }\r\n}"
+            },
+            {
+              "name": "CreateGuest",
+              "query": "mutation MyMutation($address1: String = \"\", $birthdate1: date = \"\", $contact_info1: jsonb = \"\", $full_name: String = \"\", $guest_id: Int!) {\r\n  insert_guests_one(object: {address: $address1, birthdate: $birthdate1, contact_info: $contact_info1, full_name: $full_name, guest_id: $guest_id}) {\r\n    address\r\n    birthdate\r\n    contact_info\r\n    full_name\r\n    guest_id\r\n  }\r\n}"
+            }
+          ]
+        }
+      }
+    ],
+    "allowlist": [
+      {
+        "collection": "allowed-queries",
+        "scope": {
+          "global": true
+        }
+      }
+    ],
+    "rest_endpoints": [
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "CreateBooking"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "CreateBooking",
+        "url": "createbooking"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetAllHotels"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetAllHotels",
+        "url": "getallhotels"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetAllLocations"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetAllLocations",
+        "url": "getalllocations"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetBookingsByRoom"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetBookingsByRoom",
+        "url": "getbookingsbyroom"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetRoomDetails"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetRoomDetails",
+        "url": "getroomdetails"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetRoomsByHotel"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetRoomsByHotel",
+        "url": "getroomsbyhotel"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "CreateGuest"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "CreateGuest",
+        "url": "insertguest"
+      }
+    ]
+  }
+}
