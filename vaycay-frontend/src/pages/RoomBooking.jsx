@@ -54,32 +54,22 @@ const RoomBooking = () => {
     }
   }, [roomDetails, checkInDate, checkOutDate]);
 
-  const handleBookNow = async () => {
-    try {
-      const bookingData = {
-        room_id: parseInt(roomId),
-        guest_id: currentUser?.id, // Use the authenticated user's ID from the decoded token
-        check_in_date: checkInDate,
-        check_out_date: checkOutDate,
-        total_amount: totalPrice, // Keep only the fields expected by the backend
-      };
-  
-      console.log("Booking Data:", bookingData); // Debugging log
-  
-      const response = await hotelApi.post("/createbooking", bookingData);
-  
-      console.log("Booking Response:", response.data); // Debugging log
-  
-      if (response.data?.insert_bookings_one?.booking_id) {
-        alert("Booking successful!");
-        navigate("/dashboard");
-      } else {
-        throw new Error("Booking failed");
-      }
-    } catch (err) {
-      console.error("Error creating booking:", err.response?.data || err.message);
-      alert("Failed to create booking");
+  const handleBookNow = () => {
+    if (!checkInDate || !checkOutDate) {
+      alert("Please select check-in and check-out dates.");
+      return;
     }
+  
+    const bookingDetails = {
+      room_id: parseInt(roomId),
+      guest_id: currentUser?.id,
+      check_in_date: checkInDate,
+      check_out_date: checkOutDate,
+      total_amount: totalPrice,
+      room_details: roomDetails,
+    };
+  
+    navigate("/payment", { state: bookingDetails });
   };
 
   if (loading) return <div className="loading-spinner"></div>;

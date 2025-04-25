@@ -18,6 +18,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Users from "./pages/admin/users"; 
 import UserDetails from "./pages/admin/userdetails"; 
 import Hotels from "./pages/admin/hotel_rooms";
+import PaymentScreen from "./pages/PaymentScreen";
+import ConfirmationPage from "./pages/ConfirmationPage";
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
             <Route path="/guest_profile" element={<GuestProfile />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/payment" element={<PaymentScreen />} />
+            <Route path="/confirmation" element={<ConfirmationPage />} />
           </Route>
 
           {/* Admin routes */}

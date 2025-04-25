@@ -95,7 +95,7 @@ const Profile = () => {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Password</h3>
                     <p className="mt-1 text-gray-900">***********</p>
-                    <button className="mt-2 text-sm text-teal-600 hover:text-teal-700">
+                    <button className="mt-2 text-sm text-white-600 hover:text-white-700">
                       Change Password
                     </button>
                   </div>

@@ -1,0 +1,88 @@
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./ConfirmationPage.css";
+
+const ConfirmationPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { booking_id, bookingDetails } = location.state;
+
+  // Calculate the total cost
+  const nights = Math.ceil(
+    (new Date(bookingDetails.check_out_date) - new Date(bookingDetails.check_in_date)) /
+      (1000 * 60 * 60 * 24)
+  );
+  const roomRate = bookingDetails.room_details.price;
+  const resortFee = 2500; // Example fixed resort fee
+  const taxes = (roomRate * nights + resortFee) * 0.05; // Example 5% tax
+  const totalCost = roomRate * nights + resortFee + taxes;
+
+  return (
+    <div className="confirmation-page-container">
+      <div className="confirmation-header">
+        <h1>Payment Successful!</h1>
+        <p>Your booking has been confirmed and a confirmation email has been sent to your inbox.</p>
+      </div>
+
+      <div className="confirmation-details">
+        <h2>Booking Confirmation Number: <strong>{`VACAY-${booking_id}`}</strong></h2>
+
+        <div className="booking-summary">
+          <div className="booking-info">
+            <h3>Check-In</h3>
+            <p>{bookingDetails.check_in_date}</p>
+          </div>
+          <div className="booking-info">
+            <h3>Check-Out</h3>
+            <p>{bookingDetails.check_out_date}</p>
+          </div>
+          <div className="booking-info">
+            <h3>Guests</h3>
+            <p>{bookingDetails.guests || "2 Adults, 0 Children"}</p>
+          </div>
+          <div className="booking-info">
+            <h3>Rooms</h3>
+            <p>1</p>
+          </div>
+        </div>
+
+        <div className="room-details">
+          <img
+            src="https://via.placeholder.com/300x200" // Replace with actual room image if available
+            alt={bookingDetails.room_details.room_type?.type_name || "Room"}
+          />
+          <div>
+            <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
+            <p>{bookingDetails.room_details.hotel?.hotel_name}, {bookingDetails.room_details.hotel?.location?.location_name}</p>
+            <p>{bookingDetails.room_details.description}</p>
+          </div>
+        </div>
+
+        <div className="price-summary">
+          <h2>Payment Summary</h2>
+          <p><strong>Room Rate ({nights} nights):</strong> ₱{(roomRate * nights).toFixed(2)}</p>
+          <p><strong>Resort Fee:</strong> ₱{resortFee.toFixed(2)}</p>
+          <p><strong>Taxes:</strong> ₱{taxes.toFixed(2)}</p>
+          <p className="total"><strong>Total Paid:</strong> ₱{totalCost.toFixed(2)}</p>
+        </div>
+
+        <div className="confirmation-actions">
+          <button
+            className="view-booking-button"
+            onClick={() => navigate("/dashboard")}
+          >
+            View Booking Details
+          </button>
+          <button
+            className="download-receipt-button"
+            onClick={() => alert("Receipt downloaded!")}
+          >
+            Download Receipt
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConfirmationPage;
