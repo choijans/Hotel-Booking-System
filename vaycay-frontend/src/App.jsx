@@ -8,15 +8,15 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import RecommendedHotels from "./pages/RecommendedHotels";
 import HotelRooms from "./pages/HotelRooms";
-import RoomBooking from "./pages/RoomBooking"; 
+import RoomBooking from "./pages/RoomBooking";
 import GuestProfile from "./pages/GuestProfile";
 import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";    
+import Contact from "./pages/Contact";
 import AdminLayout from "./layout/adminlayout";
 import AdminRoute from "./components/AdminRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import Users from "./pages/admin/users"; 
-import UserDetails from "./pages/admin/userdetails"; 
+import Users from "./pages/admin/users";
+import UserDetails from "./pages/admin/userdetails";
 import Hotels from "./pages/admin/hotel_rooms";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
@@ -29,24 +29,14 @@ function App() {
           {/* Protected routes */}
           <Route element={<AuthLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/hotels" element={<RecommendedHotels />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/aboutUs" element={<AboutUs />} />
-            <Route path="/contactUs" element={<Contact />} />
+            <Route path="/hotels" element={<RecommendedHotels />} />
             <Route path="/hotels/:hotelId/rooms" element={<HotelRooms />} />
-            <Route path="/rooms/:roomId/book" element={<RoomBooking />} /> {/* Add this route */}
-          </Route>
-
-          {/* Public routes */}
-          <Route element={<BaseLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/guest_profile" element={<GuestProfile />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/rooms/:roomId/book" element={<RoomBooking />} />
             <Route path="/payment" element={<PaymentScreen />} />
             <Route path="/confirmation" element={<ConfirmationPage />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
           </Route>
 
           {/* Admin routes */}
@@ -61,10 +51,16 @@ function App() {
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/users/:guest_id" element={<UserDetails />} />
             <Route path="/admin/hotels" element={<Hotels />} />
-            {/* <Route path="/admin/manage-users" element={<ManageUsers />} />
-            <Route path="/admin/manage-bookings" element={<ManageBookings />} /> */}
           </Route>
 
+          {/* Public routes */}
+          <Route element={<BaseLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+          </Route>
         </Routes>
       </Router>
     </AuthProvider>

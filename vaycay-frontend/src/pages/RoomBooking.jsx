@@ -52,7 +52,21 @@ const RoomBooking = () => {
       alert("Please select check-in and check-out dates.");
       return;
     }
-
+  
+    const today = new Date();
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+  
+    if (checkIn < today) {
+      alert("Check-in date must be in the future.");
+      return;
+    }
+  
+    if (checkOut <= checkIn) {
+      alert("Check-out date must be after the check-in date.");
+      return;
+    }
+  
     const bookingDetails = {
       room_id: parseInt(roomId),
       guest_id: currentUser?.id,
@@ -61,7 +75,7 @@ const RoomBooking = () => {
       total_amount: totalPrice,
       room_details: roomDetails,
     };
-
+  
     navigate("/payment", { state: bookingDetails });
   };
 

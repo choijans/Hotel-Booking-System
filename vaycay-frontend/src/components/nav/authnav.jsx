@@ -18,10 +18,10 @@ const AuthNav = ( ) => {
             <Link to="/hotels" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
               Recommended Hotels
             </Link>
-            <a href="/aboutUs" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+            <a href="/about" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
               About us
             </a>
-            <a href="/contactUs" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+            <a href="/contact" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
               Contact 
             </a>
             <Link 
