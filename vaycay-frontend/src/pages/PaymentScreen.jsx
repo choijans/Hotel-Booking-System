@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import { hotelApi } from "../api";
-import "./PaymentScreen.css";
+import styles from "./PaymentScreen.module.css"; // Updated import for CSS Modules
 
 const PaymentScreen = () => {
   const location = useLocation();
@@ -13,10 +13,8 @@ const PaymentScreen = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [cardType, setCardType] = useState("");
-  const [promoCode, setPromoCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Detect card type based on card number
   const handleCardNumberChange = (e) => {
     const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
     setCardNumber(value);
@@ -30,7 +28,6 @@ const PaymentScreen = () => {
   const handlePayment = async () => {
     if (isProcessing) return;
 
-    // Validate inputs
     if (!cardNumber || cardNumber.length < 16) {
       alert("Invalid card number.");
       return;
@@ -46,7 +43,6 @@ const PaymentScreen = () => {
 
     setIsProcessing(true);
     try {
-      // Prepare the payload
       const payload = {
         room_id: bookingDetails.room_id,
         guest_id: bookingDetails.guest_id,
@@ -55,11 +51,9 @@ const PaymentScreen = () => {
         total_amount: bookingDetails.total_amount,
       };
 
-      // Send the request to create the booking
       const response = await hotelApi.post("/createbooking", payload);
 
       if (response.data?.insert_bookings_one?.booking_id) {
-        // Send confirmation email
         emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
@@ -71,7 +65,6 @@ const PaymentScreen = () => {
           import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         );
 
-        // Redirect to confirmation page
         navigate("/confirmation", {
           state: {
             booking_id: response.data.insert_bookings_one.booking_id,
@@ -90,13 +83,12 @@ const PaymentScreen = () => {
   };
 
   return (
-    <div className="payment-screen-container">
-      <h1>Review Your Booking</h1>
+    <div className={styles["payment-screen-container"]}>
+      <h1 className={styles["payment-h1"]}>Review Your Booking</h1>
 
-      {/* Room Details Section */}
-      <div className="section">
+      <div className={styles["payment-section"]}>
         <h2>Room Details</h2>
-        <div className="room-details">
+        <div className={styles["payment-room-details"]}>
           <img
             src="https://via.placeholder.com/300x200"
             alt={bookingDetails.room_details.room_type?.type_name || "Room"}
@@ -112,10 +104,9 @@ const PaymentScreen = () => {
         </div>
       </div>
 
-      {/* Payment Details Section */}
-      <div className="section">
+      <div className={styles["payment-section"]}>
         <h2>Payment Details</h2>
-        <div className="form-group">
+        <div className={styles["payment-form-group"]}>
           <label>Card Number</label>
           <input
             type="text"
@@ -124,9 +115,9 @@ const PaymentScreen = () => {
             placeholder="1234 5678 9012 3456"
             maxLength="16"
           />
-          {cardType && <p className="card-type">{cardType}</p>}
+          {cardType && <p className={styles["payment-card-type"]}>{cardType}</p>}
         </div>
-        <div className="form-group">
+        <div className={styles["payment-form-group"]}>
           <label>Expiry Date (MM/YY)</label>
           <input
             type="text"
@@ -136,7 +127,7 @@ const PaymentScreen = () => {
             maxLength="5"
           />
         </div>
-        <div className="form-group">
+        <div className={styles["payment-form-group"]}>
           <label>CVV</label>
           <input
             type="text"
@@ -148,15 +139,13 @@ const PaymentScreen = () => {
         </div>
       </div>
 
-      {/* Price Summary Section */}
-      <div className="section">
+      <div className={styles["payment-section"]}>
         <h2>Price Summary</h2>
         <p><strong>Room Rate:</strong> ₱{bookingDetails.total_amount.toFixed(2)}</p>
         <p><strong>Total Paid:</strong> ₱{bookingDetails.total_amount.toFixed(2)}</p>
       </div>
 
-      {/* Payment Button */}
-      <div className="payment-actions">
+      <div className={styles["payment-actions"]}>
         <label>
           <input type="checkbox" required /> I agree to the{" "}
           <a href="/terms" target="_blank" rel="noopener noreferrer">
@@ -170,7 +159,7 @@ const PaymentScreen = () => {
         </label>
         <button
           onClick={handlePayment}
-          className="confirm-button"
+          className={styles["payment-confirm-button"]}
           disabled={isProcessing}
         >
           {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}

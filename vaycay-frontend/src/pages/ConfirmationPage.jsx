@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./ConfirmationPage.css";
+import styles from "./ConfirmationPage.module.css"; // Updated import for CSS Modules
 
 const ConfirmationPage = () => {
   const location = useLocation();
@@ -18,63 +18,76 @@ const ConfirmationPage = () => {
   const totalCost = roomRate * nights + resortFee + taxes;
 
   return (
-    <div className="confirmation-page-container">
-      <div className="confirmation-header">
+    <div className={styles["confirm-page-container"]}>
+      <div className={styles["confirm-header"]}>
         <h1>Payment Successful!</h1>
         <p>Your booking has been confirmed and a confirmation email has been sent to your inbox.</p>
       </div>
 
-      <div className="confirmation-details">
-        <h2>Booking Confirmation Number: <strong>{`VACAY-${booking_id}`}</strong></h2>
+      <div className={styles["confirm-details"]}>
+        <h2>
+          Booking Confirmation Number: <strong>{`VACAY-${booking_id}`}</strong>
+        </h2>
 
-        <div className="booking-summary">
-          <div className="booking-info">
+        <div className={styles["confirm-booking-summary"]}>
+          <div className={styles["confirm-booking-info"]}>
             <h3>Check-In</h3>
             <p>{bookingDetails.check_in_date}</p>
           </div>
-          <div className="booking-info">
+          <div className={styles["confirm-booking-info"]}>
             <h3>Check-Out</h3>
             <p>{bookingDetails.check_out_date}</p>
           </div>
-          <div className="booking-info">
+          <div className={styles["confirm-booking-info"]}>
             <h3>Guests</h3>
             <p>{bookingDetails.guests || "2 Adults, 0 Children"}</p>
           </div>
-          <div className="booking-info">
+          <div className={styles["confirm-booking-info"]}>
             <h3>Rooms</h3>
             <p>1</p>
           </div>
         </div>
 
-        <div className="room-details">
+        <div className={styles["confirm-room-details"]}>
           <img
             src="https://via.placeholder.com/300x200" // Replace with actual room image if available
             alt={bookingDetails.room_details.room_type?.type_name || "Room"}
           />
           <div>
             <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
-            <p>{bookingDetails.room_details.hotel?.hotel_name}, {bookingDetails.room_details.hotel?.location?.location_name}</p>
+            <p>
+              {bookingDetails.room_details.hotel?.hotel_name},{" "}
+              {bookingDetails.room_details.hotel?.location?.location_name}
+            </p>
             <p>{bookingDetails.room_details.description}</p>
           </div>
         </div>
 
-        <div className="price-summary">
+        <div className={styles["confirm-price-summary"]}>
           <h2>Payment Summary</h2>
-          <p><strong>Room Rate ({nights} nights):</strong> ₱{(roomRate * nights).toFixed(2)}</p>
-          <p><strong>Resort Fee:</strong> ₱{resortFee.toFixed(2)}</p>
-          <p><strong>Taxes:</strong> ₱{taxes.toFixed(2)}</p>
-          <p className="total"><strong>Total Paid:</strong> ₱{totalCost.toFixed(2)}</p>
+          <p>
+            <strong>Room Rate ({nights} nights):</strong> ₱{(roomRate * nights).toFixed(2)}
+          </p>
+          <p>
+            <strong>Resort Fee:</strong> ₱{resortFee.toFixed(2)}
+          </p>
+          <p>
+            <strong>Taxes:</strong> ₱{taxes.toFixed(2)}
+          </p>
+          <p className={styles["confirm-total"]}>
+            <strong>Total Paid:</strong> ₱{totalCost.toFixed(2)}
+          </p>
         </div>
 
-        <div className="confirmation-actions">
+        <div className={styles["confirm-actions"]}>
           <button
-            className="view-booking-button"
+            className={styles["confirm-view-booking-button"]}
             onClick={() => navigate("/dashboard")}
           >
             View Booking Details
           </button>
           <button
-            className="download-receipt-button"
+            className={styles["confirm-download-receipt-button"]}
             onClick={() => alert("Receipt downloaded!")}
           >
             Download Receipt

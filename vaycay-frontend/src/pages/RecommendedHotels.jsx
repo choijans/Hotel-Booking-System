@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
-import "./RecommendedHotels.css";
+import styles from "./RecommendedHotels.module.css"; // Updated import for CSS Modules
 
 const RecommendedHotels = () => {
   const [hotels, setHotels] = useState([]);
@@ -50,16 +50,16 @@ const RecommendedHotels = () => {
     navigate(`/hotels/${hotelId}/rooms`);
   };
 
-  if (loading) return <div className="loading-spinner"></div>;
-  if (error) return <p className="error-message">Error: {error}</p>;
+  if (loading) return <div className={styles["recohotels-loading-spinner"]}></div>;
+  if (error) return <p className={styles["recohotels-error-message"]}>Error: {error}</p>;
 
   return (
     <>
-      <div className="search-section-container">
-        <div className="search-section">
+      <div className={styles["recohotels-search-section-container"]}>
+        <div className={styles["recohotels-search-section"]}>
           <h1><b>Where to?</b></h1>
-          <div className="search-fields">
-            <div className="search-field">
+          <div className={styles["recohotels-search-fields"]}>
+            <div className={styles["recohotels-search-field"]}>
               <label>Destination</label>
               <input
                 type="text"
@@ -69,7 +69,7 @@ const RecommendedHotels = () => {
                   setSearchParams({ ...searchParams, destination: e.target.value })
                 }
               />
-              <button className="search-button" onClick={handleSearch}>
+              <button className={styles["recohotels-search-button"]} onClick={handleSearch}>
                 Search
               </button>
             </div>
@@ -77,26 +77,26 @@ const RecommendedHotels = () => {
         </div>
       </div>
 
-      <div className="recommended-hotels-container">
-        <div className="hotels-list">
+      <div className={styles["recohotels-recommended-hotels-container"]}>
+        <div className={styles["recohotels-hotels-list"]}>
           {filteredHotels.map((hotel) => (
-            <div key={hotel.hotel_id} className="hotel-card">
-              <div className="hotel-image">
+            <div key={hotel.hotel_id} className={styles["recohotels-hotel-card"]}>
+              <div className={styles["recohotels-hotel-image"]}>
                 <img
                   src="https://via.placeholder.com/300x200" // Replace with actual hotel image URL if available
                   alt={hotel.hotel_name}
                 />
               </div>
-              <div className="hotel-details">
-                <h3 className="hotel-name">{hotel.hotel_name}</h3>
-                <p className="hotel-location">{hotel.location.location_name}</p>
-                <p className="hotel-address">📍 {hotel.location.location_name}</p>
-                <div className="price-section">
-                  <span className="price">₱{hotel.price?.toFixed(2) || "7,842.30"}</span>
-                  <span className="per-night">Per Night</span>
+              <div className={styles["recohotels-hotel-details"]}>
+                <h3 className={styles["recohotels-hotel-name"]}>{hotel.hotel_name}</h3>
+                <p className={styles["recohotels-hotel-location"]}>{hotel.location.location_name}</p>
+                <p className={styles["recohotels-hotel-address"]}>📍 {hotel.location.location_name}</p>
+                <div className={styles["recohotels-price-section"]}>
+                  <span className={styles["recohotels-price"]}>₱{hotel.price?.toFixed(2) || "7,842.30"}</span>
+                  <span className={styles["recohotels-per-night"]}>Per Night</span>
                 </div>
                 <button
-                  className="view-rooms-button"
+                  className={styles["recohotels-view-rooms-button"]}
                   onClick={() => handleViewRooms(hotel.hotel_id)}
                 >
                   See Available Rooms

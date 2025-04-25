@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider"; // Import the AuthProvider context
+import { useAuth } from "../context/AuthProvider";
 import { hotelApi } from "../api";
-import "./RoomBooking.css";
+import styles from "./RoomBooking.module.css"; // Updated import for CSS Modules
 
 const RoomBooking = () => {
-  const { roomId } = useParams(); // Extract room_id from URL
+  const { roomId } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth(); // Get the authenticated user
+  const { currentUser } = useAuth();
   const [roomDetails, setRoomDetails] = useState(null);
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
@@ -16,22 +16,16 @@ const RoomBooking = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch room details from the API
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
         const response = await hotelApi.get("/getroomdetails", {
-          params: { room_id: roomId }, // Pass room_id as a parameter
+          params: { room_id: roomId },
         });
 
-        // Log the full API response for debugging
-        console.log("API Response:", response.data);
-
-        // Check if the response contains the expected structure
         if (response.data?.rooms_by_pk) {
-          setRoomDetails(response.data.rooms_by_pk); // Set room details
+          setRoomDetails(response.data.rooms_by_pk);
         } else {
-          console.error("Unexpected API Response Structure:", response.data); // Log unexpected structure
           throw new Error("Invalid response structure");
         }
       } catch (err) {
@@ -45,7 +39,6 @@ const RoomBooking = () => {
     fetchRoomDetails();
   }, [roomId]);
 
-  // Calculate total price based on selected dates
   useEffect(() => {
     if (roomDetails && checkInDate && checkOutDate) {
       const nights =
@@ -59,7 +52,7 @@ const RoomBooking = () => {
       alert("Please select check-in and check-out dates.");
       return;
     }
-  
+
     const bookingDetails = {
       room_id: parseInt(roomId),
       guest_id: currentUser?.id,
@@ -68,27 +61,27 @@ const RoomBooking = () => {
       total_amount: totalPrice,
       room_details: roomDetails,
     };
-  
+
     navigate("/payment", { state: bookingDetails });
   };
 
-  if (loading) return <div className="loading-spinner"></div>;
-  if (error) return <p className="error-message">Error: {error}</p>;
+  if (loading) return <div className={styles["roombooking-loading-spinner"]}></div>;
+  if (error) return <p className={styles["roombooking-error-message"]}>Error: {error}</p>;
   if (!roomDetails) return <div>No room details available.</div>;
 
   return (
-    <div className="room-booking-container">
-      <div className="room-details">
+    <div className={styles["roombooking-container"]}>
+      <div className={styles["roombooking-details"]}>
         <h1>{roomDetails.room_type?.type_name || "Room"}</h1>
         <p>
           📍 {roomDetails.hotel?.hotel_name},{" "}
           {roomDetails.hotel?.location?.location_name}
         </p>
         <p>PHP {roomDetails.price.toFixed(2)} Per Night</p>
-        <div className="room-description">
+        <div className={styles["roombooking-description"]}>
           <p>{roomDetails.description}</p>
         </div>
-        <div className="room-availability">
+        <div className={styles["roombooking-availability"]}>
           <p>
             Status:{" "}
             {roomDetails.availability ? "Available" : "Unavailable"}
@@ -96,7 +89,7 @@ const RoomBooking = () => {
         </div>
       </div>
 
-      <div className="booking-form">
+      <div className={styles["roombooking-form"]}>
         <h3>Book Your Stay</h3>
         <label>Check In</label>
         <input
@@ -118,7 +111,9 @@ const RoomBooking = () => {
           onChange={(e) => setGuests(parseInt(e.target.value))}
         />
         <p>Total: PHP {totalPrice.toFixed(2)}</p>
-        <button onClick={handleBookNow}>Book Now</button>
+        <button onClick={handleBookNow} className={styles["roombooking-form-button"]}>
+          Book Now
+        </button>
       </div>
     </div>
   );

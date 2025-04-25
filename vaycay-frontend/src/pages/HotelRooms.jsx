@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
-import "./HotelRooms.css";
+import styles from "./HotelRooms.module.css"; // Updated import for CSS Modules
 
 const HotelRooms = () => {
   const { hotelId } = useParams();
@@ -41,7 +41,6 @@ const HotelRooms = () => {
   }, [hotelId]);
 
   useEffect(() => {
-    // Apply sorting
     const sorted = [...filteredRooms].sort((a, b) => {
       if (sortOption === "price-asc") return a.price - b.price;
       if (sortOption === "price-desc") return b.price - a.price;
@@ -68,19 +67,19 @@ const HotelRooms = () => {
   };
 
   const handleBookNow = (roomId) => {
-    navigate(`/rooms/${roomId}/book`); // Navigate to RoomBooking with room_id
+    navigate(`/rooms/${roomId}/book`);
   };
 
-  if (loading) return <div className="loading-spinner"></div>;
-  if (error) return <p className="error-message">Error: {error}</p>;
+  if (loading) return <div className={styles["hotelroom-loading-spinner"]}></div>;
+  if (error) return <p className={styles["hotelroom-error-message"]}>Error: {error}</p>;
 
   return (
     <>
-      <div className="search-section-container">
-        <div className="search-section">
+      <div className={styles["hotelroom-search-section-container"]}>
+        <div className={styles["hotelroom-search-section"]}>
           <h1><b>Filter Rooms</b></h1>
-          <div className="search-fields">
-            <div className="date-field">
+          <div className={styles["hotelroom-search-fields"]}>
+            <div className={styles["hotelroom-date-field"]}>
               <label>Check In</label>
               <input
                 type="date"
@@ -91,7 +90,7 @@ const HotelRooms = () => {
               />
             </div>
 
-            <div className="date-field">
+            <div className={styles["hotelroom-date-field"]}>
               <label>Check Out</label>
               <input
                 type="date"
@@ -102,7 +101,7 @@ const HotelRooms = () => {
               />
             </div>
 
-            <div className="number-field">
+            <div className={styles["hotelroom-number-field"]}>
               <label>Rooms</label>
               <input
                 type="number"
@@ -114,7 +113,7 @@ const HotelRooms = () => {
               />
             </div>
 
-            <div className="number-field">
+            <div className={styles["hotelroom-number-field"]}>
               <label>Adults</label>
               <input
                 type="number"
@@ -126,7 +125,7 @@ const HotelRooms = () => {
               />
             </div>
 
-            <div className="number-field">
+            <div className={styles["hotelroom-number-field"]}>
               <label>Children</label>
               <input
                 type="number"
@@ -138,18 +137,18 @@ const HotelRooms = () => {
               />
             </div>
 
-            <button className="search-button" onClick={handleSearch}>
+            <button className={styles["hotelroom-search-button"]} onClick={handleSearch}>
               Search
             </button>
           </div>
         </div>
       </div>
 
-      <div className="filters-section">
-        <div className="sort-options">
-          <span className="sort-label">Sort by:</span>
+      <div className={styles["hotelroom-filters-section"]}>
+        <div className={styles["hotelroom-sort-options"]}>
+          <span className={styles["hotelroom-sort-label"]}>Sort by:</span>
           <select
-            className="sort-dropdown"
+            className={styles["hotelroom-sort-dropdown"]}
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
           >
@@ -159,20 +158,20 @@ const HotelRooms = () => {
         </div>
       </div>
 
-      <div className="rooms-list">
+      <div className={styles["hotelroom-rooms-list"]}>
         <h2>Rooms</h2>
-        <div className="room-cards-container">
+        <div className={styles["hotelroom-room-cards-container"]}>
           {filteredRooms.map((room) => (
-            <div key={room.room_id} className="room-card">
-              <div className="room-details">
-                <h3 className="room-name">Room {room.room_number}</h3>
-                <p className="room-type"><strong>Type:</strong> {room.room_type?.type_name || "Unknown Type"}</p>
-                <p className="room-price"><strong>Price:</strong> PHP {room.price}</p>
-                <p className={`room-availability ${room.availability ? "available" : "unavailable"}`}>
+            <div key={room.room_id} className={styles["hotelroom-room-card"]}>
+              <div className={styles["hotelroom-room-details"]}>
+                <h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
+                <p className={styles["hotelroom-room-type"]}><strong>Type:</strong> {room.room_type?.type_name || "Unknown Type"}</p>
+                <p className={styles["hotelroom-room-price"]}><strong>Price:</strong> PHP {room.price}</p>
+                <p className={`${styles["hotelroom-room-availability"]} ${room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]}`}>
                   {room.availability ? "Available" : "Unavailable"}
                 </p>
                 <button
-                  className="book-now-button"
+                  className={styles["hotelroom-book-now-button"]}
                   onClick={() => handleBookNow(room.room_id)}
                 >
                   Book Now
@@ -187,4 +186,3 @@ const HotelRooms = () => {
 };
 
 export default HotelRooms;
-
