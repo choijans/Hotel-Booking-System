@@ -8,10 +8,16 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import RecommendedHotels from "./pages/RecommendedHotels";
 import HotelRooms from "./pages/HotelRooms";
-import RoomBooking from "./pages/RoomBooking"; // Import the RoomBooking component
+import RoomBooking from "./pages/RoomBooking"; 
 import GuestProfile from "./pages/GuestProfile";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";    
+import AdminLayout from "./layout/adminlayout";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import Users from "./pages/admin/users"; 
+import UserDetails from "./pages/admin/userdetails"; 
+import Hotels from "./pages/admin/hotel_rooms";
 
 function App() {
   return (
@@ -38,6 +44,23 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
+
+          {/* Admin routes */}
+          <Route
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<Users />} />
+            <Route path="/admin/users/:guest_id" element={<UserDetails />} />
+            <Route path="/admin/hotels" element={<Hotels />} />
+            {/* <Route path="/admin/manage-users" element={<ManageUsers />} />
+            <Route path="/admin/manage-bookings" element={<ManageBookings />} /> */}
+          </Route>
+
         </Routes>
       </Router>
     </AuthProvider>

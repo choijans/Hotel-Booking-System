@@ -47,7 +47,7 @@ const Profile = () => {
                     Transaction History
                   </Link>
                   <Link 
-                    to="/support" 
+                    to="/contactUs" 
                     className="block py-2 px-4 text-gray-700 hover:bg-gray-100 rounded-md"
                   >
                     Contact Support

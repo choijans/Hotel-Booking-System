@@ -12,7 +12,9 @@ export default {
         },
         beige: {
           600: '#F6F3E9'
-        }
+        },
+        C1E3E2: '#C1E3E2',
+        FFFDF7: "#FFFDF7" // Add this custom color
       },
     }, // Extend default Tailwind theme here
   },

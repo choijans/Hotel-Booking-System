@@ -27,6 +27,22 @@ const Dashboard = () => {
     if (currentUser) fetchUser();
   }, [currentUser]);
 
+  const handleContact = () => {
+    if (currentUser) {
+      navigate("/contactUs"); // Redirect for authorized users
+    } else {
+      navigate("/contact"); // Redirect for guest users
+    }
+  };
+
+  const handleAboutUs = () => {
+    if (currentUser) {
+      navigate("/aboutUs"); // Redirect for authorized users
+    } else {
+      navigate("/about"); // Redirect for guest users
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
   
@@ -56,10 +72,13 @@ const Dashboard = () => {
 
         {/* Buttons */}
         <div className="flex space-x-4">
-          <button className="bg-teal-600 text-white px-8 py-4 rounded-md text-base font-medium hover:bg-teal-700">
+          <button 
+            className="bg-teal-600 text-white px-8 py-4 rounded-md text-base font-medium hover:bg-teal-700">
             Explore Rooms
           </button>
-          <button className="bg-transparent text-teal-600 px-8 py-4 rounded-md text-base font-medium hover:bg-gray-100 border-2 border-teal-600">
+          <button 
+            onClick={handleAboutUs}
+            className="bg-transparent text-teal-600 px-8 py-4 rounded-md text-base font-medium hover:bg-gray-100 border-2 border-teal-600">
             Learn More
           </button>
         </div>
@@ -81,7 +100,9 @@ const Dashboard = () => {
             <br /><br />
             Our intelligent matching system considers your preferences, budget, and travel style to recommend hotels that truly match what you're looking for, saving you hours of searching and comparing.
           </p>
-          <button className="bg-teal-600 text-white px-8 py-4 rounded-md text-base font-medium hover:bg-teal-700">
+          <button 
+            onClick={handleContact}
+            className="bg-teal-600 text-white px-8 py-4 rounded-md text-base font-medium hover:bg-teal-700">
             Connect with Us
           </button>
         </div>

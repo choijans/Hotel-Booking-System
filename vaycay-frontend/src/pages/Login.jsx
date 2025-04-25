@@ -20,7 +20,13 @@ const Login = () => {
       setCurrentUser(res.data.user); // Set the user details in context
       localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user details in localStorage
   
-      navigate("/dashboard"); // Redirect to the dashboard
+      // Redirect based on role
+      if (res.data.user.role === "admin") {
+        navigate("/admin/dashboard"); // Redirect admins
+      } else {
+        navigate("/dashboard"); // Redirect regular users
+      }
+
     } catch (err) {
       setError("Invalid username or password");
     }
