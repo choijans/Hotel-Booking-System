@@ -94,7 +94,7 @@ const AdminNav = () => {
                 }`
               }
             >
-              Settings
+              Account Settings
             </NavLink>
           </li>
         </ul>

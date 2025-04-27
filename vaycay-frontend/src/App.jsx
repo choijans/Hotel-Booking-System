@@ -21,6 +21,8 @@ import Hotels from "./pages/admin/hotel_rooms";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import AdminSignIn from "./pages/admin/AdminSignIn";
+import Settings from "./pages/admin/Settings";
+
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/users/:guest_id" element={<UserDetails />} />
             <Route path="/admin/hotels" element={<Hotels />} />
+            <Route path="/admin/settings" element={<Settings />} />
+
           </Route>
 
           {/* Public routes */}
