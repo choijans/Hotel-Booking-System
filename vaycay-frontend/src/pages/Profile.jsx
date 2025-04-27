@@ -30,7 +30,7 @@ const Profile = () => {
         }
 
         // Fetch profile data using GET request
-        const profileResponse = await hotelApi.get("/getguestprofile", {
+        const profileResponse = await hotelApi.get("/getguestdetails", {
           params: { guest_id: parseInt(guest_id) },
         });
 
