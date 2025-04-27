@@ -20,6 +20,7 @@ import UserDetails from "./pages/admin/userdetails";
 import Hotels from "./pages/admin/hotel_rooms";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
+import AdminSignIn from "./pages/admin/AdminSignIn";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/confirmation" element={<ConfirmationPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/guest_profile" element={<GuestProfile />} />
           </Route>
 
           {/* Admin routes */}
@@ -60,6 +62,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin/signin" element={<AdminSignIn />} />
           </Route>
         </Routes>
       </Router>
