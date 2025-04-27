@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import { hotelApi } from "../api";
-import styles from "./PaymentScreen.module.css"; // Updated import for CSS Modules
+import styles from "./PaymentScreen.module.css";
+
+// Import card images
+import visaImage from "../assets/visa.png";
+import mastercardImage from "../assets/mastercard.png";
+import amexImage from "../assets/amex.png";
 
 const PaymentScreen = () => {
   const location = useLocation();
@@ -16,19 +21,48 @@ const PaymentScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleCardNumberChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
-    setCardNumber(value);
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (value.length > 16) value = value.slice(0, 16); // Limit to 16 digits
 
-    if (/^4/.test(value)) setCardType("Visa");
-    else if (/^5[1-5]/.test(value)) setCardType("Mastercard");
-    else if (/^3[47]/.test(value)) setCardType("American Express");
+    // Format card number with spaces (e.g., 1234 5678 9012 3456)
+    const formattedValue = value.replace(/(\d{4})(?=\d)/g, "$1 ");
+
+    setCardNumber(formattedValue);
+
+    // Detect card type
+    if (/^4/.test(value)) setCardType("visa");
+    else if (/^5[1-5]/.test(value)) setCardType("mastercard");
+    else if (/^3[47]/.test(value)) setCardType("amex");
     else setCardType("");
+  };
+
+  const handleExpiryDateChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (value.length > 4) value = value.slice(0, 4); // Limit to 4 digits (MMYY)
+
+    // Format expiry date as MM/YY
+    const formattedValue = value.replace(/(\d{2})(?=\d)/, "$1/");
+
+    setExpiryDate(formattedValue);
+  };
+
+  const getCardImage = () => {
+    switch (cardType) {
+      case "visa":
+        return visaImage;
+      case "mastercard":
+        return mastercardImage;
+      case "amex":
+        return amexImage;
+      default:
+        return null;
+    }
   };
 
   const handlePayment = async () => {
     if (isProcessing) return;
 
-    if (!cardNumber || cardNumber.length < 16) {
+    if (!cardNumber || cardNumber.replace(/\s/g, "").length < 16) {
       alert("Invalid card number.");
       return;
     }
@@ -100,6 +134,10 @@ const PaymentScreen = () => {
               {bookingDetails.room_details.hotel?.location?.location_name}
             </p>
             <p>{bookingDetails.room_details.description}</p>
+            <p>
+              <strong>Guests:</strong> {bookingDetails.guests}{" "}
+              {bookingDetails.guests > 1 ? "Guests" : "Guest"}
+            </p>
           </div>
         </div>
       </div>
@@ -113,16 +151,22 @@ const PaymentScreen = () => {
             value={cardNumber}
             onChange={handleCardNumberChange}
             placeholder="1234 5678 9012 3456"
-            maxLength="16"
+            maxLength="19" // Includes spaces
           />
-          {cardType && <p className={styles["payment-card-type"]}>{cardType}</p>}
+          {cardType && (
+            <img
+              src={getCardImage()}
+              alt={cardType}
+              className={styles["payment-card-image"]}
+            />
+          )}
         </div>
         <div className={styles["payment-form-group"]}>
           <label>Expiry Date (MM/YY)</label>
           <input
             type="text"
             value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
+            onChange={handleExpiryDateChange}
             placeholder="MM/YY"
             maxLength="5"
           />
