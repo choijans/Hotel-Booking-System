@@ -27,7 +27,7 @@ const AdminNav = () => {
               Dashboard
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/admin/hotels"
               className={({ isActive }) =>
@@ -54,7 +54,7 @@ const AdminNav = () => {
             >
               Bookings
             </NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink
               to="/admin/users"

@@ -131,12 +131,12 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Hotels Management</h2>
           <div className="flex space-x-4">
-            <Link
+            {/* <Link
               to="/admin/hotels"
               className="bg-gray-100 text-teal-600 px-4 py-2 rounded-md border border-teal-600 hover:bg-C1E3E2"
             >
               Explore Hotels
-            </Link>
+            </Link> */}
             <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
               Add New Hotel
             </button>
@@ -183,7 +183,7 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* Bookings Management Section */}
+      {/* Bookings Management Section 
       <div className="mt-12">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Bookings Management</h2>
@@ -200,7 +200,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Display loading, error, or table */}
+        {/* Display loading, error, or table 
         {loadingBookings ? (
           <p>Loading bookings...</p>
         ) : errorBookings ? (
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
