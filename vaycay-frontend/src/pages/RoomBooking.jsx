@@ -74,6 +74,7 @@ const RoomBooking = () => {
       check_out_date: checkOutDate,
       total_amount: totalPrice,
       room_details: roomDetails,
+      guests, // Include the number of guests
     };
   
     navigate("/payment", { state: bookingDetails });

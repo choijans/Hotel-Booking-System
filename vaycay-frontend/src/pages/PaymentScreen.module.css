@@ -41,6 +41,7 @@
 
 .payment-form-group {
   margin-bottom: 15px;
+  position: relative;
 }
 
 .payment-form-group label {
@@ -54,6 +55,16 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 16px;
+}
+
+.payment-card-image {
+  position: absolute;
+  top: 55%;
+  right: 10px; /* Align to the right inside the input */
+  width: 33px; /* Adjust width to fit nicely */
+  height: auto; /* Maintain aspect ratio */
+  pointer-events: none; /* Prevent interaction with the image */
 }
 
 .payment-card-type {

@@ -131,12 +131,12 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Hotels Management</h2>
           <div className="flex space-x-4">
-            <Link
+            {/* <Link
               to="/admin/hotels"
               className="bg-gray-100 text-teal-600 px-4 py-2 rounded-md border border-teal-600 hover:bg-C1E3E2"
             >
               Explore Hotels
-            </Link>
+            </Link> */}
             <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
               Add New Hotel
             </button>
@@ -161,7 +161,11 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {hotels.map((hotel) => (
-                <tr key={hotel.hotel_id}>
+                <tr 
+                  key={hotel.hotel_id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => (window.location.href = `/admin/hotels/${hotel.id}`)} // Redirect on row click
+                >
                   <td className="px-4 py-2">{hotel.hotel_id}</td>
                   <td className="px-4 py-2">{hotel.hotel_name}</td>
                   <td className="px-4 py-2">{hotel.location.location_name}</td>
@@ -174,71 +178,6 @@ const AdminDashboard = () => {
                         <button>
                         <img src={deleteIcon} alt="Delete" className="w-6 h-6" />
                         </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Bookings Management Section */}
-      <div className="mt-12">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Bookings Management</h2>
-          <div className="flex space-x-4">
-            <Link
-              to="/admin/bookings"
-              className="bg-gray-100 text-teal-600 px-4 py-2 rounded-md border border-teal-600 hover:bg-C1E3E2"
-            >
-              Explore Bookings
-            </Link>
-            <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
-              Add New Booking
-            </button>
-          </div>
-        </div>
-
-        {/* Display loading, error, or table */}
-        {loadingBookings ? (
-          <p>Loading bookings...</p>
-        ) : errorBookings ? (
-          <p className="text-red-500">{errorBookings}</p>
-        ) : (
-          <table className="w-full bg-white shadow-md rounded-lg">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Booking ID</th>
-                <th className="px-4 py-2 text-left">Hotel Name</th>
-                <th className="px-4 py-2 text-left">Room Description</th>
-                <th className="px-4 py-2 text-left">Check-In</th>
-                <th className="px-4 py-2 text-left">Check-Out</th>
-                <th className="px-4 py-2 text-left">Guest ID</th>
-                <th className="px-4 py-2 text-left">Payment Status</th>
-                <th className="px-4 py-2 text-left">Total Amount</th>
-                <th className="px-4 py-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.booking_id}>
-                  <td className="px-4 py-2">{booking.booking_id}</td>
-                  <td className="px-4 py-2">{booking.room.hotel.hotel_name}</td>
-                  <td className="px-4 py-2">{booking.room.description}</td>
-                  <td className="px-4 py-2">{booking.check_in_date}</td>
-                  <td className="px-4 py-2">{booking.check_out_date}</td>
-                  <td className="px-4 py-2">{booking.guest_id}</td>
-                  <td className="px-4 py-2">{booking.payment_status}</td>
-                  <td className="px-4 py-2">₱{booking.total_amount}</td>
-                  <td className="px-4 py-2">
-                    <div className="flex space-x-2">
-                      <button>
-                        <img src={editIcon} alt="Edit" className="w-6 h-6" />
-                      </button>
-                      <button>
-                        <img src={deleteIcon} alt="Delete" className="w-6 h-6" />
-                      </button>
                     </div>
                   </td>
                 </tr>

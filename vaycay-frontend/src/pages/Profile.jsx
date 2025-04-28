@@ -125,7 +125,7 @@ const Profile = () => {
                   </button>
                   <button
                     onClick={() => {
-                      localStorage.removeItem("token");
+                      localStorage.clear();
                       navigate("/login");
                     }}
                     className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium"

@@ -16,17 +16,12 @@ const Login = () => {
       const res = await authApi.post("/login", { username, password });
       console.log("Login response:", res.data);
   
-      setAuthToken(res.data.token); // Set the token in Axios and localStorage
-      setCurrentUser(res.data.user); // Set the user details in context
-      localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user details in localStorage
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userId", res.data.user.id); // Ensure userId is set
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      setCurrentUser(res.data.user);
   
-      // Redirect based on role
-      if (res.data.user.role === "admin") {
-        navigate("/admin/dashboard"); // Redirect admins
-      } else {
-        navigate("/dashboard"); // Redirect regular users
-      }
-
+      navigate("/dashboard")
     } catch (err) {
       setError("Invalid username or password");
     }

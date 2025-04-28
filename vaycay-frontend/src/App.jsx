@@ -18,8 +18,12 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Users from "./pages/admin/users";
 import UserDetails from "./pages/admin/userdetails";
 import Hotels from "./pages/admin/hotel_rooms";
+import HotelDetails from "./pages/admin/hoteldetails"; 
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
+import AdminSignIn from "./pages/admin/AdminSignIn";
+import Settings from "./pages/admin/Settings";
+
 
 function App() {
   return (
@@ -37,6 +41,7 @@ function App() {
             <Route path="/confirmation" element={<ConfirmationPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/guest_profile" element={<GuestProfile />} />
           </Route>
 
           {/* Admin routes */}
@@ -51,6 +56,9 @@ function App() {
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/users/:guest_id" element={<UserDetails />} />
             <Route path="/admin/hotels" element={<Hotels />} />
+            <Route path="/admin/hotels/:hotel_id" element={<HotelDetails />} />s
+            <Route path="/admin/settings" element={<Settings />} />
+
           </Route>
 
           {/* Public routes */}
@@ -61,6 +69,7 @@ function App() {
             <Route path="/guest_profile" element={<GuestProfile />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin/signin" element={<AdminSignIn />} />
           </Route>
         </Routes>
       </Router>

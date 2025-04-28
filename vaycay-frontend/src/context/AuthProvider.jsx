@@ -26,9 +26,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setCurrentUser(null);
-    setAuthToken(null); // Remove the token from Axios headers
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    setAuthToken(null); 
+    localStorage.clear();
   };
 
   return (

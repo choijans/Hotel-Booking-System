@@ -1,16 +1,11 @@
-#to start and build docker
-docker compose up --build
-
-#to start the app (run in vaycay frontend directory)
-npm run dev 
-
-#to stop docker 
-control c
-docker compose down
-
-npm install
-
-
+git clone repo
+pgadmin make ur password password
+make the dbs
+go to folder, then docker-compose up --build
+open hasura localhost:8080/console - (the password is in dockercompose file supersecureadminsecret smth like that)
+apply metadata found in the hasura_metadata file (just find the most updated one)
+if not connected pa the postgres database kay connect it u can find the connection url in dockercompose file
+go to vaycay-frontend folder, open console and npm run dev
 
 ## EmailJS Setup
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "./ConfirmationPage.module.css"; // Updated import for CSS Modules
+import jsPDF from "jspdf";
+import styles from "./ConfirmationPage.module.css";
 
 const ConfirmationPage = () => {
   const location = useLocation();
@@ -16,6 +17,40 @@ const ConfirmationPage = () => {
   const resortFee = 2500; // Example fixed resort fee
   const taxes = (roomRate * nights + resortFee) * 0.05; // Example 5% tax
   const totalCost = roomRate * nights + resortFee + taxes;
+
+  // Function to generate and download the receipt
+  const downloadReceipt = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text("Booking Receipt", 10, 10);
+
+    // Add booking details
+    doc.setFontSize(12);
+    doc.text(`Booking ID: VACAY-${booking_id}`, 10, 20);
+    doc.text(`Check-In: ${bookingDetails.check_in_date}`, 10, 30);
+    doc.text(`Check-Out: ${bookingDetails.check_out_date}`, 10, 40);
+    doc.text(`Guests: ${bookingDetails.guests} Guests`, 10, 50);
+
+    // Add room details
+    doc.text(`Room: ${bookingDetails.room_details.room_type?.type_name || "Room"}`, 10, 60);
+    doc.text(
+      `Hotel: ${bookingDetails.room_details.hotel?.hotel_name}, ${bookingDetails.room_details.hotel?.location?.location_name}`,
+      10,
+      70
+    );
+
+    // Add payment summary
+    doc.text("Payment Summary:", 10, 90);
+    doc.text(`Room Rate (${nights} nights): ₱${(roomRate * nights).toFixed(2)}`, 10, 100);
+    doc.text(`Resort Fee: ₱${resortFee.toFixed(2)}`, 10, 110);
+    doc.text(`Taxes: ₱${taxes.toFixed(2)}`, 10, 120);
+    doc.text(`Total Paid: ₱${totalCost.toFixed(2)}`, 10, 130);
+
+    // Save the PDF
+    doc.save(`Receipt-VACAY-${booking_id}.pdf`);
+  };
 
   return (
     <div className={styles["confirm-page-container"]}>
@@ -40,7 +75,9 @@ const ConfirmationPage = () => {
           </div>
           <div className={styles["confirm-booking-info"]}>
             <h3>Guests</h3>
-            <p>{bookingDetails.guests || "2 Adults, 0 Children"}</p>
+            <p>
+              {bookingDetails.guests} {bookingDetails.guests > 1 ? "Guests" : "Guest"}
+            </p>
           </div>
           <div className={styles["confirm-booking-info"]}>
             <h3>Rooms</h3>
@@ -88,7 +125,7 @@ const ConfirmationPage = () => {
           </button>
           <button
             className={styles["confirm-download-receipt-button"]}
-            onClick={() => alert("Receipt downloaded!")}
+            onClick={downloadReceipt}
           >
             Download Receipt
           </button>

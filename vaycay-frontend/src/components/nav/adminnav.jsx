@@ -27,7 +27,7 @@ const AdminNav = () => {
               Dashboard
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/admin/hotels"
               className={({ isActive }) =>
@@ -54,7 +54,7 @@ const AdminNav = () => {
             >
               Bookings
             </NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink
               to="/admin/users"
@@ -69,20 +69,7 @@ const AdminNav = () => {
               Users
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/admin/reports"
-              className={({ isActive }) =>
-                `block p-2 rounded ${
-                  isActive
-                    ? "bg-C1E3E2 text-teal-600"
-                    : "hover:bg-C1E3E2 hover:text-teal-600"
-                }`
-              }
-            >
-              Reports
-            </NavLink>
-          </li>
+
           <li>
             <NavLink
               to="/admin/settings"
@@ -94,7 +81,7 @@ const AdminNav = () => {
                 }`
               }
             >
-              Settings
+              Account Settings
             </NavLink>
           </li>
         </ul>
