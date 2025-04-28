@@ -21,7 +21,6 @@ import Hotels from "./pages/admin/hotel_rooms";
 import HotelDetails from "./pages/admin/hoteldetails"; 
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
-import AdminSignIn from "./pages/admin/AdminSignIn";
 import Settings from "./pages/admin/Settings";
 
 
@@ -69,7 +68,7 @@ function App() {
             <Route path="/guest_profile" element={<GuestProfile />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin/signin" element={<AdminSignIn />} />
+
           </Route>
         </Routes>
       </Router>

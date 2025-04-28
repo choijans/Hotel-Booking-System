@@ -81,6 +81,11 @@ const Profile = () => {
     fetchProfileData();
   }, [navigate]);
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -124,11 +129,10 @@ const Profile = () => {
                     Transaction History
                   </button>
                   <button
-                    onClick={() => {
-                      localStorage.clear();
-                      navigate("/login");
-                    }}
-                    className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium"
+                    onClick={() => setSelectedSection("Logout")}
+                    className={`block py-2 px-4 ${
+                      selectedSection === "Logout" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
+                    } rounded-md font-medium`}
                   >
                     Logout
                   </button>
@@ -149,11 +153,7 @@ const Profile = () => {
                       <p className="mt-1 text-gray-900">{profile.full_name}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                      <p className="mt-1 text-gray-900">{profile.email}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">Contact Number</h3>
+                      <h3 className="text-sm font-medium text-gray-500">Contact Information</h3>
                       <p className="mt-1 text-gray-900">{profile.phone}</p>
                     </div>
                     <div>
@@ -224,6 +224,21 @@ const Profile = () => {
                         ))}
                     </ul>
                   )}
+                </div>
+              </div>
+            )}
+
+            {selectedSection === "Logout" && (
+              <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Logout</h2>
+                  <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors"
+                  >
+                    Confirm Logout
+                  </button>
                 </div>
               </div>
             )}

@@ -61,7 +61,7 @@ const PaymentScreen = () => {
 
   const handlePayment = async () => {
     if (isProcessing) return;
-
+  
     if (!cardNumber || cardNumber.replace(/\s/g, "").length < 16) {
       alert("Invalid card number.");
       return;
@@ -74,40 +74,58 @@ const PaymentScreen = () => {
       alert("Invalid CVV.");
       return;
     }
-
+  
     setIsProcessing(true);
     try {
-      const payload = {
+      // Step 1: Insert Booking
+      const bookingPayload = {
         room_id: bookingDetails.room_id,
         guest_id: bookingDetails.guest_id,
         check_in_date: bookingDetails.check_in_date,
         check_out_date: bookingDetails.check_out_date,
         total_amount: bookingDetails.total_amount,
       };
-
-      const response = await hotelApi.post("/createbooking", payload);
-      
-      if (response.data?.insert_bookings_one?.booking_id) {
-        emailjs.send(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          {
-            user_email: "user@example.com", // Replace with actual user email
-            booking_id: response.data.insert_bookings_one.booking_id,
-            total_amount: bookingDetails.total_amount,
-          },
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-        );
-
-        navigate("/confirmation", {
-          state: {
-            booking_id: response.data.insert_bookings_one.booking_id,
-            bookingDetails,
-          },
-        });
-      } else {
+  
+      const bookingResponse = await hotelApi.post("/createbooking", bookingPayload);
+  
+      if (!bookingResponse.data?.insert_bookings_one?.booking_id) {
         throw new Error("Failed to create booking.");
       }
+  
+      const bookingId = bookingResponse.data.insert_bookings_one.booking_id;
+  
+      // Step 2: Insert Payment
+      const paymentPayload = {
+        booking_id: bookingId,
+        amount: bookingDetails.total_amount,
+        payment_method: "Credit Card", // Example payment method
+      };
+  
+      const paymentResponse = await hotelApi.post("/createpayment", paymentPayload);
+  
+      if (!paymentResponse.data?.insert_payments_one?.payment_id) {
+        throw new Error("Failed to create payment.");
+      }
+  
+      // Step 3: Send Confirmation Email
+      emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          user_email: "user@example.com", // Replace with actual user email
+          booking_id: bookingId,
+          total_amount: bookingDetails.total_amount,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+  
+      // Step 4: Navigate to Confirmation Page
+      navigate("/confirmation", {
+        state: {
+          booking_id: bookingId,
+          bookingDetails,
+        },
+      });
     } catch (err) {
       console.error("Payment failed:", err);
       alert("Payment failed. Please try again.");

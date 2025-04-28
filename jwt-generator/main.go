@@ -179,6 +179,82 @@ func validateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(claims)
 }
 
+// Change password handler
+func changePasswordHandler(w http.ResponseWriter, r *http.Request) {
+    // Parse the request body
+    var req struct {
+        OldPassword string `json:"old_password"`
+        NewPassword string `json:"new_password"`
+    }
+    err := json.NewDecoder(r.Body).Decode(&req)
+    if err != nil {
+        http.Error(w, "Invalid request", http.StatusBadRequest)
+        return
+    }
+
+    // Get the token from the Authorization header
+    tokenStr := r.Header.Get("Authorization")
+    if tokenStr == "" {
+        http.Error(w, "Missing token", http.StatusUnauthorized)
+        return
+    }
+
+    // Remove "Bearer " prefix if present
+    if len(tokenStr) > 7 && tokenStr[:7] == "Bearer " {
+        tokenStr = tokenStr[7:]
+    }
+
+    // Parse and validate the token
+    token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+        return jwtSecret, nil
+    })
+    if err != nil || !token.Valid {
+        http.Error(w, "Invalid token", http.StatusUnauthorized)
+        return
+    }
+
+    // Extract user ID from the token claims
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+        return
+    }
+    userID := claims["x-hasura-user-id"].(string)
+
+    // Retrieve the user's current password from the database
+    var storedPassword string
+    err = db.QueryRow("SELECT password FROM users WHERE id = $1", userID).Scan(&storedPassword)
+    if err != nil {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    // Verify the old password
+    err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(req.OldPassword))
+    if err != nil {
+        http.Error(w, "Old password is incorrect", http.StatusUnauthorized)
+        return
+    }
+
+    // Hash the new password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+    if err != nil {
+        http.Error(w, "Error hashing password", http.StatusInternalServerError)
+        return
+    }
+
+    // Update the password in the database
+    _, err = db.Exec("UPDATE users SET password = $1 WHERE id = $2", string(hashedPassword), userID)
+    if err != nil {
+        http.Error(w, "Error updating password", http.StatusInternalServerError)
+        return
+    }
+
+    // Respond with success
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"message": "Password updated successfully"})
+}
+
 // Main function
 func main() {
 	initDB()
@@ -187,6 +263,7 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/validate", validateTokenHandler)
+	http.HandleFunc("/change-password", changePasswordHandler) 
 
 	corsHandler := CorsMiddleware().Handler(http.DefaultServeMux)
 	log.Println("Auth Service running on :4000")
