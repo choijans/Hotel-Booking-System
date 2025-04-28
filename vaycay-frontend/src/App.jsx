@@ -22,7 +22,7 @@ import HotelDetails from "./pages/admin/hoteldetails";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import Settings from "./pages/admin/Settings";
-
+import EditProfile from "./pages/EditProfile"
 
 function App() {
   return (
@@ -41,6 +41,7 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/guest_profile" element={<GuestProfile />} />
+            <Route path="/edit_profile" element={<EditProfile />} />
           </Route>
 
           {/* Admin routes */}
