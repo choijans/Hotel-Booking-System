@@ -1,50 +1,164 @@
-.roombooking-container {
+.roombooking-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+}
+
+.roombooking-header {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.roombooking-details {
+.roombooking-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+.roombooking-location {
+  font-size: 1rem;
+  margin-top: 5px;
+  color: #666;
+}
+
+.roombooking-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #00aa88;
+}
+
+.roombooking-price span {
+  font-size: 1rem;
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.roombooking-booknow-top {
+  background-color: #3CA7A3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.roombooking-images-section {
+  display: flex;
+  gap: 20px;
+}
+
+.roombooking-main-image img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.roombooking-thumbnail-images {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.roombooking-thumbnail-images img {
+  width: 120px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.roombooking-content {
+  display: flex;
+  margin-top: 30px;
+  gap: 30px;
+}
+
+.roombooking-roomdetails {
   flex: 2;
-  margin-right: 20px;
 }
 
-.roombooking-description {
+.roombooking-amenities ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 10px;
 }
 
-.roombooking-form {
+.roombooking-amenities li {
+  background-color: #f3f3f3;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.roombooking-form-container {
   flex: 1;
-  background: #f9f9f9;
+}
+
+.roombooking-form {
+  border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.roombooking-form h3 {
+  margin-bottom: 15px;
 }
 
 .roombooking-form label {
   display: block;
-  margin-bottom: 5px;
+  margin-top: 10px;
   font-weight: bold;
 }
 
 .roombooking-form input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
+  padding: 8px;
+  margin-top: 5px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
-.roombooking-form button {
+.roombooking-form-button {
+  margin-top: 20px;
   width: 100%;
-  padding: 10px;
-  background: #219995;
-  color: #fff;
+  background-color: #3CA7A3;
+  color: white;
   border: none;
-  border-radius: 4px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.roombooking-form button:hover {
-  background: #1b7a7a;
+.roombooking-total {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.roombooking-white-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.roombooking-roomdetails h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.roombooking-form h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  /* text-align: center; */
 }
