@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { hotelApi } from "../api";
+import { hotelApi, authApi } from "../api"; // Import authApi for API calls
 import styles from "./Profile.module.css";
 
 const Profile = () => {
@@ -16,6 +16,14 @@ const Profile = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Change Password State
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -86,6 +94,42 @@ const Profile = () => {
     navigate("/login");
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New password and confirm password do not match.");
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await authApi.post(
+        "/change-password",
+        {
+          old_password: oldPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setPasswordSuccess(response.data.message || "Password changed successfully.");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || "Failed to change password. Please try again.");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -129,6 +173,14 @@ const Profile = () => {
                     Transaction History
                   </button>
                   <button
+                    onClick={() => setSelectedSection("Change Password")}
+                    className={`block py-2 px-4 ${
+                      selectedSection === "Change Password" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
+                    } rounded-md font-medium`}
+                  >
+                    Change Password
+                  </button>
+                  <button
                     onClick={() => setSelectedSection("Logout")}
                     className={`block py-2 px-4 ${
                       selectedSection === "Logout" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
@@ -146,7 +198,20 @@ const Profile = () => {
             {selectedSection === "Profile" && (
               <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
-                  <h1 className="text-2xl font-bold text-gray-800 mb-6">Profile Information</h1>
+                  <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800">Profile Information</h1>
+                    <button
+                      onClick={() => navigate("/edit_profile")}
+                      className="flex items-center justify-center"
+                    >
+                      <img
+                        src="/src/assets/edit.png"
+                        alt="Edit Profile"
+                        className="h-6 w-6 cursor-pointer hover:opacity-80"
+                      />
+                    </button>
+                  </div>
+                  
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
@@ -166,7 +231,7 @@ const Profile = () => {
             )}
 
             {selectedSection === "Bookings" && (
-              <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+              <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">Bookings</h2>
                   {bookings.length === 0 ? (
@@ -204,7 +269,7 @@ const Profile = () => {
             )}
 
             {selectedSection === "Transaction History" && (
-              <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+              <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">Transaction History</h2>
                   {transactions.length === 0 ? (
@@ -224,6 +289,65 @@ const Profile = () => {
                         ))}
                     </ul>
                   )}
+                </div>
+              </div>
+            )}
+
+
+            {selectedSection === "Change Password" && (
+              <div className="bg-white shadow rounded-lg overflow-hidden">
+                <div className="p-6">
+                  <h1 className="text-2xl font-bold text-gray-800 mb-6">Change Password</h1>
+                  <form onSubmit={handleChangePassword} className="space-y-6">
+                    <div>
+                      <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700">
+                        Old Password
+                      </label>
+                      <input
+                        type="password"
+                        id="oldPassword"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        id="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                      />
+                    </div>
+                    {passwordError && <p className="text-sm text-red-600">{passwordError}</p>}
+                    {passwordSuccess && <p className="text-sm text-green-600">{passwordSuccess}</p>}
+                    <button
+                      type="submit"
+                      disabled={passwordLoading}
+                      className="w-full bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition-colors"
+                    >
+                      {passwordLoading ? "Changing Password..." : "Change Password"}
+                    </button>
+                  </form>
                 </div>
               </div>
             )}
