@@ -1,150 +1,298 @@
-.payment-screen-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f6f3e9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.payment-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  margin-top: 20px;
+  background-color: #219995;
+  font-family: Arial, sans-serif;
 }
 
-.payment-h1 {
+.payment-header {
+  background-color: #219995;
+  color: white;
+  padding: 15px 0;
+  padding-bottom: 0;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.payment-section {
-  margin-bottom: 20px;
+.payment-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
 }
 
-.payment-room-details {
+.payment-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
   display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
-.payment-room-details img {
-  width: 150px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
+@media (min-width: 768px) {
+  .payment-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
-.payment-details {
+.booking-section, .payment-section {
   background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  width: 100%;
 }
 
-.payment-details h2 {
+.booking-section {
+  flex: 3;
+}
+
+.payment-section {
+  flex: 2;
+}
+
+.booking-section h2, .payment-section h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Room Details Styling */
+.room-details {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.room-image {
+  flex: 0 0 100px;
+}
+
+.room-image img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.room-info {
+  flex: 1;
+}
+
+.room-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.hotel-location {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.room-description {
+  font-size: 14px;
+  color: #555;
+  margin: 8px 0;
+}
+
+/* Booking Dates Styling */
+.booking-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.date-block {
+  flex: 1;
+  min-width: 120px;
+}
+
+.date-label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.date-value {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Guest Information Styling */
+.guest-section {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.guest-name {
+  font-weight: 500;
+  margin: 0;
+}
+
+.guest-contact {
+  color: #666;
+  font-size: 14px;
+  margin: 6px 0 0 0;
+}
+
+/* Special Requests Styling */
+.special-requests {
   margin-bottom: 20px;
 }
 
-.payment-form-group {
-  margin-bottom: 15px;
+.requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  color: #1a9f96;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+}
+
+.request-text {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Payment Form Styling */
+.payment-form {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
   position: relative;
 }
 
-.payment-form-group label {
+.form-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
 }
 
-.payment-form-group input {
+.form-group input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
 }
 
-.payment-card-image {
+.form-group input:focus {
+  border-color: #1a9f96;
+  outline: none;
+}
+
+.card-image {
   position: absolute;
-  top: 55%;
-  right: 10px; /* Align to the right inside the input */
-  width: 33px; /* Adjust width to fit nicely */
-  height: auto; /* Maintain aspect ratio */
-  pointer-events: none; /* Prevent interaction with the image */
+  right: 12px;
+  top: 38px;
+  height: 20px;
+  width: auto;
 }
 
-.payment-card-type {
-  margin-top: 5px;
+/* Price Summary Styling */
+.price-summary {
+  margin-top: 24px;
+}
+
+.price-rows {
+  margin-bottom: 20px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
   font-size: 14px;
   color: #555;
 }
 
-.payment-error-message {
-  color: red;
-  font-size: 14px;
+.price-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
   margin-top: 10px;
-}
-
-.payment-button {
-  width: 100%;
-  padding: 15px;
-  background-color: #219995;
-  color: white;
-  border: none;
-  border-radius: 4px;
   font-size: 16px;
-  cursor: pointer;
 }
 
-.payment-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.total-amount {
+  color: #1a9f96;
 }
 
-.payment-button:hover:not(:disabled) {
-  background-color: #1b7a7a;
+/* Terms Agreement Styling */
+.terms-agreement {
+  margin: 20px 0;
 }
 
-.payment-pay-button {
-  background-color: #219995;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  color: #555;
 }
 
-.payment-pay-button:hover {
-  background-color: #1b7a7a;
+.checkbox-label input {
+  margin-right: 8px;
+  margin-top: 3px;
 }
 
-.payment-apply-button {
-  background-color: #219995;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.checkbox-label a {
+  color: #1a9f96;
+  text-decoration: none;
 }
 
-.payment-apply-button:hover {
-  background-color: #1b7a7a;
+.checkbox-label a:hover {
+  text-decoration: underline;
 }
 
-.payment-actions {
-  text-align: center;
-}
-
-.payment-confirm-button {
-  background-color: #219995;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
+/* Confirm Button Styling */
+.confirm-button {
   width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background-color: #1a9f96;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.payment-confirm-button:disabled {
-  background-color: #ccc;
+.confirm-button:hover:not(:disabled) {
+  background-color: #158881;
+}
+
+.confirm-button:disabled {
+  background-color: #999;
   cursor: not-allowed;
-}
-
-.payment-confirm-button:hover:not(:disabled) {
-  background-color: #1b7a7a;
 }

@@ -19,6 +19,8 @@ const PaymentScreen = () => {
   const [cvv, setCvv] = useState("");
   const [cardType, setCardType] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
+
 
   const handleCardNumberChange = (e) => {
     let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
@@ -135,97 +137,180 @@ const PaymentScreen = () => {
   };
 
   return (
-    <div className={styles["payment-screen-container"]}>
-      <h1 className={styles["payment-h1"]}>Review Your Booking</h1>
+    <div className={styles["payment-page-wrapper"]}>
+      <div className={styles["payment-header"]}>
+        <h1>Review Your Booking</h1>
+      </div>
+      
+      <div className={styles["payment-container"]}>
+        {/* Room Details Section */}
+        <div className={styles["booking-section"]}>
+          <h2>Room Details</h2>
+          <div className={styles["room-details"]}>
+            <div className={styles["room-image"]}>
+              <img
+                src="https://via.placeholder.com/300x200"
+                alt={bookingDetails.room_details.room_type?.type_name || "Room"}
+              />
+            </div>
+            <div className={styles["room-info"]}>
+              <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
+              <p className={styles["hotel-location"]}>
+                {bookingDetails.room_details.hotel?.hotel_name},{" "}
+                {bookingDetails.room_details.hotel?.location?.location_name}
+              </p>
+              <p className={styles["room-description"]}>{bookingDetails.room_details.description}</p>
+            </div>
+          </div>
 
-      <div className={styles["payment-section"]}>
-        <h2>Room Details</h2>
-        <div className={styles["payment-room-details"]}>
-          <img
-            src="https://via.placeholder.com/300x200"
-            alt={bookingDetails.room_details.room_type?.type_name || "Room"}
-          />
-          <div>
-            <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
-            <p>
-              {bookingDetails.room_details.hotel?.hotel_name},{" "}
-              {bookingDetails.room_details.hotel?.location?.location_name}
-            </p>
-            <p>{bookingDetails.room_details.description}</p>
-            <p>
-              <strong>Guests:</strong> {bookingDetails.guests}{" "}
-              {bookingDetails.guests > 1 ? "Guests" : "Guest"}
-            </p>
+          {/* Check-in/Check-out Information */}
+          <div className={styles["booking-dates"]}>
+            <div className={styles["date-block"]}>
+              <span className={styles["date-label"]}>Check-In</span>
+              <span className={styles["date-value"]}>{new Date(bookingDetails.check_in_date).toLocaleDateString()}</span>
+            </div>
+            <div className={styles["date-block"]}>
+              <span className={styles["date-label"]}>Check-Out</span>
+              <span className={styles["date-value"]}>{new Date(bookingDetails.check_out_date).toLocaleDateString()}</span>
+            </div>
+            <div className={styles["date-block"]}>
+              <span className={styles["date-label"]}>Room</span>
+              <span className={styles["date-value"]}>1 Room</span>
+            </div>
+            <div className={styles["date-block"]}>
+              <span className={styles["date-label"]}>Guests</span>
+              <span className={styles["date-value"]}>{bookingDetails.guests || "2"} {(bookingDetails.guests > 1 || bookingDetails.guests === undefined) ? "Adults" : "Adult"}</span>
+            </div>
+          </div>
+
+          {/* Guest Information Section */}
+          {/* <div className={styles["guest-section"]}>
+            <h2>Guest Information</h2>
+            <div className={styles["guest-info"]}>
+              <p className={styles["guest-name"]}>{bookingDetails.guest_name || "Guest Name"}</p>
+              <p className={styles["guest-contact"]}>{bookingDetails.guest_email || "guest@example.com"} • {bookingDetails.guest_phone || "+63 123 456 7890"}</p>
+            </div>
+          </div> */}
+
+          {/* Special Requests Section */}
+          <div className={styles["special-requests"]}>
+            <div className={styles["requests-header"]}>
+              <h2>Special Requests</h2>
+              <button className={styles["edit-button"]}>Edit</button>
+            </div>
+            <p className={styles["request-text"]}>{bookingDetails.special_requests || "High floor, away from elevator if possible."}</p>
           </div>
         </div>
-      </div>
 
-      <div className={styles["payment-section"]}>
-        <h2>Payment Details</h2>
-        <div className={styles["payment-form-group"]}>
-          <label>Card Number</label>
-          <input
-            type="text"
-            value={cardNumber}
-            onChange={handleCardNumberChange}
-            placeholder="1234 5678 9012 3456"
-            maxLength="19" // Includes spaces
-          />
-          {cardType && (
-            <img
-              src={getCardImage()}
-              alt={cardType}
-              className={styles["payment-card-image"]}
-            />
-          )}
-        </div>
-        <div className={styles["payment-form-group"]}>
-          <label>Expiry Date (MM/YY)</label>
-          <input
-            type="text"
-            value={expiryDate}
-            onChange={handleExpiryDateChange}
-            placeholder="MM/YY"
-            maxLength="5"
-          />
-        </div>
-        <div className={styles["payment-form-group"]}>
-          <label>CVV</label>
-          <input
-            type="text"
-            value={cvv}
-            onChange={(e) => setCvv(e.target.value)}
-            placeholder="123"
-            maxLength="3"
-          />
-        </div>
-      </div>
+        {/* Payment Details Section */}
+        <div className={styles["payment-section"]}>
+          <h2>Payment Details</h2>
+          
+          <div className={styles["payment-form"]}>
+            <div className={styles["form-group"]}>
+              <label>Card Number</label>
+              <input
+                type="text"
+                value={cardNumber}
+                onChange={handleCardNumberChange}
+                placeholder="1234 5678 9012 3456"
+                maxLength="19" // Includes spaces
+                className={styles["card-input"]}
+              />
+              {cardType && (
+                <img
+                  src={getCardImage()}
+                  alt={cardType}
+                  className={styles["card-image"]}
+                />
+              )}
+            </div>
+            
+            <div className={styles["form-group"]}>
+              <label>Expiry Date(MM/YY)</label>
+              <input
+                type="text"
+                value={expiryDate}
+                onChange={handleExpiryDateChange}
+                placeholder="MM/YY"
+                maxLength="5"
+                className={styles["date-input"]}
+              />
+            </div>
+            
+            <div className={styles["form-group"]}>
+              <label>CVV</label>
+              <input
+                type="text"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                placeholder="123"
+                maxLength="3"
+                className={styles["cvv-input"]}
+              />
+            </div>
+          </div>
 
-      <div className={styles["payment-section"]}>
-        <h2>Price Summary</h2>
-        <p><strong>Room Rate:</strong> ₱{bookingDetails.total_amount.toFixed(2)}</p>
-        <p><strong>Total Paid:</strong> ₱{bookingDetails.total_amount.toFixed(2)}</p>
-      </div>
+          {/* Price Summary Section */}
+          <div className={styles["price-summary"]}>
+            <h2>Price Summary</h2>
+            
+            <div className={styles["price-rows"]}>
+              <div className={styles["price-row"]}>
+                <span>Room Rate (5 nights)</span>
+                <span>₱{(bookingDetails.total_amount * 0.9).toFixed(2)}</span>
+              </div>
+              <div className={styles["price-row"]}>
+                <span>Resort Fee</span>
+                <span>₱{(bookingDetails.total_amount * 0.05).toFixed(2)}</span>
+              </div>
+              <div className={styles["price-row"]}>
+                <span>Taxes</span>
+                <span>₱{(bookingDetails.total_amount * 0.05).toFixed(2)}</span>
+              </div>
+              <div className={styles["price-total"]}>
+                <span>Total</span>
+                <span className={styles["total-amount"]}>₱{bookingDetails.total_amount.toFixed(2)}</span>
+              </div>
+            </div>
 
-      <div className={styles["payment-actions"]}>
-        <label>
-          <input type="checkbox" required /> I agree to the{" "}
-          <a href="/terms" target="_blank" rel="noopener noreferrer">
-            Terms and Conditions
-          </a>
-          ,{" "}
-          <a href="/cancellation-policy" target="_blank" rel="noopener noreferrer">
-            Cancellation Policy
-          </a>
-          , and acknowledge that my payment will be processed now.
-        </label>
-        <button
-          onClick={handlePayment}
-          className={styles["payment-confirm-button"]}
-          disabled={isProcessing}
-        >
-          {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
-        </button>
+            {/* <div className={styles["terms-agreement"]}>
+              <label className={styles["checkbox-label"]}>
+                <input type="checkbox" required />
+                <span>I agree to the <a href="/terms">Terms and Conditions</a>, <a href="/cancellation-policy">Cancellation Policy</a>, and acknowledge that my payment will be processed now.</span>
+              </label>
+            </div> */}
+
+            <div className={styles["terms-container"]}>
+              <label htmlFor="terms" className={styles["checkbox-label"]}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={isTermsChecked}
+                  onChange={(e) => setIsTermsChecked(e.target.checked)}
+                />
+                <span>I agree to the <a href="/terms">Terms and Conditions</a>, <a href="/cancellation-policy">Cancellation Policy</a>, and acknowledge that my payment will be processed now.</span>
+              </label>
+            </div>
+
+            {/* <button
+              onClick={handlePayment}
+              className={styles["confirm-button"]}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
+            </button> */}
+
+            <button
+              className={styles["confirm-button"]}
+              onClick={handlePayment}
+              disabled={!isTermsChecked || isProcessing}
+            >
+              {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
+            </button>
+
+          </div>
+        </div>
       </div>
     </div>
   );
