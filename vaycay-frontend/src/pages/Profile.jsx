@@ -50,6 +50,7 @@ const Profile = () => {
             setProfile({
               full_name: guests_by_pk.full_name || "",
               email: guests_by_pk.contact_info?.email || "",
+              birthdate: guests_by_pk.birthdate || "",
               phone: guests_by_pk.contact_info?.phone || "",
               address: guests_by_pk.address || "",
             });
@@ -216,6 +217,10 @@ const Profile = () => {
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
                       <p className="mt-1 text-gray-900">{profile.full_name}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Birth Date</h3>
+                      <p className="mt-1 text-gray-900">{profile.birthdate}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Contact Information</h3>
