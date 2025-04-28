@@ -69,20 +69,7 @@ const AdminNav = () => {
               Users
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/admin/reports"
-              className={({ isActive }) =>
-                `block p-2 rounded ${
-                  isActive
-                    ? "bg-C1E3E2 text-teal-600"
-                    : "hover:bg-C1E3E2 hover:text-teal-600"
-                }`
-              }
-            >
-              Reports
-            </NavLink>
-          </li>
+
           <li>
             <NavLink
               to="/admin/settings"

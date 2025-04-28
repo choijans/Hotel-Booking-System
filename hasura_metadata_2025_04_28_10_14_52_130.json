@@ -1,5 +1,5 @@
 {
-  "resource_version": 45,
+  "resource_version": 57,
   "metadata": {
     "version": 3,
     "sources": [
@@ -198,6 +198,40 @@
                     }
                   }
                 }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "payment_method",
+                    "payment_status",
+                    "booking_id",
+                    "payment_id",
+                    "amount",
+                    "payment_date"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "payment_method",
+                    "payment_status",
+                    "booking_id",
+                    "payment_id",
+                    "amount",
+                    "payment_date"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
               }
             ]
           },
@@ -479,6 +513,22 @@
             {
               "name": "CreateGuest",
               "query": "mutation MyMutation($address1: String = \"\", $birthdate1: date = \"\", $contact_info1: jsonb = \"\", $full_name: String = \"\", $guest_id: Int!) {\r\n  insert_guests_one(object: {address: $address1, birthdate: $birthdate1, contact_info: $contact_info1, full_name: $full_name, guest_id: $guest_id}) {\r\n    address\r\n    birthdate\r\n    contact_info\r\n    full_name\r\n    guest_id\r\n  }\r\n}"
+            },
+            {
+              "name": "GetAllBookings",
+              "query": "query MyQuery {\r\n  bookings {\r\n    booking_id\r\n    room {\r\n      description\r\n      hotel {\r\n        hotel_name\r\n      }\r\n      price\r\n    }\r\n    check_in_date\r\n    check_out_date\r\n    guest_id\r\n    payment_status\r\n    total_amount\r\n  }\r\n}"
+            },
+            {
+              "name": "GetGuestBookings",
+              "query": "query GetGuestBookings($guest_id: Int!) {\r\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\r\n    booking_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n  }\r\n}"
+            },
+            {
+              "name": "GetAllUsers",
+              "query": "query MyQuery {\r\n  users(where: {role: {_eq: \"user\"}}) {\r\n    id\r\n    username\r\n    role\r\n    created_at\r\n  }\r\n}"
+            },
+            {
+              "name": "GetGuestDetails",
+              "query": "query GetGuestDetails($guest_id: Int!) {\n  guests_by_pk(guest_id: $guest_id) {\n    guest_id\n    full_name\n    address\n    birthdate\n    contact_info\n  }\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\n    booking_id\n    check_in_date\n    check_out_date\n    status\n    total_amount\n  }\n  payments {\n    payment_id\n    booking_id\n    amount\n    payment_date\n    payment_status\n    payment_method\n  }\n}"
             }
           ]
         }
@@ -540,6 +590,34 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "GetAllUsers"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetAllUsers",
+        "url": "getallusers"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetAllBookings"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetAllBookings",
+        "url": "getbookings"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "GetBookingsByRoom"
           }
         },
@@ -548,6 +626,34 @@
         ],
         "name": "GetBookingsByRoom",
         "url": "getbookingsbyroom"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetGuestBookings"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetGuestBookings",
+        "url": "getguestbookings"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetGuestDetails"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetGuestDetails",
+        "url": "getguestdetails"
       },
       {
         "comment": "",

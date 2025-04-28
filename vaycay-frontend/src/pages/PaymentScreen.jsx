@@ -86,7 +86,7 @@ const PaymentScreen = () => {
       };
 
       const response = await hotelApi.post("/createbooking", payload);
-
+      
       if (response.data?.insert_bookings_one?.booking_id) {
         emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
