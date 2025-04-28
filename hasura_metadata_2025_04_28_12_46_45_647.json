@@ -1,5 +1,5 @@
 {
-  "resource_version": 57,
+  "resource_version": 92,
   "metadata": {
     "version": 3,
     "sources": [
@@ -277,6 +277,27 @@
                 }
               }
             ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "payment_status",
+                    "status",
+                    "check_in_date",
+                    "check_out_date",
+                    "booking_id",
+                    "guest_id",
+                    "room_id",
+                    "total_amount",
+                    "created_at",
+                    "updated_at"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
             "select_permissions": [
               {
                 "role": "user",
@@ -527,8 +548,16 @@
               "query": "query MyQuery {\r\n  users(where: {role: {_eq: \"user\"}}) {\r\n    id\r\n    username\r\n    role\r\n    created_at\r\n  }\r\n}"
             },
             {
+              "name": "GetGuestProfile",
+              "query": "query GetGuestProfile($guest_id: Int!) {\r\n  guests_by_pk(guest_id: $guest_id) {\r\n    full_name\r\n    birthdate\r\n    contact_info\r\n    address\r\n  }\r\n}"
+            },
+            {
+              "name": "GetGuestTransactions",
+              "query": "query GetGuestTransactions($guest_id: Int!) {\r\n  payments(where: {guest_id: {_eq: $guest_id}}) {\r\n    payment_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
+            },
+            {
               "name": "GetGuestDetails",
-              "query": "query GetGuestDetails($guest_id: Int!) {\n  guests_by_pk(guest_id: $guest_id) {\n    guest_id\n    full_name\n    address\n    birthdate\n    contact_info\n  }\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\n    booking_id\n    check_in_date\n    check_out_date\n    status\n    total_amount\n  }\n  payments {\n    payment_id\n    booking_id\n    amount\n    payment_date\n    payment_status\n    payment_method\n  }\n}"
+              "query": "query GetGuestDetails($guest_id: Int!) {\r\n  guests_by_pk(guest_id: $guest_id) {\r\n    guest_id\r\n    full_name\r\n    address\r\n    birthdate\r\n    contact_info\r\n  }\r\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\r\n    booking_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n  }\r\n  payments {\r\n    payment_id\r\n    booking_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
             }
           ]
         }
@@ -654,6 +683,34 @@
         ],
         "name": "GetGuestDetails",
         "url": "getguestdetails"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetGuestProfile"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetGuestProfile",
+        "url": "getguestprofile"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetGuestTransactions"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetGuestTransactions",
+        "url": "getguesttransactions"
       },
       {
         "comment": "",

@@ -9,7 +9,8 @@ const RecommendedHotels = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useState({
-    destination: "",
+    hotelName: "",
+    location: "",
   });
   const navigate = useNavigate();
 
@@ -36,12 +37,9 @@ const RecommendedHotels = () => {
 
   const handleSearch = () => {
     const filtered = hotels.filter((hotel) => {
-      return (
-        !searchParams.destination ||
-        hotel.location.location_name
-          .toLowerCase()
-          .includes(searchParams.destination.toLowerCase())
-      );
+      const matchesHotelName = !searchParams.hotelName || hotel.hotel_name.toLowerCase().includes(searchParams.hotelName.toLowerCase());
+      const matchesLocation = !searchParams.location || hotel.location.location_name.toLowerCase().includes(searchParams.location.toLowerCase());
+      return matchesHotelName && matchesLocation;
     });
     setFilteredHotels(filtered);
   };
@@ -57,22 +55,33 @@ const RecommendedHotels = () => {
     <>
       <div className={styles["recohotels-search-section-container"]}>
         <div className={styles["recohotels-search-section"]}>
-          <h1><b>Where to?</b></h1>
+          <h1><b>Search Hotels</b></h1>
           <div className={styles["recohotels-search-fields"]}>
             <div className={styles["recohotels-search-field"]}>
-              <label>Destination</label>
+              <label>Hotel Name</label>
               <input
                 type="text"
-                placeholder="Select Destination"
-                value={searchParams.destination}
+                placeholder="Search by hotel name"
+                value={searchParams.hotelName}
                 onChange={(e) =>
-                  setSearchParams({ ...searchParams, destination: e.target.value })
+                  setSearchParams({ ...searchParams, hotelName: e.target.value })
                 }
               />
-              <button className={styles["recohotels-search-button"]} onClick={handleSearch}>
-                Search
-              </button>
             </div>
+            <div className={styles["recohotels-search-field"]}>
+              <label>Location</label>
+              <input
+                type="text"
+                placeholder="Search by location"
+                value={searchParams.location}
+                onChange={(e) =>
+                  setSearchParams({ ...searchParams, location: e.target.value })
+                }
+              />
+            </div>
+            <button className={styles["recohotels-search-button"]} onClick={handleSearch}>
+              Search
+            </button>
           </div>
         </div>
       </div>
@@ -92,7 +101,9 @@ const RecommendedHotels = () => {
                 <p className={styles["recohotels-hotel-location"]}>{hotel.location.location_name}</p>
                 <p className={styles["recohotels-hotel-address"]}>📍 {hotel.location.location_name}</p>
                 <div className={styles["recohotels-price-section"]}>
-                  <span className={styles["recohotels-price"]}>₱{hotel.price?.toFixed(2) || "7,842.30"}</span>
+                  <span className={styles["recohotels-price"]}>
+                    Starting from ₱{hotel.rooms_aggregate.aggregate.min.price?.toFixed(2) || "N/A"}
+                  </span>
                   <span className={styles["recohotels-per-night"]}>Per Night</span>
                 </div>
                 <button

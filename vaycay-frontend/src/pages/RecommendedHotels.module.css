@@ -134,3 +134,33 @@ body {
 .recohotels-search-button:hover {
   background: #1b7a7a;
 }
+.recohotels-search-fields {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.recohotels-search-field {
+  flex: 1;
+}
+
+.recohotels-search-field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.recohotels-search-button {
+  background: #219995;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.recohotels-search-button:hover {
+  background: #1a7a73;
+}
