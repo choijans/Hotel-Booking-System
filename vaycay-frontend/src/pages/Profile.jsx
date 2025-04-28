@@ -11,8 +11,6 @@ const Profile = () => {
     email: "",
     phone: "",
     address: "",
-    payment_method: "",
-    card_number: "",
   });
   const [bookings, setBookings] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -29,38 +27,53 @@ const Profile = () => {
           return;
         }
 
-        // Fetch profile data using GET request
-        const profileResponse = await hotelApi.get("/getguestprofile", {
+        // Fetch all data using GET request
+        const profileResponse = await hotelApi.get("/getguestdetails", {
           params: { guest_id: parseInt(guest_id) },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        console.log("Profile Response:", profileResponse.data);
+        if (profileResponse.data) {
+          const { guests_by_pk, bookings, payments } = profileResponse.data;
 
-        if (profileResponse.data && profileResponse.data.guests_by_pk) {
-          const profileData = profileResponse.data.guests_by_pk;
-          setProfile({
-            full_name: profileData.full_name || "",
-            email: profileData.contact_info?.email || "",
-            phone: profileData.contact_info?.phone || "",
-            address: profileData.address || "",
-            payment_method: profileData.payment_method || "",
-            card_number: profileData.card_number || "",
-          });
+          if (guests_by_pk) {
+            setProfile({
+              full_name: guests_by_pk.full_name || "",
+              email: guests_by_pk.contact_info?.email || "",
+              phone: guests_by_pk.contact_info?.phone || "",
+              address: guests_by_pk.address || "",
+            });
+          }
 
-          // Extract bookings and transactions
-          const bookingsData = profileData.bookings || [];
-          setBookings(bookingsData);
+          if (bookings) {
+            // Associate payments with bookings using booking_id
+            const bookingsWithPayments = bookings.map((booking) => ({
+              ...booking,
+              payments: payments.filter((payment) => payment.booking_id === booking.booking_id),
+            }));
+            setBookings(bookingsWithPayments);
+          }
 
-          const paymentsData = bookingsData.flatMap((booking) => booking.payments || []);
-          setTransactions(paymentsData);
+          // Set transactions if payments exist
+          setTransactions(payments || []);
         } else {
           throw new Error("Invalid profile response structure");
         }
 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching profile data:", err.response?.data || err.message);
-        setError("Failed to fetch profile data. Please try again.");
+        console.error("Error fetching profile data:", err.response?.data || err.message || err);
+
+        // Gracefully handle missing fields
+        if (err.response?.data?.code === "validation-failed") {
+          setError("Some data could not be loaded, but the rest is displayed.");
+          setTransactions([]); // Fallback to empty transactions
+        } else {
+          setError("Failed to fetch profile data. Please try again.");
+        }
+
         setLoading(false);
       }
     };
@@ -111,14 +124,6 @@ const Profile = () => {
                     Transaction History
                   </button>
                   <button
-                    onClick={() => setSelectedSection("FAQs")}
-                    className={`block py-2 px-4 ${
-                      selectedSection === "FAQs" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
-                    } rounded-md font-medium`}
-                  >
-                    FAQs
-                  </button>
-                  <button
                     onClick={() => {
                       localStorage.removeItem("token");
                       navigate("/login");
@@ -155,14 +160,6 @@ const Profile = () => {
                       <h3 className="text-sm font-medium text-gray-500">Address</h3>
                       <p className="mt-1 text-gray-900">{profile.address}</p>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">Payment Method</h3>
-                      <p className="mt-1 text-gray-900">{profile.payment_method}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">Card Number</h3>
-                      <p className="mt-1 text-gray-900">{profile.card_number}</p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -178,11 +175,26 @@ const Profile = () => {
                     <ul className="space-y-4">
                       {bookings.map((booking) => (
                         <li key={booking.booking_id} className="border-b pb-4">
-                          <p>Room ID: {booking.room_id}</p>
                           <p>Check-In: {booking.check_in_date}</p>
                           <p>Check-Out: {booking.check_out_date}</p>
                           <p>Status: {booking.status}</p>
                           <p>Total Amount: ₱{booking.total_amount}</p>
+                          {booking.payments && booking.payments.length > 0 && (
+                            <div className="mt-4">
+                              <h3 className="text-sm font-medium text-gray-500">Payments</h3>
+                              <ul className="space-y-2">
+                                {booking.payments.map((payment) => (
+                                  <li key={payment.payment_id}>
+                                    <p>Payment ID: {payment.payment_id}</p>
+                                    <p>Amount: ₱{payment.amount}</p>
+                                    <p>Date: {payment.payment_date}</p>
+                                    <p>Status: {payment.payment_status}</p>
+                                    <p>Method: {payment.payment_method}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>
@@ -199,26 +211,19 @@ const Profile = () => {
                     <p>No transactions found.</p>
                   ) : (
                     <ul className="space-y-4">
-                      {transactions.map((transaction) => (
-                        <li key={transaction.payment_id} className="border-b pb-4">
-                          <p>Payment ID: {transaction.payment_id}</p>
-                          <p>Amount: ₱{transaction.amount}</p>
-                          <p>Date: {transaction.payment_date}</p>
-                          <p>Status: {transaction.payment_status}</p>
-                          <p>Method: {transaction.payment_method}</p>
-                        </li>
-                      ))}
+                      {transactions
+                        .filter((transaction) => transaction.guest_id === parseInt(localStorage.getItem("userId")))
+                        .map((transaction) => (
+                          <li key={transaction.payment_id} className="border-b pb-4">
+                            <p>Payment ID: {transaction.payment_id}</p>
+                            <p>Amount: ₱{transaction.amount}</p>
+                            <p>Date: {transaction.payment_date}</p>
+                            <p>Status: {transaction.payment_status}</p>
+                            <p>Method: {transaction.payment_method}</p>
+                          </li>
+                        ))}
                     </ul>
                   )}
-                </div>
-              </div>
-            )}
-
-            {selectedSection === "FAQs" && (
-              <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4">FAQs</h2>
-                  <p>Coming soon...</p>
                 </div>
               </div>
             )}

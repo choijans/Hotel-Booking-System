@@ -63,7 +63,7 @@ const GuestProfile = () => {
         guest_id: parseInt(userId),
       };
 
-      const response = await fetch("/api/insertguest", {
+      const response = await fetch("http://localhost:8080/api/rest/insertguest", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
