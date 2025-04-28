@@ -120,7 +120,8 @@ const Profile = () => {
                   </button>
                   <button
                     onClick={() => {
-                      localStorage.removeItem("token");
+                      localStorage.clear(); // Clear all localStorage data
+                      setCurrentUser(null); // Reset the currentUser in the AuthProvider context
                       navigate("/login");
                     }}
                     className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium"

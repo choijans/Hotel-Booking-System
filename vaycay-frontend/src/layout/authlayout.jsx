@@ -8,6 +8,9 @@ const AuthLayout = () => {
   if (loading) return <div>Loading...</div>; // Show a loading state while initializing auth
 
   if (!currentUser && !localStorage.getItem("token")) {
+    console.log("AuthLayout: User not authenticated");
+    console.log("currentUser:", currentUser);
+    console.log("token:", localStorage.getItem("token"));
     return <Navigate to="/login" />;
   }
 

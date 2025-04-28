@@ -1,61 +1,44 @@
 import { useState } from "react";
+import { authApi, setAuthToken } from "../../api"; // Use the same API setup as Login.jsx
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../../context/AuthProvider"; // Import useAuth
 import logoImage from "../../assets/logo.png"; // Assuming you have a logo image
 
 const AdminSignIn = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-  const [error, setError] = useState(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { setCurrentUser } = useAuth(); // Access setCurrentUser from useAuth
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
       // Make API call to authenticate admin
-      const response = await axios.post(
-        "http://localhost:8080/api/rest/adminlogin",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-hasura-admin-secret": "supersecureadminsecret",
-          },
-        }
-      );
+      const res = await authApi.post("/login", { username, password });
+      console.log("Admin Login response:", res.data);
 
-      console.log("Login response:", response.data);
+      // Check if the user has an admin role
+      if (res.data.user.role === "admin") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.setItem("adminToken", res.data.token);
+        localStorage.setItem("adminInfo", JSON.stringify(res.data.user));
+        setCurrentUser(res.data.user); // Update the currentUser in the AuthProvider context
 
-      // Check if login was successful
-      if (response.data.success) {
-        // Store admin token in localStorage
-        localStorage.setItem("adminToken", response.data.token);
-        localStorage.setItem("adminInfo", JSON.stringify(response.data.adminInfo));
-        
-        // Redirect to admin dashboard
+        console.log("Redirecting to /admin/dashboard");
         navigate("/admin/dashboard");
       } else {
-        setError(response.data.message || "Invalid credentials");
+        // If the user is not an admin, show an error
+        setError("Access denied. Only admins can sign in here.");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError(
-        err.response?.data?.message || "Failed to sign in. Please try again."
-      );
+      console.error("Admin Login error:", err);
+      setError("Invalid username or password.");
     } finally {
       setLoading(false);
     }
@@ -66,7 +49,7 @@ const AdminSignIn = () => {
       className="min-h-screen flex items-center justify-center bg-center bg-no-repeat"
       style={{
         backgroundImage: `url('/src/assets/bgbg.jpg')`,
-        backgroundSize: 'cover', // Adjust the size of the background image
+        backgroundSize: "cover", // Adjust the size of the background image
       }}
     >
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
@@ -83,7 +66,7 @@ const AdminSignIn = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleAdminLogin}>
           <div className="mb-4">
             <label
               htmlFor="username"
@@ -95,8 +78,8 @@ const AdminSignIn = () => {
               type="text"
               id="username"
               name="username"
-              value={formData.username}
-              onChange={handleChange}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               placeholder="Enter your username"
@@ -114,8 +97,8 @@ const AdminSignIn = () => {
               type="password"
               id="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               placeholder="Enter your password"
