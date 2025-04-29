@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
@@ -22,7 +23,11 @@ const HotelRooms = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await hotelApi.get(`/getroomsbyhotel?hotel_id=${hotelId}`);
+        const response = await axios.get(`http://localhost:8080/api/rest/getroomsbyhotel?hotel_id=${hotelId}`, {
+            headers: {
+              "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+            },
+          });
         if (response.data && response.data.rooms) {
           setRooms(response.data.rooms);
           setFilteredRooms(response.data.rooms);

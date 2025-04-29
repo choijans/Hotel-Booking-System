@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
@@ -17,7 +18,12 @@ const RecommendedHotels = () => {
   useEffect(() => {
     const fetchHotels = async () => {
       try {
-        const response = await hotelApi.get("/getallhotels");
+        // const response = await hotelApi.get("/getallhotels");
+        const response = await axios.get("http://localhost:8080/api/rest/getallhotels", {
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+          },
+        });
         if (response.data && response.data.hotels) {
           setHotels(response.data.hotels);
           setFilteredHotels(response.data.hotels);
@@ -91,10 +97,11 @@ const RecommendedHotels = () => {
           {filteredHotels.map((hotel) => (
             <div key={hotel.hotel_id} className={styles["recohotels-hotel-card"]}>
               <div className={styles["recohotels-hotel-image"]}>
-                <img
-                  src="https://via.placeholder.com/300x200" // Replace with actual hotel image URL if available
-                  alt={hotel.hotel_name}
-                />
+              <img
+                src={`/src/assets/admin_pics/hotel${(hotel.hotel_id % 3) + 1}.jpg`}
+                alt={hotel.hotel_name}
+              />
+
               </div>
               <div className={styles["recohotels-hotel-details"]}>
                 <h3 className={styles["recohotels-hotel-name"]}>{hotel.hotel_name}</h3>
