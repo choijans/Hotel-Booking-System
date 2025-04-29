@@ -17,8 +17,8 @@ import AdminRoute from "./components/AdminRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Users from "./pages/admin/users";
 import UserDetails from "./pages/admin/userdetails";
-import Hotels from "./pages/admin/hotel_rooms";
 import HotelDetails from "./pages/admin/hoteldetails"; 
+import EditHotel from "./pages/admin/editHotel";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import Settings from "./pages/admin/Settings";
@@ -55,8 +55,8 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/users/:guest_id" element={<UserDetails />} />
-            <Route path="/admin/hotels" element={<Hotels />} />
-            <Route path="/admin/hotels/:hotel_id" element={<HotelDetails />} />s
+            <Route path="/admin/hotels/:hotel_id" element={<HotelDetails />} />
+            <Route path="/admin/hotels/:hotel_id/edit" element={<EditHotel />} />
             <Route path="/admin/settings" element={<Settings />} />
 
           </Route>

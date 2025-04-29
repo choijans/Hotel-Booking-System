@@ -130,60 +130,48 @@ const AdminDashboard = () => {
       <div className="mt-12">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Hotels Management</h2>
-          <div className="flex space-x-4">
-            {/* <Link
-              to="/admin/hotels"
-              className="bg-gray-100 text-teal-600 px-4 py-2 rounded-md border border-teal-600 hover:bg-C1E3E2"
-            >
-              Explore Hotels
-            </Link> */}
-            <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
-              Add New Hotel
-            </button>
-          </div>
+          <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
+            Add New Hotel
+          </button>
         </div>
 
-        {/* Display loading, error, or table */}
+        {/* Display loading, error, or grid */}
         {loading ? (
           <p>Loading hotels...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <table className="w-full bg-white shadow-md rounded-lg">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">ID</th>
-                <th className="px-4 py-2 text-left">Hotel Name</th>
-                <th className="px-4 py-2 text-left">Location</th>
-                <th className="px-4 py-2 text-left">Description</th>
-                <th className="px-4 py-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {hotels.map((hotel) => (
-                <tr 
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {hotels.map((hotel, index) => {
+              // Cycle through static images
+              const imageIndex = (index % 3) + 1; // Cycles between 1, 2, and 3
+              const imagePath = `/src/assets/admin_pics/hotel${imageIndex}.jpg`;
+
+              return (
+                <div
                   key={hotel.hotel_id}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => (window.location.href = `/admin/hotels/${hotel.id}`)} // Redirect on row click
+                  className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => (window.location.href = `/admin/hotels/${hotel.hotel_id}`)} // Redirect to hotel details page
                 >
-                  <td className="px-4 py-2">{hotel.hotel_id}</td>
-                  <td className="px-4 py-2">{hotel.hotel_name}</td>
-                  <td className="px-4 py-2">{hotel.location.location_name}</td>
-                  <td className="px-4 py-2">{hotel.description}</td>
-                  <td className="px-4 py-2">
-                    <div className="flex space-x-2">
-                        <button>
-                        <img src={editIcon} alt="Edit" className="w-6 h-6" />
-                        </button>
-                        <button>
-                        <img src={deleteIcon} alt="Delete" className="w-6 h-6" />
-                        </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  {/* Hotel Image */}
+                  <img
+                    src={imagePath}
+                    alt={hotel.hotel_name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-teal-600">{hotel.hotel_name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Location: {hotel.location.location_name}
+                    </p>
+                    <p className="text-sm text-gray-700 mt-2 line-clamp-3">
+                      {hotel.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

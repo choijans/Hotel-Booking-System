@@ -1,5 +1,5 @@
 {
-  "resource_version": 66,
+  "resource_version": 18,
   "metadata": {
     "version": 3,
     "sources": [
@@ -173,6 +173,25 @@
                     "updated_at"
                   ],
                   "filter": {}
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "full_name",
+                    "birthdate",
+                    "guest_id",
+                    "contact_info",
+                    "address",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "check": null
                 },
                 "comment": ""
               }
@@ -581,6 +600,18 @@
             {
               "name": "CreatePayment",
               "query": "mutation CreatePayment(\n  $booking_id: Int!\n  $amount: numeric!\n  $payment_method: String!\n) {\n  insert_payments_one(object: {\n    booking_id: $booking_id,\n    amount: $amount,\n    payment_method: $payment_method,\n    payment_status: \"Pending\",\n    payment_date: \"now()\"\n  }) {\n    payment_id\n  }\n}"
+            },
+            {
+              "name": "UpdateGuestProfile",
+              "query": "mutation UpdateGuestProfile(\r\n  $guest_id: Int!\r\n  $full_name: String\r\n  $phone: String\r\n  $address: String\r\n  $birthdate: date\r\n) {\r\n  update_guests_by_pk(\r\n    pk_columns: { guest_id: $guest_id }\r\n    _set: {\r\n      full_name: $full_name\r\n      contact_info: { phone: $phone } # Update the entire contact_info object\r\n      address: $address\r\n      birthdate: $birthdate\r\n    }\r\n  ) {\r\n    guest_id\r\n    full_name\r\n    contact_info\r\n    address\r\n    birthdate\r\n  }\r\n}"
+            },
+            {
+              "name": "UpdateHotelDetails",
+              "query": "mutation UpdateHotelDetails(\r\n  $hotel_id: Int!,\r\n  $hotel_name: String!,\r\n  $description: String!,\r\n  $location_id: Int!,\r\n  $location_name: String!,\r\n  $location_description: String!\r\n) {\r\n  # Update the hotel details\r\n  update_hotels_by_pk(\r\n    pk_columns: { hotel_id: $hotel_id },\r\n    _set: {\r\n      hotel_name: $hotel_name,\r\n      description: $description\r\n    }\r\n  ) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n  }\r\n\r\n  # Update the location details\r\n  update_locations_by_pk(\r\n    pk_columns: { location_id: $location_id },\r\n    _set: {\r\n      location_name: $location_name,\r\n      description: $location_description\r\n    }\r\n  ) {\r\n    location_id\r\n    location_name\r\n    description\r\n  }\r\n}"
+            },
+            {
+              "name": "GetHotelData",
+              "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n      }\r\n    }\r\n  }\r\n}"
             }
           ]
         }
@@ -754,6 +785,20 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "GetHotelData"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetHotelData",
+        "url": "gethoteldata"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "GetRoomDetails"
           }
         },
@@ -790,6 +835,34 @@
         ],
         "name": "CreateGuest",
         "url": "insertguest"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "UpdateGuestProfile"
+          }
+        },
+        "methods": [
+          "PUT"
+        ],
+        "name": "UpdateGuestProfile",
+        "url": "updateguestprofile"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "UpdateHotelDetails"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "UpdateHotelDetails",
+        "url": "updatehoteldetails"
       }
     ]
   }
