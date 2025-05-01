@@ -22,7 +22,11 @@ import EditHotel from "./pages/admin/editHotel";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import Settings from "./pages/admin/Settings";
-import EditProfile from "./pages/EditProfile"
+import EditProfile from "./pages/EditProfile";
+import AddHotel from "./pages/admin/addhotel";
+import AddRooms from "./pages/admin/addrooms";
+import EditRooms from "./pages/admin/editrooms";
+
 
 function App() {
   return (
@@ -57,6 +61,9 @@ function App() {
             <Route path="/admin/users/:guest_id" element={<UserDetails />} />
             <Route path="/admin/hotels/:hotel_id" element={<HotelDetails />} />
             <Route path="/admin/hotels/:hotel_id/edit" element={<EditHotel />} />
+            <Route path="/admin/hotels/addhotel" element={<AddHotel />} />
+            <Route path="/admin/hotels/:hotel_id/addroom" element={<AddRooms />} />
+            <Route path="/admin/hotels/:hotel_id/rooms/:room_id/edit" element={<EditRooms />} />
             <Route path="/admin/settings" element={<Settings />} />
 
           </Route>

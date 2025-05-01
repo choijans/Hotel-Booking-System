@@ -72,6 +72,18 @@ const PaymentScreen = () => {
       alert("Invalid expiry date. Use MM/YY format.");
       return;
     }
+    const [expMonth, expYear] = expiryDate.split("/").map(Number);
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100; // Get last two digits
+    const currentMonth = currentDate.getMonth() + 1;
+
+    if (
+      expYear < currentYear ||
+      (expYear === currentYear && expMonth < currentMonth)
+    ) {
+      alert("Card has already expired.");
+      return;
+    }
     if (!cvv || cvv.length < 3) {
       alert("Invalid CVV.");
       return;

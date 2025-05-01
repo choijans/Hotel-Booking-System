@@ -130,7 +130,10 @@ const AdminDashboard = () => {
       <div className="mt-12">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Hotels Management</h2>
-          <button className="bg-teal-600 text-white px-4 py-2 rounded-md">
+          <button
+            className="bg-teal-600 text-white px-4 py-2 rounded-md"
+            onClick={() => (window.location.href = "/admin/hotels/addhotel")}
+          >
             Add New Hotel
           </button>
         </div>
