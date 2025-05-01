@@ -1,5 +1,5 @@
 {
-  "resource_version": 18,
+  "resource_version": 29,
   "metadata": {
     "version": 3,
     "sources": [
@@ -610,8 +610,32 @@
               "query": "mutation UpdateHotelDetails(\r\n  $hotel_id: Int!,\r\n  $hotel_name: String!,\r\n  $description: String!,\r\n  $location_id: Int!,\r\n  $location_name: String!,\r\n  $location_description: String!\r\n) {\r\n  # Update the hotel details\r\n  update_hotels_by_pk(\r\n    pk_columns: { hotel_id: $hotel_id },\r\n    _set: {\r\n      hotel_name: $hotel_name,\r\n      description: $description\r\n    }\r\n  ) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n  }\r\n\r\n  # Update the location details\r\n  update_locations_by_pk(\r\n    pk_columns: { location_id: $location_id },\r\n    _set: {\r\n      location_name: $location_name,\r\n      description: $location_description\r\n    }\r\n  ) {\r\n    location_id\r\n    location_name\r\n    description\r\n  }\r\n}"
             },
             {
+              "name": "createHotel",
+              "query": "mutation AddHotel(\r\n  $hotel_name: String!,\r\n  $location_name: String!,\r\n  $location_description: String!,\r\n  $description: String!\r\n) {\r\n  insert_locations_one(\r\n    object: {\r\n      location_name: $location_name,\r\n      description: $location_description,\r\n      hotels: {\r\n        data: {\r\n          hotel_name: $hotel_name,\r\n          description: $description\r\n        }\r\n      }\r\n    }\r\n  ) {\r\n    location_id\r\n    location_name\r\n    description\r\n    hotels {\r\n      hotel_id\r\n      hotel_name\r\n      description\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "DeleteRoom",
+              "query": "mutation DeleteRoom($room_id: Int!) {\r\n  delete_rooms_by_pk(room_id: $room_id) {\r\n    room_id\r\n    room_number\r\n  }\r\n}"
+            },
+            {
+              "name": "CheckRoomDependencies",
+              "query": "query CheckRoomDependencies($room_id: Int!) {\r\n  bookings(where: { room_id: { _eq: $room_id } }) {\r\n    booking_id\r\n  }\r\n}"
+            },
+            {
+              "name": "EditRoom",
+              "query": "mutation EditRoom(\r\n  $room_id: Int!,\r\n  $room_number: String!,\r\n  $type_name: String!,\r\n  $type_description: String!,\r\n  $price: numeric!,\r\n  $availability: Boolean!,\r\n  $description: String!\r\n) {\r\n  update_rooms_by_pk(\r\n    pk_columns: { room_id: $room_id },\r\n    _set: {\r\n      room_number: $room_number,\r\n      price: $price,\r\n      availability: $availability,\r\n      description: $description,\r\n      updated_at: \"now()\"\r\n    }\r\n  ) {\r\n    room_id\r\n    room_number\r\n    price\r\n    availability\r\n    description\r\n  }\r\n\r\n  update_room_types(\r\n    where: { type_name: { _eq: $type_name } },\r\n    _set: { description: $type_description }\r\n  ) {\r\n    affected_rows\r\n  }\r\n}"
+            },
+            {
               "name": "GetHotelData",
-              "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n      }\r\n    }\r\n  }\r\n}"
+              "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "AddRoom",
+              "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n}"
+            },
+            {
+              "name": "DeleteBooking",
+              "query": "mutation DeleteBooking($booking_id: Int!) {\r\n  delete_bookings_by_pk(booking_id: $booking_id) {\r\n    booking_id\r\n  }\r\n}"
             }
           ]
         }
@@ -626,6 +650,48 @@
       }
     ],
     "rest_endpoints": [
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "createHotel"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "createHotel",
+        "url": "addhotel"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "AddRoom"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "AddRoom",
+        "url": "addroom"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "CheckRoomDependencies"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "CheckRoomDependencies",
+        "url": "checkroomdependencies"
+      },
       {
         "comment": "",
         "definition": {
@@ -653,6 +719,48 @@
         ],
         "name": "CreatePayment",
         "url": "createpayment"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "DeleteBooking"
+          }
+        },
+        "methods": [
+          "DELETE"
+        ],
+        "name": "DeleteBooking",
+        "url": "deletebooking"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "DeleteRoom"
+          }
+        },
+        "methods": [
+          "DELETE"
+        ],
+        "name": "DeleteRoom",
+        "url": "deleteroom"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "EditRoom"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "EditRoom",
+        "url": "editroom"
       },
       {
         "comment": "",

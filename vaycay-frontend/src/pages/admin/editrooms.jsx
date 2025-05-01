@@ -116,6 +116,18 @@ const EditRooms = () => {
             />
           </div>
           <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              Room Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+            />
+          </div>
+          <div>
             <label htmlFor="typeName" className="block text-sm font-medium text-gray-700">
               Room Type Name
             </label>
@@ -166,18 +178,6 @@ const EditRooms = () => {
               <option value="true">Available</option>
               <option value="false">Not Available</option>
             </select>
-          </div>
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Room Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
-            />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}

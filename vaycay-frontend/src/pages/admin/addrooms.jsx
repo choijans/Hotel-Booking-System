@@ -9,9 +9,10 @@ const AddRooms = () => {
 
   const [roomNumber, setRoomNumber] = useState("");
   const [roomType, setRoomType] = useState("");
+  const [roomTypeDescription, setRoomTypeDescription] = useState(""); // New state for room_type.description
   const [price, setPrice] = useState("");
   const [availability, setAvailability] = useState(true);
-  const [description, setDescription] = useState(""); // New state for description
+  const [description, setDescription] = useState(""); // New state for rooms.description
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -21,7 +22,8 @@ const AddRooms = () => {
     const requestBody = {
       hotel_id: parseInt(hotel_id),
       room_number: roomNumber,
-      room_type: roomType,
+      room_type: roomType, // Send type_name
+      room_type_description: roomTypeDescription, // Send type_description
       price: parseFloat(price),
       availability: availability,
       description: description, // Include description in the request body
@@ -80,14 +82,38 @@ const AddRooms = () => {
           />
         </div>
         <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            Room Description
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+          />
+        </div>
+        <div>
           <label htmlFor="roomType" className="block text-sm font-medium text-gray-700">
-            Room Type
+            Room Type Name
           </label>
           <input
             type="text"
             id="roomType"
             value={roomType}
             onChange={(e) => setRoomType(e.target.value)}
+            required
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="roomTypeDescription" className="block text-sm font-medium text-gray-700">
+            Room Type Description
+          </label>
+          <textarea
+            id="roomTypeDescription"
+            value={roomTypeDescription}
+            onChange={(e) => setRoomTypeDescription(e.target.value)}
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
           />
@@ -118,18 +144,6 @@ const AddRooms = () => {
             <option value="true">Available</option>
             <option value="false">Not Available</option>
           </select>
-        </div>
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
-          />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         {success && <p className="text-sm text-green-600">{success}</p>}

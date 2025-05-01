@@ -10,9 +10,11 @@ const HotelDetails = () => {
   const [hotelData, setHotelData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [roomToDelete, setRoomToDelete] = useState(null); // Track the room to delete
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // Show confirmation dialog
-  const [activeTab, setActiveTab] = useState("rooms"); // Add activeTab state with default value "rooms"
+  const [roomToDelete, setRoomToDelete] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+  const [activeTab, setActiveTab] = useState("rooms");
+  const [bookingToDelete, setBookingToDelete] = useState(null); 
+  const [showDeleteBookingConfirmation, setShowDeleteBookingConfirmation] = useState(false);  
 
   useEffect(() => {
     const fetchHotelData = async () => {
@@ -23,8 +25,12 @@ const HotelDetails = () => {
             "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
           },
         });
-
-        setHotelData(response.data.hotels_by_pk);
+  
+        console.log("API Response:", response.data); // Log the API response
+        setHotelData({
+          ...response.data.hotels_by_pk,
+          bookings: response.data.bookings, // Include bookings in the state
+        });
         setLoading(false);
       } catch (err) {
         console.error("Error fetching hotel data:", err);
@@ -32,7 +38,7 @@ const HotelDetails = () => {
         setLoading(false);
       }
     };
-
+  
     fetchHotelData();
   }, [hotel_id]);
 
@@ -83,6 +89,43 @@ const HotelDetails = () => {
     } catch (err) {
       console.error("Error deleting room:", err.response?.data || err.message);
       alert("Failed to delete the room. Please try again.");
+    }
+  };
+
+  const handleDeleteBooking = (booking_id) => {
+    setBookingToDelete(booking_id); // Set the booking to delete
+    setShowDeleteBookingConfirmation(true); // Show the confirmation dialog
+  };
+  
+  const confirmDeleteBooking = async () => {
+    try {
+      await axios.request({
+        method: "DELETE",
+        url: "http://localhost:8080/api/rest/deletebooking",
+        data: { booking_id: bookingToDelete },
+        headers: {
+          "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+          "Content-Type": "application/json",
+        },
+      });
+  
+      // Refresh the hotel data after deletion
+      const response = await axios.get("http://localhost:8080/api/rest/gethoteldata", {
+        params: { hotel_id },
+        headers: {
+          "x-hasura-admin-secret": "supersecureadminsecret",
+        },
+      });
+  
+      setHotelData({
+        ...response.data.hotels_by_pk,
+        bookings: response.data.bookings, // Update bookings in the state
+      });
+      setShowDeleteBookingConfirmation(false);
+      setBookingToDelete(null);
+    } catch (err) {
+      console.error("Error deleting booking:", err.response?.data || err.message);
+      alert("Failed to delete the booking. Please try again.");
     }
   };
 
@@ -192,45 +235,54 @@ const HotelDetails = () => {
               </div>
             )}
 
-{activeTab === "bookings" && (
-  <div className="mt-4">
-    <h2 className="text-xl font-bold">Bookings</h2>
-    <table className="w-full bg-white shadow-md rounded-lg mt-4">
-      <thead>
-        <tr className="bg-gray-100">
-          <th className="px-4 py-2 text-left">Booking ID</th>
-          <th className="px-4 py-2 text-left">Guest ID</th>
-          <th className="px-4 py-2 text-left">Room Number</th>
-          <th className="px-4 py-2 text-left">Check-In</th>
-          <th className="px-4 py-2 text-left">Check-Out</th>
-          <th className="px-4 py-2 text-left">Status</th>
-          <th className="px-4 py-2 text-left">Total Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {hotelData?.bookings?.length > 0 ? (
-          hotelData.bookings.map((booking) => (
-            <tr key={booking.booking_id}>
-              <td className="px-4 py-2">{booking.booking_id}</td>
-              <td className="px-4 py-2">{booking.guest_id}</td>
-              <td className="px-4 py-2">{booking.room.room_number}</td>
-              <td className="px-4 py-2">{booking.check_in_date}</td>
-              <td className="px-4 py-2">{booking.check_out_date}</td>
-              <td className="px-4 py-2">{booking.status}</td>
-              <td className="px-4 py-2">₱{booking.total_amount}</td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
-              No bookings found.
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-)}
+            {activeTab === "bookings" && (
+              <div className="mt-4">
+                <h2 className="text-xl font-bold">Bookings</h2>
+                <table className="w-full bg-white shadow-md rounded-lg mt-4">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">Booking ID</th>
+                      <th className="px-4 py-2 text-left">Guest ID</th>
+                      <th className="px-4 py-2 text-left">Room Number</th>
+                      <th className="px-4 py-2 text-left">Check-In</th>
+                      <th className="px-4 py-2 text-left">Check-Out</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                      <th className="px-4 py-2 text-left">Total Amount</th>
+                      <th className="px-4 py-2 text-left">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hotelData?.bookings?.length > 0 ? (
+                      hotelData.bookings.map((booking) => (
+                        <tr key={booking.booking_id}>
+                          <td className="px-4 py-2">{booking.booking_id}</td>
+                          <td className="px-4 py-2">{booking.guest_id}</td>
+                          <td className="px-4 py-2">{booking.room.room_number}</td>
+                          <td className="px-4 py-2">{booking.check_in_date}</td>
+                          <td className="px-4 py-2">{booking.check_out_date}</td>
+                          <td className="px-4 py-2">{booking.status}</td>
+                          <td className="px-4 py-2">₱{booking.total_amount}</td>
+                          <td className="px-4 py-2">
+                            <button
+                              onClick={() => handleDeleteBooking(booking.booking_id)}
+                              className="flex items-center text-red-600 hover:underline"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
+                          No bookings found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {showDeleteConfirmation && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -247,6 +299,30 @@ const HotelDetails = () => {
                     </button>
                     <button
                       onClick={confirmDeleteRoom}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showDeleteBookingConfirmation && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg">
+                  <p className="text-lg font-medium mb-4">
+                    Are you sure you want to delete this booking?
+                  </p>
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      onClick={() => setShowDeleteBookingConfirmation(false)}
+                      className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmDeleteBooking}
                       className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                     >
                       Delete

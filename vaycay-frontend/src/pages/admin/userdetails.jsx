@@ -70,7 +70,12 @@ const UserDetails = () => {
           <div className="mt-4">
             <h2 className="text-xl font-bold">Personal Information</h2>
             <p>Full Name: {userDetails.full_name}</p>
-            <p>Contact Info: {JSON.stringify(userDetails.contact_info)}</p>
+            <p>
+              Contact Info:{" "}
+              {userDetails.contact_info?.phone
+                ? userDetails.contact_info.phone
+                : "No contact information available"}
+            </p>
             <p>Address: {userDetails.address}</p>
           </div>
 
