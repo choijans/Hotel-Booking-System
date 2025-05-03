@@ -68,6 +68,9 @@ const RecommendedHotels = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          borderBottomLeftRadius: '25px',
+          borderBottomRightRadius: '25px',
+          boxShadow: '0 2px 14px rgba(0, 0, 0, 0.3)',
         }}
       ></div>
       <div className={styles["recohotels-search-section-container"]}>
