@@ -1,6 +1,7 @@
 /* General Layout */
 body {
-  background-color: #219995; /* Original teal background */
+  background-color: #FFFDF7;
+  /* background-color: #3CA7A3; */
 }
 
 .recohotels-recommended-hotels-container {
@@ -91,15 +92,37 @@ body {
 }
 
 /* Search Section */
+/* .recohotels-search-section-container {
+  background-color: #FFFDF7;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  padding-top: 15px;
+  max-width: 1160px;
+  margin: 0 auto;
+  margin-top: 150px;
+  border-radius: 20px;
+  margin-bottom: 100px;
+} */
+
 .recohotels-search-section-container {
-  background-color: #F6F3E9; /* Beige background for the search section */
-  padding: 20px 0;
+  background-color: rgba(255, 255, 255, 0.4); /* 50% transparent white */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  padding-top: 15px;
+  max-width: 1160px;
+  margin: 0 auto;
+  margin-top: 90px;
+  border-radius: 20px;
+  margin-bottom: 90px;
 }
 
+
 .recohotels-search-section {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   text-align: center;
+  padding-top: 5px;
 }
 
 .recohotels-search-fields {
@@ -113,18 +136,27 @@ body {
   flex: 1;
 }
 
+.recohotels-search-field label{
+  /* color: #15706D; */
+  color: #10716D;
+}
+
 .recohotels-search-field input {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.6);
 }
+
 
 .recohotels-search-button {
   background: #219995;
   color: #fff;
   border: none;
   padding: 8px 16px; /* Reduced padding for a smaller button */
+  margin-top: 35px;
+  height: 45px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px; /* Adjusted font size */
@@ -134,16 +166,26 @@ body {
 .recohotels-search-button:hover {
   background: #1b7a7a;
 }
+
 .recohotels-search-fields {
   display: flex;
   gap: 10px;
   justify-content: center;
+  text-align: left;
   margin-top: 10px;
 }
 
 .recohotels-search-field {
   flex: 1;
 }
+
+.recohotels-search-field label {
+  display: block;
+  margin-bottom: 6px; /* or whatever spacing you prefer */
+  margin-top: 6px;
+  font-weight: 500; /* optional for better clarity */
+}
+
 
 .recohotels-search-field input {
   width: 100%;
@@ -153,7 +195,7 @@ body {
 }
 
 .recohotels-search-button {
-  background: #219995;
+  background: #1b7a7a;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -162,5 +204,5 @@ body {
 }
 
 .recohotels-search-button:hover {
-  background: #1a7a73;
+  background: #219995;
 }

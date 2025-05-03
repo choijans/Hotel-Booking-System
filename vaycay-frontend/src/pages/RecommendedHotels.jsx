@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
 import styles from "./RecommendedHotels.module.css"; // Updated import for CSS Modules
 
+
 const RecommendedHotels = () => {
   const [hotels, setHotels] = useState([]);
   const [filteredHotels, setFilteredHotels] = useState([]);
@@ -59,9 +60,20 @@ const RecommendedHotels = () => {
 
   return (
     <>
+      <div
+        className="absolute top-0 left-0 w-full z-[-1]"
+        style={{
+          height: '440px',
+          backgroundImage: `url('/src/assets/leftbg.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      ></div>
       <div className={styles["recohotels-search-section-container"]}>
         <div className={styles["recohotels-search-section"]}>
-          <h1><b>Search Hotels</b></h1>
+          {/* <h1 className="text-2xl font-bold">Where to?</h1> */}
+          <h1 className="text-2xl font-bold" style={{ color: '#10716D' }}>Where to?</h1>
           <div className={styles["recohotels-search-fields"]}>
             <div className={styles["recohotels-search-field"]}>
               <label>Hotel Name</label>
