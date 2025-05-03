@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { hotelApi } from "../api";
-import styles from "./HotelRooms.module.css"; // Updated import for CSS Modules
+import styles from "./HotelRooms.module.css";
 
 const HotelRooms = () => {
   const { hotelId } = useParams();
@@ -80,9 +80,23 @@ const HotelRooms = () => {
 
   return (
     <>
+      <div
+        className="absolute top-0 left-0 w-full z-[-1]"
+        style={{
+          height: '440px',
+          backgroundImage: `url('/src/assets/leftbg.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          borderBottomLeftRadius: '25px',
+          borderBottomRightRadius: '25px',
+          boxShadow: '0 2px 14px rgba(0, 0, 0, 0.3)',
+        }}
+      ></div>
       <div className={styles["hotelroom-search-section-container"]}>
         <div className={styles["hotelroom-search-section"]}>
-          <h1><b>Filter Rooms</b></h1>
+          {/* <h1>Filter Rooms</h1> */}
+          <h1 className="text-2xl font-bold" style={{ color: '#10716D' }}>Filter Rooms</h1>
           <div className={styles["hotelroom-search-fields"]}>
             <div className={styles["hotelroom-date-field"]}>
               <label>Check In</label>
@@ -164,27 +178,41 @@ const HotelRooms = () => {
       </div>
 
       <div className={styles["hotelroom-rooms-list"]}>
-        <h2>Rooms</h2>
-        <div className={styles["hotelroom-room-cards-container"]}>
-          {filteredRooms.map((room) => (
-            <div key={room.room_id} className={styles["hotelroom-room-card"]}>
-              <div className={styles["hotelroom-room-details"]}>
-                <h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
-                <p className={styles["hotelroom-room-type"]}><strong>Type:</strong> {room.room_type?.type_name || "Unknown Type"}</p>
-                <p className={styles["hotelroom-room-price"]}><strong>Price:</strong> PHP {room.price}</p>
-                <p className={`${styles["hotelroom-room-availability"]} ${room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]}`}>
-                  {room.availability ? "Available" : "Unavailable"}
-                </p>
-                <button
-                  className={styles["hotelroom-book-now-button"]}
-                  onClick={() => handleBookNow(room.room_id)}
-                >
-                  Book Now
-                </button>
+        <h2>Available Rooms</h2>
+        
+        {filteredRooms.length === 0 ? (
+          <div className={styles["hotelroom-no-rooms"]}>
+            <p>No rooms match your search criteria. Try different dates or filters.</p>
+          </div>
+        ) : (
+          <div className={styles["hotelroom-room-cards-container"]}>
+            {filteredRooms.map((room) => (
+              <div key={room.room_id} className={styles["hotelroom-room-card"]}>
+                <div className={styles["hotelroom-room-image"]}>
+                <img
+                  src={`/src/assets/admin_pics/hotel${(room.room_id % 3) + 1}.jpg`}
+                  alt={room.room_name}
+                />
+                </div>
+                <div className={styles["hotelroom-room-details"]}>
+                  <h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
+                  <p className={styles["hotelroom-room-type"]}><strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}</p>
+                  <p className={styles["hotelroom-room-price"]}><strong>Price:</strong> PHP {room.price.toLocaleString()}</p>
+                  <span className={`${styles["hotelroom-room-availability"]} ${room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]}`}>
+                    {room.availability ? "Available" : "Unavailable"}
+                  </span>
+                  <button
+                    className={styles["hotelroom-book-now-button"]}
+                    onClick={() => handleBookNow(room.room_id)}
+                    disabled={!room.availability}
+                  >
+                    {room.availability ? "Book Now" : "Not Available"}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

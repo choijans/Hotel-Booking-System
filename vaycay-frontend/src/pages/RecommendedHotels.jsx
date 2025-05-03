@@ -116,7 +116,6 @@ const RecommendedHotels = () => {
                 src={`/src/assets/admin_pics/hotel${(hotel.hotel_id % 3) + 1}.jpg`}
                 alt={hotel.hotel_name}
               />
-
               </div>
               <div className={styles["recohotels-hotel-details"]}>
                 <h3 className={styles["recohotels-hotel-name"]}>{hotel.hotel_name}</h3>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
@@ -19,10 +20,15 @@ const RoomBooking = () => {
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        const response = await hotelApi.get("/getroomdetails", {
-          params: { room_id: roomId },
+        const response = await axios.get("http://localhost:8080/api/rest/getroomdetails", {
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret",
+          },
+          params: {
+            room_id: roomId,
+          },
         });
-
+        
         if (response.data?.rooms_by_pk) {
           setRoomDetails(response.data.rooms_by_pk);
         } else {
