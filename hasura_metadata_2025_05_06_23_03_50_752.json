@@ -1,5 +1,5 @@
 {
-  "resource_version": 29,
+  "resource_version": 41,
   "metadata": {
     "version": 3,
     "sources": [
@@ -622,20 +622,28 @@
               "query": "query CheckRoomDependencies($room_id: Int!) {\r\n  bookings(where: { room_id: { _eq: $room_id } }) {\r\n    booking_id\r\n  }\r\n}"
             },
             {
-              "name": "EditRoom",
-              "query": "mutation EditRoom(\r\n  $room_id: Int!,\r\n  $room_number: String!,\r\n  $type_name: String!,\r\n  $type_description: String!,\r\n  $price: numeric!,\r\n  $availability: Boolean!,\r\n  $description: String!\r\n) {\r\n  update_rooms_by_pk(\r\n    pk_columns: { room_id: $room_id },\r\n    _set: {\r\n      room_number: $room_number,\r\n      price: $price,\r\n      availability: $availability,\r\n      description: $description,\r\n      updated_at: \"now()\"\r\n    }\r\n  ) {\r\n    room_id\r\n    room_number\r\n    price\r\n    availability\r\n    description\r\n  }\r\n\r\n  update_room_types(\r\n    where: { type_name: { _eq: $type_name } },\r\n    _set: { description: $type_description }\r\n  ) {\r\n    affected_rows\r\n  }\r\n}"
-            },
-            {
               "name": "GetHotelData",
-              "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n}"
-            },
-            {
-              "name": "AddRoom",
               "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n}"
             },
             {
               "name": "DeleteBooking",
               "query": "mutation DeleteBooking($booking_id: Int!) {\r\n  delete_bookings_by_pk(booking_id: $booking_id) {\r\n    booking_id\r\n  }\r\n}"
+            },
+            {
+              "name": "AddRoomType",
+              "query": "mutation AddRoomType($type_name: String!, $description: String!) {\r\n  insert_room_types_one(\r\n    object: { type_name: $type_name, description: $description },\r\n    on_conflict: {\r\n      constraint: room_types_type_name_key, # Ensure this constraint exists in your database\r\n      update_columns: description\r\n    }\r\n  ) {\r\n    type_id\r\n  }\r\n}"
+            },
+            {
+              "name": "AddRoom",
+              "query": "mutation AddRoom(\r\n  $hotel_id: Int!,\r\n  $room_number: String!,\r\n  $type_id: Int!,\r\n  $description: String,\r\n  $price: numeric!,\r\n  $availability: Boolean!\r\n) {\r\n  insert_rooms_one(\r\n    object: {\r\n      hotel_id: $hotel_id,\r\n      room_number: $room_number,\r\n      type_id: $type_id,\r\n      description: $description,\r\n      price: $price,\r\n      availability: $availability\r\n    }\r\n  ) {\r\n    room_id\r\n  }\r\n}"
+            },
+            {
+              "name": "EditRoom",
+              "query": "mutation EditRoom(\r\n  $room_id: Int!,\r\n  $room_number: String!,\r\n  $type_id: Int!,\r\n  $description: String,\r\n  $price: numeric!,\r\n  $availability: Boolean!\r\n) {\r\n  update_rooms_by_pk(\r\n    pk_columns: { room_id: $room_id },\r\n    _set: {\r\n      room_number: $room_number,\r\n      type_id: $type_id,\r\n      description: $description,\r\n      price: $price,\r\n      availability: $availability\r\n    }\r\n  ) {\r\n    room_id\r\n    room_number\r\n    type_id\r\n    description\r\n    price\r\n    availability\r\n  }\r\n}"
+            },
+            {
+              "name": "GetRoomTypesByHotel",
+              "query": "query GetRoomTypesByHotel($hotel_id: Int!) {\r\n  room_types(\r\n    where: {\r\n      rooms: {\r\n        hotel_id: { _eq: $hotel_id }\r\n      }\r\n    }\r\n  ) {\r\n    type_id\r\n    type_name\r\n    description\r\n  }\r\n}"
             }
           ]
         }
@@ -677,6 +685,20 @@
         ],
         "name": "AddRoom",
         "url": "addroom"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "AddRoomType"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "AddRoomType",
+        "url": "addroomtype"
       },
       {
         "comment": "",
@@ -929,6 +951,20 @@
         ],
         "name": "GetRoomsByHotel",
         "url": "getroomsbyhotel"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetRoomTypesByHotel"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetRoomTypesByHotel",
+        "url": "getroomtypesbyhotel"
       },
       {
         "comment": "",

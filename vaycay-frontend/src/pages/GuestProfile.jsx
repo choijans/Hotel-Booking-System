@@ -58,7 +58,7 @@ const GuestProfile = () => {
       const payload = {
         address1: formData.address,
         birthdate1: formData.birthdate,
-        contact_info1: { phone: formData.contact_info },
+        contact_info1: formData.contact_info,
         full_name: formData.full_name,
         guest_id: parseInt(userId),
       };
@@ -126,7 +126,7 @@ const GuestProfile = () => {
               name="contact_info"
               value={formData.contact_info}
               onChange={handleChange}
-              placeholder="XXXX-XXX-XXXX"
+              placeholder="@"
             />
             {errors.contact_info && (
               <span className={styles["guest-error-message"]}>{errors.contact_info}</span>

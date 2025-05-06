@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import backIcon from "../../assets/back.png";
@@ -8,44 +8,62 @@ const AddRooms = () => {
   const navigate = useNavigate();
 
   const [roomNumber, setRoomNumber] = useState("");
-  const [roomType, setRoomType] = useState("");
-  const [roomTypeDescription, setRoomTypeDescription] = useState(""); // New state for room_type.description
+  const [roomTypes, setRoomTypes] = useState([]); // State to store room types
+  const [selectedRoomType, setSelectedRoomType] = useState(""); // State for selected room type
   const [price, setPrice] = useState("");
   const [availability, setAvailability] = useState(true);
   const [description, setDescription] = useState(""); // New state for rooms.description
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Fetch all room types when the component loads
+  useEffect(() => {
+    const getAllRoomTypes = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/rest/getallroomtypes", // REST API endpoint to fetch room types
+          {
+            headers: {
+              "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+            },
+          }
+        );
 
-    const requestBody = {
-      hotel_id: parseInt(hotel_id),
-      room_number: roomNumber,
-      room_type: roomType, // Send type_name
-      room_type_description: roomTypeDescription, // Send type_description
-      price: parseFloat(price),
-      availability: availability,
-      description: description, // Include description in the request body
+        setRoomTypes(response.data.room_types); // Set the fetched room types
+      } catch (err) {
+        console.error("Error fetching room types:", err);
+        setError("Failed to fetch room types. Please try again.");
+      }
     };
 
-    console.log("Request Body:", requestBody);
+    getAllRoomTypes();
+  }, []);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/rest/addroom",
-        requestBody,
+      const roomResponse = await axios.post(
+        "http://localhost:8080/api/rest/addroom", // Updated REST API endpoint
+        {
+          hotel_id: parseInt(hotel_id),
+          room_number: roomNumber,
+          type_id: parseInt(selectedRoomType), // Use the selected room type ID
+          description: description,
+          price: parseFloat(price),
+          availability: availability,
+        },
         {
           headers: {
             "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
           },
         }
       );
-
-      console.log("Response:", response.data);
+  
+      console.log("Room added successfully:", roomResponse.data);
       setSuccess("Room added successfully!");
       setError(null);
-
+  
       // Redirect back to the HotelDetails page
       setTimeout(() => navigate(`/admin/hotels/${hotel_id}`), 2000);
     } catch (err) {
@@ -95,28 +113,24 @@ const AddRooms = () => {
         </div>
         <div>
           <label htmlFor="roomType" className="block text-sm font-medium text-gray-700">
-            Room Type Name
+            Room Type
           </label>
-          <input
-            type="text"
+          <select
             id="roomType"
-            value={roomType}
-            onChange={(e) => setRoomType(e.target.value)}
+            value={selectedRoomType}
+            onChange={(e) => setSelectedRoomType(e.target.value)}
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="roomTypeDescription" className="block text-sm font-medium text-gray-700">
-            Room Type Description
-          </label>
-          <textarea
-            id="roomTypeDescription"
-            value={roomTypeDescription}
-            onChange={(e) => setRoomTypeDescription(e.target.value)}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
-          />
+          >
+            <option value="" disabled>
+              Select a room type
+            </option>
+            {roomTypes.map((type) => (
+              <option key={type.type_id} value={type.type_id}>
+                {type.type_name} - {type.description}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700">

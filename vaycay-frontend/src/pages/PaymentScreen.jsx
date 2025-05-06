@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import emailjs from "@emailjs/browser";
-import { hotelApi } from "../api";
 import styles from "./PaymentScreen.module.css";
 
 // Import card images
 import visaImage from "../assets/visa.png";
 import mastercardImage from "../assets/mastercard.png";
 import amexImage from "../assets/amex.png";
+import axios from "axios";
 
 const PaymentScreen = () => {
   const location = useLocation();
@@ -20,7 +19,6 @@ const PaymentScreen = () => {
   const [cardType, setCardType] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTermsChecked, setIsTermsChecked] = useState(false);
-
 
   const handleCardNumberChange = (e) => {
     let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
@@ -63,7 +61,7 @@ const PaymentScreen = () => {
 
   const handlePayment = async () => {
     if (isProcessing) return;
-  
+
     if (!cardNumber || cardNumber.replace(/\s/g, "").length < 16) {
       alert("Invalid card number.");
       return;
@@ -88,7 +86,7 @@ const PaymentScreen = () => {
       alert("Invalid CVV.");
       return;
     }
-  
+
     setIsProcessing(true);
     try {
       // Step 1: Insert Booking
@@ -99,41 +97,23 @@ const PaymentScreen = () => {
         check_out_date: bookingDetails.check_out_date,
         total_amount: bookingDetails.total_amount,
       };
-  
-      const bookingResponse = await hotelApi.post("/createbooking", bookingPayload);
-  
-      if (!bookingResponse.data?.insert_bookings_one?.booking_id) {
+
+      const bookingResponse = await axios.post("http://localhost:8081/createbooking", bookingPayload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!bookingResponse.data?.booking_id) {
         throw new Error("Failed to create booking.");
       }
-  
-      const bookingId = bookingResponse.data.insert_bookings_one.booking_id;
-  
-      // Step 2: Insert Payment
-      const paymentPayload = {
-        booking_id: bookingId,
-        amount: bookingDetails.total_amount,
-        payment_method: "Credit Card", // Example payment method
-      };
-  
-      const paymentResponse = await hotelApi.post("/createpayment", paymentPayload);
-  
-      if (!paymentResponse.data?.insert_payments_one?.payment_id) {
-        throw new Error("Failed to create payment.");
-      }
-  
-      // Step 3: Send Confirmation Email
-      emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          user_email: "user@example.com", // Replace with actual user email
-          booking_id: bookingId,
-          total_amount: bookingDetails.total_amount,
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      );
-  
-      // Step 4: Navigate to Confirmation Page
+
+      const bookingId = bookingResponse.data.booking_id;
+
+      // Notify the user that the booking was created successfully
+      alert("Booking created successfully! Payment is being processed.");
+
+      // Step 2: Navigate to Confirmation Page
       navigate("/confirmation", {
         state: {
           booking_id: bookingId,
@@ -141,8 +121,8 @@ const PaymentScreen = () => {
         },
       });
     } catch (err) {
-      console.error("Payment failed:", err);
-      alert("Payment failed. Please try again.");
+      console.error("Booking failed:", err);
+      alert("Booking failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -153,7 +133,7 @@ const PaymentScreen = () => {
       <div className={styles["payment-header"]}>
         <h1>Review Your Booking</h1>
       </div>
-      
+
       <div className={styles["payment-container"]}>
         {/* Room Details Section */}
         <div className={styles["booking-section"]}>
@@ -174,50 +154,12 @@ const PaymentScreen = () => {
               <p className={styles["room-description"]}>{bookingDetails.room_details.description}</p>
             </div>
           </div>
-
-          {/* Check-in/Check-out Information */}
-          <div className={styles["booking-dates"]}>
-            <div className={styles["date-block"]}>
-              <span className={styles["date-label"]}>Check-In</span>
-              <span className={styles["date-value"]}>{new Date(bookingDetails.check_in_date).toLocaleDateString()}</span>
-            </div>
-            <div className={styles["date-block"]}>
-              <span className={styles["date-label"]}>Check-Out</span>
-              <span className={styles["date-value"]}>{new Date(bookingDetails.check_out_date).toLocaleDateString()}</span>
-            </div>
-            <div className={styles["date-block"]}>
-              <span className={styles["date-label"]}>Room</span>
-              <span className={styles["date-value"]}>1 Room</span>
-            </div>
-            <div className={styles["date-block"]}>
-              <span className={styles["date-label"]}>Guests</span>
-              <span className={styles["date-value"]}>{bookingDetails.guests || "2"} {(bookingDetails.guests > 1 || bookingDetails.guests === undefined) ? "Adults" : "Adult"}</span>
-            </div>
-          </div>
-
-          {/* Guest Information Section */}
-          {/* <div className={styles["guest-section"]}>
-            <h2>Guest Information</h2>
-            <div className={styles["guest-info"]}>
-              <p className={styles["guest-name"]}>{bookingDetails.guest_name || "Guest Name"}</p>
-              <p className={styles["guest-contact"]}>{bookingDetails.guest_email || "guest@example.com"} • {bookingDetails.guest_phone || "+63 123 456 7890"}</p>
-            </div>
-          </div> */}
-
-          {/* Special Requests Section */}
-          <div className={styles["special-requests"]}>
-            <div className={styles["requests-header"]}>
-              <h2>Special Requests</h2>
-              <button className={styles["edit-button"]}>Edit</button>
-            </div>
-            <p className={styles["request-text"]}>{bookingDetails.special_requests || "High floor, away from elevator if possible."}</p>
-          </div>
         </div>
 
         {/* Payment Details Section */}
         <div className={styles["payment-section"]}>
           <h2>Payment Details</h2>
-          
+
           <div className={styles["payment-form"]}>
             <div className={styles["form-group"]}>
               <label>Card Number</label>
@@ -237,9 +179,9 @@ const PaymentScreen = () => {
                 />
               )}
             </div>
-            
+
             <div className={styles["form-group"]}>
-              <label>Expiry Date(MM/YY)</label>
+              <label>Expiry Date (MM/YY)</label>
               <input
                 type="text"
                 value={expiryDate}
@@ -249,7 +191,7 @@ const PaymentScreen = () => {
                 className={styles["date-input"]}
               />
             </div>
-            
+
             <div className={styles["form-group"]}>
               <label>CVV</label>
               <input
@@ -263,65 +205,29 @@ const PaymentScreen = () => {
             </div>
           </div>
 
-          {/* Price Summary Section */}
-          <div className={styles["price-summary"]}>
-            <h2>Price Summary</h2>
-            
-            <div className={styles["price-rows"]}>
-              <div className={styles["price-row"]}>
-                <span>Room Rate (5 nights)</span>
-                <span>₱{(bookingDetails.total_amount * 0.9).toFixed(2)}</span>
-              </div>
-              <div className={styles["price-row"]}>
-                <span>Resort Fee</span>
-                <span>₱{(bookingDetails.total_amount * 0.05).toFixed(2)}</span>
-              </div>
-              <div className={styles["price-row"]}>
-                <span>Taxes</span>
-                <span>₱{(bookingDetails.total_amount * 0.05).toFixed(2)}</span>
-              </div>
-              <div className={styles["price-total"]}>
-                <span>Total</span>
-                <span className={styles["total-amount"]}>₱{bookingDetails.total_amount.toFixed(2)}</span>
-              </div>
-            </div>
-
-            {/* <div className={styles["terms-agreement"]}>
-              <label className={styles["checkbox-label"]}>
-                <input type="checkbox" required />
-                <span>I agree to the <a href="/terms">Terms and Conditions</a>, <a href="/cancellation-policy">Cancellation Policy</a>, and acknowledge that my payment will be processed now.</span>
-              </label>
-            </div> */}
-
-            <div className={styles["terms-container"]}>
-              <label htmlFor="terms" className={styles["checkbox-label"]}>
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={isTermsChecked}
-                  onChange={(e) => setIsTermsChecked(e.target.checked)}
-                />
-                <span>I agree to the <a href="/terms">Terms and Conditions</a>, <a href="/cancellation-policy">Cancellation Policy</a>, and acknowledge that my payment will be processed now.</span>
-              </label>
-            </div>
-
-            {/* <button
-              onClick={handlePayment}
-              className={styles["confirm-button"]}
-              disabled={isProcessing}
-            >
-              {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
-            </button> */}
-
-            <button
-              className={styles["confirm-button"]}
-              onClick={handlePayment}
-              disabled={!isTermsChecked || isProcessing}
-            >
-              {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
-            </button>
-
+          <div className={styles["terms-container"]}>
+            <label htmlFor="terms" className={styles["checkbox-label"]}>
+              <input
+                type="checkbox"
+                id="terms"
+                checked={isTermsChecked}
+                onChange={(e) => setIsTermsChecked(e.target.checked)}
+              />
+              <span>
+                I agree to the <a href="/terms">Terms and Conditions</a>,{" "}
+                <a href="/cancellation-policy">Cancellation Policy</a>, and
+                acknowledge that my payment will be processed now.
+              </span>
+            </label>
           </div>
+
+          <button
+            className={styles["confirm-button"]}
+            onClick={handlePayment}
+            disabled={!isTermsChecked || isProcessing}
+          >
+            {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
+          </button>
         </div>
       </div>
     </div>
