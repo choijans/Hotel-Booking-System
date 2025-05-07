@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // Import useParams
 import axios from "axios";
 import backIcon from "../../assets/back.png";
 
 const AddRoomType = () => {
   const navigate = useNavigate();
+  const { hotel_id } = useParams(); // Get hotel_id from the URL
 
   const [typeName, setTypeName] = useState("");
   const [description, setDescription] = useState("");
@@ -15,11 +16,18 @@ const AddRoomType = () => {
     e.preventDefault();
 
     try {
+      console.log("Request Body:", {
+        type_name: typeName,
+        description: description,
+        hotel_id: hotel_id, // Automatically include hotel_id
+      });
+
       const response = await axios.post(
         "http://localhost:8080/api/rest/addroomtype", // REST API endpoint for adding room type
         {
           type_name: typeName,
           description: description,
+          hotel_id: parseInt(hotel_id), // Ensure hotel_id is an integer
         },
         {
           headers: {
@@ -35,7 +43,7 @@ const AddRoomType = () => {
       // Redirect back to the HotelDetails page after a short delay
       setTimeout(() => navigate(-1), 2000);
     } catch (err) {
-      console.error("Error adding room type:", err);
+      console.error("Error adding room type:", err.response?.data || err.message);
       setError("Failed to add room type. Please try again.");
       setSuccess(null);
     }

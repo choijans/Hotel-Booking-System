@@ -10,11 +10,11 @@ const HotelDetails = () => {
   const [hotelData, setHotelData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [roomToDelete, setRoomToDelete] = useState(null);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+  const [roomTypeToDelete, setRoomTypeToDelete] = useState(null); // State to track the room type to delete
+  const [showDeleteRoomTypeConfirmation, setShowDeleteRoomTypeConfirmation] = useState(false); 
   const [activeTab, setActiveTab] = useState("rooms");
-  const [bookingToDelete, setBookingToDelete] = useState(null); 
-  const [showDeleteBookingConfirmation, setShowDeleteBookingConfirmation] = useState(false);  
+  const [bookingToDelete, setBookingToDelete] = useState(null);
+  const [showDeleteBookingConfirmation, setShowDeleteBookingConfirmation] = useState(false);
   const [roomTypes, setRoomTypes] = useState([]); // State to store room types
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const HotelDetails = () => {
             "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
           },
         });
-  
+
         console.log("API Response:", response.data); // Log the API response
         setHotelData({
           ...response.data.hotels_by_pk,
@@ -39,13 +39,13 @@ const HotelDetails = () => {
         setLoading(false);
       }
     };
-  
+
     fetchHotelData();
 
     const getAllRoomTypes = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/rest/getroomtypesbyhotel", // REST API endpoint to fetch room types
+          "http://localhost:8080/api/rest/getroomtypesbyhotel", // REST API endpoint
           {
             params: { hotel_id }, // Pass the hotel_id as a query parameter
             headers: {
@@ -53,7 +53,7 @@ const HotelDetails = () => {
             },
           }
         );
-    
+
         console.log("Fetched Room Types:", response.data.room_types); // Debugging log
         setRoomTypes(response.data.room_types); // Set the fetched room types
       } catch (err) {
@@ -61,62 +61,63 @@ const HotelDetails = () => {
         setError("Failed to fetch room types. Please try again.");
       }
     };
+
     getAllRoomTypes();
   }, [hotel_id]);
-
-  const handleDeleteRoom = (room_id) => {
-    setRoomToDelete(room_id); // Set the room to delete
-    setShowDeleteConfirmation(true); // Show the confirmation dialog
+  
+  const handleDeleteRoomType = (type_id) => {
+    setRoomTypeToDelete(type_id); 
+    setShowDeleteRoomTypeConfirmation(true); 
   };
 
-  const confirmDeleteRoom = async () => {
+  const confirmDeleteRoomType = async () => {
     try {
-      // Check for related bookings
-      const checkResponse = await axios.get("http://localhost:8080/api/rest/checkroomdependencies", {
-        params: { room_id: roomToDelete },
-        headers: {
-          "x-hasura-admin-secret": "supersecureadminsecret",
+      console.log("Deleting room type with ID:", roomTypeToDelete);
+  
+      await axios.post(
+        "http://localhost:8080/api/rest/deleteroomtype", // REST API endpoint
+        {
+          type_id: roomTypeToDelete,
         },
-      });
-
-      if (checkResponse.data.bookings.length > 0) {
-        alert("This room cannot be deleted because it has associated bookings.");
-        setShowDeleteConfirmation(false);
-        setRoomToDelete(null);
-        return;
-      }
-
-      // Proceed with deletion if no dependencies
-      await axios.request({
-        method: "DELETE",
-        url: "http://localhost:8080/api/rest/deleteroom",
-        data: { room_id: roomToDelete },
-        headers: {
-          "x-hasura-admin-secret": "supersecureadminsecret",
-          "Content-Type": "application/json",
-        },
-      });
-
-      // Refresh the hotel data after deletion
-      const response = await axios.get("http://localhost:8080/api/rest/gethoteldata", {
-        params: { hotel_id },
-        headers: {
-          "x-hasura-admin-secret": "supersecureadminsecret",
-        },
-      });
-
-      setHotelData(response.data.hotels_by_pk);
-      setShowDeleteConfirmation(false);
-      setRoomToDelete(null);
+        {
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      // Refresh the room types list after deleting the room type
+      const response = await axios.get(
+        "http://localhost:8080/api/rest/getroomtypesbyhotel", // REST API endpoint to fetch room types
+        {
+          params: { hotel_id },
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret",
+          },
+        }
+      );
+  
+      setRoomTypes(response.data.room_types);
+      setShowDeleteRoomTypeConfirmation(false);
+      setRoomTypeToDelete(null);
+      alert("Room type deleted successfully.");
     } catch (err) {
-      console.error("Error deleting room:", err.response?.data || err.message);
-      alert("Failed to delete the room. Please try again.");
+      console.error("Error deleting room type:", err.response?.data || err.message);
+  
+      if (err.response?.data?.code === "constraint-violation") {
+        alert(
+          "Cannot delete this room type because it is associated with existing rooms. Please delete the associated rooms first."
+        );
+      } else {
+        alert("Failed to delete room type. Please try again.");
+      }
     }
   };
 
   const handleDeleteBooking = (booking_id) => {
-    setBookingToDelete(booking_id); // Set the booking to delete
-    setShowDeleteBookingConfirmation(true); // Show the confirmation dialog
+    setBookingToDelete(booking_id);
+    setShowDeleteBookingConfirmation(true); 
   };
   
   const confirmDeleteBooking = async () => {
@@ -191,7 +192,7 @@ const HotelDetails = () => {
                 }`}
                 onClick={() => setActiveTab("rooms")}
               >
-                Rooms
+                Room Types
               </button>
               <button
                 className={`px-4 py-2 font-medium ${
@@ -204,111 +205,84 @@ const HotelDetails = () => {
             </div>
 
             {activeTab === "rooms" && (
-  <div className="mt-4">
-    {/* Rooms Section */}
-    <div className="flex justify-between items-center">
-      <h2 className="text-xl font-bold">Rooms</h2>
-      <button
-        className="bg-teal-600 text-white px-4 py-2 rounded-md"
-        onClick={() => navigate(`/admin/hotels/${hotel_id}/addroom`)}
-      >
-        Add New Room
-      </button>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-      {hotelData.rooms.map((room) => (
-        <div
-          key={room.room_id}
-          className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between"
-        >
-          <div>
-            <p><strong>Room Number:</strong> {room.room_number}</p>
-            <p><strong>Type:</strong> {room.room_type.type_name}</p>
-            <p><strong>Price:</strong> ₱{room.price}</p>
-            <p>
-              <strong>Availability:</strong>{" "}
-              {room.availability ? "Available" : "Not Available"}
-            </p>
-          </div>
-          <div className="flex justify-end space-x-4 mt-4">
-            <button
-              onClick={() => navigate(`/admin/hotels/${hotel_id}/rooms/${room.room_id}/edit`)}
-              className="flex items-center"
-            >
-              <img
-                src="/src/assets/edit.png"
-                alt="Edit"
-                className="w-6 h-6 hover:opacity-80"
-              />
-            </button>
-            <button
-              onClick={() => handleDeleteRoom(room.room_id)}
-              className="flex items-center"
-            >
-              <img
-                src="/src/assets/delete.png"
-                alt="Delete"
-                className="w-6 h-6 hover:opacity-80"
-              />
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-
-    {/* Room Types Section */}
-    <div className="mt-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Room Types</h2>
-        <button
-          className="bg-teal-600 text-white px-4 py-2 rounded-md"
-          onClick={() => navigate(`/admin/hotels/${hotel_id}/addroomtype`)}
-        >
-          Add Room Type
-        </button>
-      </div>
-      <table className="w-full bg-white shadow-md rounded-lg mt-4">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">Type Name</th>
-            <th className="px-4 py-2 text-left">Description</th>
-            <th className="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {roomTypes.length > 0 ? (
-            roomTypes.map((type) => (
-              <tr key={type.type_id}>
-                <td className="px-4 py-2">{type.type_name}</td>
-                <td className="px-4 py-2">{type.description}</td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => navigate(`/admin/hotels/${hotel_id}/roomtypes/${type.type_id}/edit`)}
-                    className="text-blue-600 hover:underline mr-4"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => console.log(`Delete Room Type: ${type.type_id}`)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" className="px-4 py-2 text-center text-gray-500">
-                No room types found.
-              </td>
-            </tr>
+            <div className="mt-4">
+              {/* Room Types Section */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold">Room Types</h2>
+                  <div className="flex space-x-4">
+                    {/* Add New Room Button */}
+                    <button
+                      className="bg-teal-600 text-white px-4 py-2 rounded-md"
+                      onClick={() => navigate(`/admin/hotels/${hotel_id}/addroom`)}
+                    >
+                      Add New Room
+                    </button>
+                    {/* Add Room Type Button */}
+                    <button
+                      className="bg-teal-600 text-white px-4 py-2 rounded-md"
+                      onClick={() => navigate(`/admin/hotels/${hotel_id}/addroomtype`)}
+                    >
+                      Add Room Type
+                    </button>
+                  </div>
+                </div>
+                <table className="w-full bg-white shadow-md rounded-lg mt-4">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">Type Name</th>
+                      <th className="px-4 py-2 text-left">Description</th>
+                      <th className="px-4 py-2 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {roomTypes && roomTypes.length > 0 ? (
+                      roomTypes.map((type) => (
+                        <tr key={type.type_id}>
+                          <td
+                            className="px-4 py-2 text-teal-600 cursor-pointer hover:underline"
+                            onClick={() =>
+                              navigate(`/admin/hotels/${hotel_id}/roomtypes/${type.type_id}/rooms`)
+                            }
+                          >
+                            {type.type_name}
+                          </td>
+                          <td className="px-4 py-2">{type.description}</td>
+                          <td className="px-4 py-2">
+                            <button
+                              onClick={() => navigate(`/admin/hotels/${hotel_id}/roomtypes/${type.type_id}/edit`)}
+                              className="mr-4"
+                            >
+                              <img
+                                src="/src/assets/edit.png"
+                                alt="Edit"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRoomType(type.type_id)}
+                            >
+                              <img
+                                src="/src/assets/delete.png"
+                                alt="Delete"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="3" className="px-4 py-2 text-center text-gray-500">
+                          No room types found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
 
             {activeTab === "bookings" && (
               <div className="mt-4">
@@ -358,30 +332,31 @@ const HotelDetails = () => {
                 </table>
               </div>
             )}
-
-            {showDeleteConfirmation && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  <p className="text-lg font-medium mb-4">
-                    Are you sure you want to delete this room?
-                  </p>
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      onClick={() => setShowDeleteConfirmation(false)}
-                      className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmDeleteRoom}
-                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
+          </div>
+      
+          {showDeleteRoomTypeConfirmation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <p className="text-lg font-medium mb-4">
+                  Are you sure you want to delete this room type?
+                </p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowDeleteRoomTypeConfirmation(false)}
+                    className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteRoomType}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
             {showDeleteBookingConfirmation && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -406,7 +381,6 @@ const HotelDetails = () => {
                 </div>
               </div>
             )}
-          </div>
         </div>
       )}
     </div>

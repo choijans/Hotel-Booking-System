@@ -16,13 +16,14 @@ const AddRooms = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Fetch all room types when the component loads
+  // Fetch all room types for the specific hotel when the component loads
   useEffect(() => {
     const getAllRoomTypes = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/rest/getallroomtypes", // REST API endpoint to fetch room types
+          "http://localhost:8080/api/rest/getroomtypesbyhotel", // REST API endpoint to fetch room types by hotel
           {
+            params: { hotel_id }, // Pass the hotel_id as a query parameter
             headers: {
               "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
             },
@@ -37,14 +38,14 @@ const AddRooms = () => {
     };
 
     getAllRoomTypes();
-  }, []);
+  }, [hotel_id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const roomResponse = await axios.post(
-        "http://localhost:8080/api/rest/addroom", // Updated REST API endpoint
+        "http://localhost:8080/api/rest/addroom", // REST API endpoint to add a room
         {
           hotel_id: parseInt(hotel_id),
           room_number: roomNumber,
@@ -59,11 +60,11 @@ const AddRooms = () => {
           },
         }
       );
-  
+
       console.log("Room added successfully:", roomResponse.data);
       setSuccess("Room added successfully!");
       setError(null);
-  
+
       // Redirect back to the HotelDetails page
       setTimeout(() => navigate(`/admin/hotels/${hotel_id}`), 2000);
     } catch (err) {

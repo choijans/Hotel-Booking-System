@@ -1,5 +1,5 @@
 {
-  "resource_version": 41,
+  "resource_version": 56,
   "metadata": {
     "version": 3,
     "sources": [
@@ -614,24 +614,12 @@
               "query": "mutation AddHotel(\r\n  $hotel_name: String!,\r\n  $location_name: String!,\r\n  $location_description: String!,\r\n  $description: String!\r\n) {\r\n  insert_locations_one(\r\n    object: {\r\n      location_name: $location_name,\r\n      description: $location_description,\r\n      hotels: {\r\n        data: {\r\n          hotel_name: $hotel_name,\r\n          description: $description\r\n        }\r\n      }\r\n    }\r\n  ) {\r\n    location_id\r\n    location_name\r\n    description\r\n    hotels {\r\n      hotel_id\r\n      hotel_name\r\n      description\r\n    }\r\n  }\r\n}"
             },
             {
-              "name": "DeleteRoom",
-              "query": "mutation DeleteRoom($room_id: Int!) {\r\n  delete_rooms_by_pk(room_id: $room_id) {\r\n    room_id\r\n    room_number\r\n  }\r\n}"
-            },
-            {
-              "name": "CheckRoomDependencies",
-              "query": "query CheckRoomDependencies($room_id: Int!) {\r\n  bookings(where: { room_id: { _eq: $room_id } }) {\r\n    booking_id\r\n  }\r\n}"
-            },
-            {
               "name": "GetHotelData",
               "query": "query GetHotelData($hotel_id: Int!) {\r\n  # Fetch hotel details\r\n  hotels_by_pk(hotel_id: $hotel_id) {\r\n    hotel_id\r\n    hotel_name\r\n    description\r\n    location {\r\n      location_id\r\n      location_name\r\n      description\r\n    }\r\n    # Fetch rooms for the hotel\r\n    rooms {\r\n      room_id\r\n      room_number\r\n      description\r\n      price\r\n      availability\r\n      status\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n  # Fetch bookings for the hotel\r\n  bookings(where: { room: { hotel_id: { _eq: $hotel_id } } }) {\r\n    booking_id\r\n    guest_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n    created_at\r\n    updated_at\r\n    room {\r\n      room_number\r\n      room_type {\r\n        type_name\r\n        description\r\n      }\r\n    }\r\n  }\r\n}"
             },
             {
               "name": "DeleteBooking",
               "query": "mutation DeleteBooking($booking_id: Int!) {\r\n  delete_bookings_by_pk(booking_id: $booking_id) {\r\n    booking_id\r\n  }\r\n}"
-            },
-            {
-              "name": "AddRoomType",
-              "query": "mutation AddRoomType($type_name: String!, $description: String!) {\r\n  insert_room_types_one(\r\n    object: { type_name: $type_name, description: $description },\r\n    on_conflict: {\r\n      constraint: room_types_type_name_key, # Ensure this constraint exists in your database\r\n      update_columns: description\r\n    }\r\n  ) {\r\n    type_id\r\n  }\r\n}"
             },
             {
               "name": "AddRoom",
@@ -643,7 +631,31 @@
             },
             {
               "name": "GetRoomTypesByHotel",
-              "query": "query GetRoomTypesByHotel($hotel_id: Int!) {\r\n  room_types(\r\n    where: {\r\n      rooms: {\r\n        hotel_id: { _eq: $hotel_id }\r\n      }\r\n    }\r\n  ) {\r\n    type_id\r\n    type_name\r\n    description\r\n  }\r\n}"
+              "query": "query GetRoomTypesByHotel($hotel_id: Int!) {\r\n  room_types(where: { hotel_id: { _eq: $hotel_id } }) {\r\n    type_id\r\n    type_name\r\n    description\r\n  }\r\n}"
+            },
+            {
+              "name": "UpdateRoomStatusAndAvailability",
+              "query": "mutation UpdateRoomStatusAndAvailability($room_id: Int!, $status: String!, $availability: Boolean!) {\r\n  update_rooms_by_pk(\r\n    pk_columns: { room_id: $room_id },\r\n    _set: { status: $status, availability: $availability }\r\n  ) {\r\n    room_id\r\n    status\r\n    availability\r\n  }\r\n}"
+            },
+            {
+              "name": "GetRoomsByType",
+              "query": "query GetRoomsByType($type_id: Int!) {\r\n  rooms(where: { type_id: { _eq: $type_id } }) {\r\n    room_id\r\n    room_number\r\n    price\r\n    availability\r\n    status\r\n  }\r\n}"
+            },
+            {
+              "name": "UpdateRoomType",
+              "query": "mutation UpdateRoomType($type_id: Int!, $type_name: String!, $description: String!) {\r\n  update_room_types_by_pk(\r\n    pk_columns: { type_id: $type_id },\r\n    _set: { type_name: $type_name, description: $description }\r\n  ) {\r\n    type_id\r\n    type_name\r\n    description\r\n  }\r\n}"
+            },
+            {
+              "name": "GetRoomTypeById",
+              "query": "query GetRoomTypeById($type_id: Int!) {\r\n  room_types_by_pk(type_id: $type_id) {\r\n    type_id\r\n    type_name\r\n    description\r\n  }\r\n}"
+            },
+            {
+              "name": "DeleteRoomType",
+              "query": "mutation DeleteRoomType($type_id: Int!) {\r\n  delete_room_types_by_pk(type_id: $type_id) {\r\n    type_id\r\n    type_name\r\n  }\r\n}"
+            },
+            {
+              "name": "AddRoomType",
+              "query": "mutation AddRoomType($type_name: String!, $description: String!, $hotel_id: Int!) {\r\n  insert_room_types_one(\r\n    object: { type_name: $type_name, description: $description, hotel_id: $hotel_id },\r\n    on_conflict: {\r\n      constraint: room_types_type_name_key,  \r\n      update_columns: [description]\r\n    }\r\n  ) {\r\n    type_id\r\n    type_name\r\n    description\r\n    hotel_id\r\n  }\r\n}"
             }
           ]
         }
@@ -705,20 +717,6 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
-            "query_name": "CheckRoomDependencies"
-          }
-        },
-        "methods": [
-          "GET"
-        ],
-        "name": "CheckRoomDependencies",
-        "url": "checkroomdependencies"
-      },
-      {
-        "comment": "",
-        "definition": {
-          "query": {
-            "collection_name": "allowed-queries",
             "query_name": "CreateBooking"
           }
         },
@@ -761,14 +759,14 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
-            "query_name": "DeleteRoom"
+            "query_name": "DeleteRoomType"
           }
         },
         "methods": [
-          "DELETE"
+          "POST"
         ],
-        "name": "DeleteRoom",
-        "url": "deleteroom"
+        "name": "DeleteRoomType",
+        "url": "deleteroomtype"
       },
       {
         "comment": "",
@@ -957,6 +955,34 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "GetRoomsByType"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetRoomsByType",
+        "url": "getroomsbytype"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetRoomTypeById"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetRoomTypeById",
+        "url": "getroomtypebyid"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "GetRoomTypesByHotel"
           }
         },
@@ -1007,6 +1033,34 @@
         ],
         "name": "UpdateHotelDetails",
         "url": "updatehoteldetails"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "UpdateRoomStatusAndAvailability"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "UpdateRoomStatusAndAvailability",
+        "url": "updateroomstatusandavailability"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "UpdateRoomType"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "UpdateRoomType",
+        "url": "updateroomtype"
       }
     ]
   }

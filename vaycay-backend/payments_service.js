@@ -10,7 +10,7 @@ async function consumeQueue(queueName) {
   const channel = await connection.createChannel();
   await channel.assertQueue(queueName, { durable: true });
 
-  console.log(`Waiting for messages in queue: ${queueName}`);
+  console.log('Waiting for messages in queue: ${queueName}');
 
   channel.consume(queueName, async (msg) => {
     if (msg !== null) {
