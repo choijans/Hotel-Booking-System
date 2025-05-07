@@ -36,8 +36,9 @@ const EditRooms = () => {
         setAvailability(room.availability);
         setDescription(room.description);
 
-        // Fetch all room types
-        const roomTypesResponse = await axios.get("http://localhost:8080/api/rest/getallroomtypes", {
+        // Fetch all room types for the specific hotel
+        const roomTypesResponse = await axios.get("http://localhost:8080/api/rest/getroomtypesbyhotel", {
+          params: { hotel_id }, // Pass the hotel_id as a query parameter
           headers: {
             "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
           },
@@ -53,7 +54,7 @@ const EditRooms = () => {
     };
 
     fetchRoomData();
-  }, [room_id]);
+  }, [room_id, hotel_id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

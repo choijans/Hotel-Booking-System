@@ -22,6 +22,7 @@ CREATE TABLE room_types (
     type_id SERIAL PRIMARY KEY,
     type_name VARCHAR(50) NOT NULL,
     description TEXT
+    hotel_id INTEGER NOT NULL REFERENCES hotels(hotel_id) ON DELETE CASCADE
 );
 
 CREATE TABLE rooms (

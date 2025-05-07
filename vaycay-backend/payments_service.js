@@ -10,7 +10,7 @@ async function consumeQueue(queueName) {
   const channel = await connection.createChannel();
   await channel.assertQueue(queueName, { durable: true });
 
-  console.log(`Waiting for messages in queue: ${queueName}`);
+  console.log('Waiting for messages in queue: ${queueName}');
 
   channel.consume(queueName, async (msg) => {
     if (msg !== null) {
@@ -23,10 +23,10 @@ async function consumeQueue(queueName) {
           booking_id: bookingEvent.booking_id,
           amount: bookingEvent.total_amount,
           payment_method: "Credit Card", // Example payment method
-          payment_status: "Complete",
+          payment_status: "Pending",
         };
 
-        const mutation = `
+        const createPaymentMutation = `
           mutation CreatePayment($paymentData: payments_insert_input!) {
             insert_payments_one(object: $paymentData) {
               payment_id
@@ -34,10 +34,10 @@ async function consumeQueue(queueName) {
           }
         `;
 
-        const response = await axios.post(
+        const paymentResponse = await axios.post(
           HASURA_URL,
           {
-            query: mutation,
+            query: createPaymentMutation,
             variables: { paymentData: paymentPayload },
           },
           {
@@ -48,13 +48,43 @@ async function consumeQueue(queueName) {
           }
         );
 
-        console.log("Payment created successfully:", response.data);
+        console.log("Payment created successfully:", paymentResponse.data);
 
-        // Acknowledge the message
+        // Step 2: Update booking status in Hasura
+        const updateBookingMutation = `
+          mutation UpdateBookingStatus($booking_id: Int!) {
+            update_bookings_by_pk(
+              pk_columns: { booking_id: $booking_id },
+              _set: { status: "Confirmed", payment_status: "Confirmed" }
+            ) {
+              booking_id
+              status
+              payment_status
+            }
+          }
+        `;
+
+        const updateResponse = await axios.post(
+          HASURA_URL,
+          {
+            query: updateBookingMutation,
+            variables: { booking_id: bookingEvent.booking_id },
+          },
+          {
+            headers: {
+              "x-hasura-admin-secret": HASURA_ADMIN_SECRET,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Booking updated successfully:", updateResponse.data);
+
+        // Step 3: Acknowledge the message
         channel.ack(msg);
       } catch (error) {
-        console.error("Error creating payment:", error.response?.data || error.message);
-        // Optionally, you can reject the message and requeue it
+        console.error("Error processing booking event:", error.response?.data || error.message);
+        // Optionally, reject and requeue the message
         channel.nack(msg, false, true);
       }
     }
