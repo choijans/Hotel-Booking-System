@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { hotelApi } from "../api";
 import styles from "./HotelRooms.module.css";
 
 const HotelRooms = () => {
@@ -9,28 +8,53 @@ const HotelRooms = () => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
+  const [selectedRoomType, setSelectedRoomType] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useState({
     checkIn: "",
     checkOut: "",
-    rooms: 1,
-    adults: 1,
-    children: 0,
   });
   const [sortOption, setSortOption] = useState("price-asc");
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/rest/getroomsbyhotel?hotel_id=${hotelId}`, {
+        const response = await axios.get(
+          `http://localhost:8080/api/rest/getroomsbyhotel?hotel_id=${hotelId}`,
+          {
             headers: {
-              "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+              "x-hasura-admin-secret": "supersecureadminsecret",
             },
-          });
+          }
+        );
+    
         if (response.data && response.data.rooms) {
-          setRooms(response.data.rooms);
-          setFilteredRooms(response.data.rooms);
+          // Log the API response to verify the data
+          console.log("Rooms API Response:", response.data.rooms);
+    
+          // Ensure bookings are included in the response
+          const roomsWithBookings = await Promise.all(
+            response.data.rooms.map(async (room) => {
+              const bookingsResponse = await axios.get(
+                `http://localhost:8080/api/rest/getbookingsbyroom?room_id=${room.room_id}`,
+                {
+                  headers: {
+                    "x-hasura-admin-secret": "supersecureadminsecret",
+                  },
+                }
+              );
+    
+              return {
+                ...room,
+                bookings: bookingsResponse.data.bookings || [],
+              };
+            })
+          );
+    
+          setRooms(roomsWithBookings);
+          setFilteredRooms(roomsWithBookings);
         } else {
           throw new Error("Invalid response structure");
         }
@@ -42,34 +66,98 @@ const HotelRooms = () => {
       }
     };
 
+    const fetchRoomTypes = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/rest/getroomtypesbyhotel?hotel_id=${hotelId}`,
+          {
+            headers: {
+              "x-hasura-admin-secret": "supersecureadminsecret",
+            },
+          }
+        );
+
+        if (response.data && response.data.room_types) {
+          setRoomTypes(response.data.room_types);
+        } else {
+          throw new Error("Invalid response structure");
+        }
+      } catch (err) {
+        console.error("Error fetching room types:", err.response?.data || err.message);
+        setError("Failed to fetch room types");
+      }
+    };
+
     fetchRooms();
+    fetchRoomTypes();
   }, [hotelId]);
 
   useEffect(() => {
-    const sorted = [...filteredRooms].sort((a, b) => {
-      if (sortOption === "price-asc") return a.price - b.price;
-      if (sortOption === "price-desc") return b.price - a.price;
-      return 0;
-    });
-    setFilteredRooms(sorted);
-  }, [sortOption]);
-
-  const handleSearch = () => {
-    const filtered = rooms.filter((room) => {
-      const isAvailable = room.bookings.every((booking) => {
-        const bookingStart = new Date(booking.check_in_date);
-        const bookingEnd = new Date(booking.check_out_date);
-        const searchStart = new Date(searchParams.checkIn);
-        const searchEnd = new Date(searchParams.checkOut);
-
-        return searchEnd <= bookingStart || searchStart >= bookingEnd;
+    const timer = setTimeout(() => {
+      const filtered = rooms.filter((room) => {
+        // Room type filter
+        if (selectedRoomType && room.room_type?.type_name !== selectedRoomType) {
+          console.log("Room excluded due to type mismatch:", room.room_id);
+          return false;
+        }
+  
+        // Date filter
+        if (searchParams.checkIn && searchParams.checkOut) {
+          const checkInDate = new Date(searchParams.checkIn);
+          const checkOutDate = new Date(searchParams.checkOut);
+  
+          console.log("Check-In Date:", checkInDate, "Check-Out Date:", checkOutDate);
+  
+          if (!(checkInDate instanceof Date) || isNaN(checkInDate) || !(checkOutDate instanceof Date) || isNaN(checkOutDate)) {
+            console.log("Invalid dates provided.");
+            return false;
+          }
+  
+          if (!room.bookings || !Array.isArray(room.bookings)) {
+            console.log("No bookings found for room:", room.room_id);
+            return true;
+          }
+  
+          console.log("Room Bookings for Room ID:", room.room_id, room.bookings);
+  
+          const isAvailable = room.bookings.every((booking) => {
+            const bookingStart = new Date(booking.check_in_date);
+            const bookingEnd = new Date(booking.check_out_date);
+  
+            console.log(
+              "Booking Start:", bookingStart,
+              "Booking End:", bookingEnd,
+              "Check-In:", checkInDate,
+              "Check-Out:", checkOutDate
+            );
+  
+            // Room is available if the requested dates do not overlap with existing bookings
+            return checkOutDate <= bookingStart || checkInDate >= bookingEnd;
+          });
+  
+          if (!isAvailable) {
+            console.log("Room unavailable for selected dates:", room.room_id);
+          }
+  
+          return isAvailable;
+        }
+  
+        // If no dates are selected, include all rooms
+        console.log("No dates selected, including all rooms.");
+        return true;
       });
-
-      return isAvailable;
-    });
-
-    setFilteredRooms(filtered);
-  };
+  
+      const sorted = [...filtered].sort((a, b) => {
+        if (sortOption === "price-asc") return a.price - b.price;
+        if (sortOption === "price-desc") return b.price - a.price;
+        return 0;
+      });
+  
+      setFilteredRooms(sorted);
+    }, 300);
+  
+    return () => clearTimeout(timer);
+  }, [rooms, selectedRoomType, searchParams, sortOption]);
 
   const handleBookNow = (roomId) => {
     navigate(`/rooms/${roomId}/book`);
@@ -93,9 +181,9 @@ const HotelRooms = () => {
           boxShadow: '0 2px 14px rgba(0, 0, 0, 0.3)',
         }}
       ></div>
+
       <div className={styles["hotelroom-search-section-container"]}>
         <div className={styles["hotelroom-search-section"]}>
-          {/* <h1>Filter Rooms</h1> */}
           <h1 className="text-2xl font-bold" style={{ color: '#10716D' }}>Filter Rooms</h1>
           <div className={styles["hotelroom-search-fields"]}>
             <div className={styles["hotelroom-date-field"]}>
@@ -121,44 +209,20 @@ const HotelRooms = () => {
             </div>
 
             <div className={styles["hotelroom-number-field"]}>
-              <label>Rooms</label>
-              <input
-                type="number"
-                min="1"
-                value={searchParams.rooms}
-                onChange={(e) =>
-                  setSearchParams({ ...searchParams, rooms: e.target.value })
-                }
-              />
+              <label>Room Type</label>
+              <select
+                value={selectedRoomType}
+                onChange={(e) => setSelectedRoomType(e.target.value)}
+                className={styles["hotelroom-sort-dropdown"]}
+              >
+                <option value="">All Room Types</option>
+                {roomTypes.map((type) => (
+                  <option key={type.type_id} value={type.type_name}>
+                    {type.type_name}
+                  </option>
+                ))}
+              </select>
             </div>
-
-            <div className={styles["hotelroom-number-field"]}>
-              <label>Adults</label>
-              <input
-                type="number"
-                min="1"
-                value={searchParams.adults}
-                onChange={(e) =>
-                  setSearchParams({ ...searchParams, adults: e.target.value })
-                }
-              />
-            </div>
-
-            <div className={styles["hotelroom-number-field"]}>
-              <label>Children</label>
-              <input
-                type="number"
-                min="0"
-                value={searchParams.children}
-                onChange={(e) =>
-                  setSearchParams({ ...searchParams, children: e.target.value })
-                }
-              />
-            </div>
-
-            <button className={styles["hotelroom-search-button"]} onClick={handleSearch}>
-              Search
-            </button>
           </div>
         </div>
       </div>
@@ -179,7 +243,7 @@ const HotelRooms = () => {
 
       <div className={styles["hotelroom-rooms-list"]}>
         <h2>Available Rooms</h2>
-        
+
         {filteredRooms.length === 0 ? (
           <div className={styles["hotelroom-no-rooms"]}>
             <p>No rooms match your search criteria. Try different dates or filters.</p>
@@ -189,16 +253,24 @@ const HotelRooms = () => {
             {filteredRooms.map((room) => (
               <div key={room.room_id} className={styles["hotelroom-room-card"]}>
                 <div className={styles["hotelroom-room-image"]}>
-                <img
-                  src={`/src/assets/admin_pics/hotel${(room.room_id % 3) + 1}.jpg`}
-                  alt={room.room_name}
-                />
+                  <img
+                    src={`/src/assets/admin_pics/hotel${(room.room_id % 3) + 1}.jpg`}
+                    alt={room.room_name}
+                  />
                 </div>
                 <div className={styles["hotelroom-room-details"]}>
                   <h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
-                  <p className={styles["hotelroom-room-type"]}><strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}</p>
-                  <p className={styles["hotelroom-room-price"]}><strong>Price:</strong> PHP {room.price.toLocaleString()}</p>
-                  <span className={`${styles["hotelroom-room-availability"]} ${room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]}`}>
+                  <p className={styles["hotelroom-room-type"]}>
+                    <strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}
+                  </p>
+                  <p className={styles["hotelroom-room-price"]}>
+                    <strong>Price:</strong> PHP {room.price.toLocaleString()}
+                  </p>
+                  <span
+                    className={`${styles["hotelroom-room-availability"]} ${
+                      room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]
+                    }`}
+                  >
                     {room.availability ? "Available" : "Unavailable"}
                   </span>
                   <button

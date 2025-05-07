@@ -14,9 +14,9 @@ const ConfirmationPage = () => {
       (1000 * 60 * 60 * 24)
   );
   const roomRate = bookingDetails.room_details.price;
-  const resortFee = 2500; // Example fixed resort fee
-  const taxes = (roomRate * nights + resortFee) * 0.05; // Example 5% tax
-  const totalCost = roomRate * nights + resortFee + taxes;
+  const extraAdultCharge = bookingDetails.extra_adults * 500 * nights; // Example: ₱500 per extra adult per night
+  const extraChildCharge = bookingDetails.extra_children * 300 * nights; // Example: ₱300 per extra child per night
+  const totalCost = roomRate * nights + extraAdultCharge + extraChildCharge;
 
   // Function to generate and download the receipt
   const downloadReceipt = () => {
@@ -31,22 +31,25 @@ const ConfirmationPage = () => {
     doc.text(`Booking ID: VACAY-${booking_id}`, 10, 20);
     doc.text(`Check-In: ${bookingDetails.check_in_date}`, 10, 30);
     doc.text(`Check-Out: ${bookingDetails.check_out_date}`, 10, 40);
-    doc.text(`Guests: ${bookingDetails.guests} Guests`, 10, 50);
+    doc.text(`Adults: ${bookingDetails.adults}`, 10, 50);
+    doc.text(`Children: ${bookingDetails.children}`, 10, 60);
+    doc.text(`Extra Adults: ${bookingDetails.extra_adults}`, 10, 70);
+    doc.text(`Extra Children: ${bookingDetails.extra_children}`, 10, 80);
 
     // Add room details
-    doc.text(`Room: ${bookingDetails.room_details.room_type?.type_name || "Room"}`, 10, 60);
+    doc.text(`Room: ${bookingDetails.room_details.room_type?.type_name || "Room"}`, 10, 90);
     doc.text(
       `Hotel: ${bookingDetails.room_details.hotel?.hotel_name}, ${bookingDetails.room_details.hotel?.location?.location_name}`,
       10,
-      70
+      100
     );
 
     // Add payment summary
-    doc.text("Payment Summary:", 10, 90);
-    doc.text(`Room Rate (${nights} nights): ₱${(roomRate * nights).toFixed(2)}`, 10, 100);
-    doc.text(`Resort Fee: ₱${resortFee.toFixed(2)}`, 10, 110);
-    doc.text(`Taxes: ₱${taxes.toFixed(2)}`, 10, 120);
-    doc.text(`Total Paid: ₱${totalCost.toFixed(2)}`, 10, 130);
+    doc.text("Payment Summary:", 10, 120);
+    doc.text(`Room Rate (${nights} nights): ₱${(roomRate * nights).toFixed(2)}`, 10, 130);
+    doc.text(`Extra Adults: ₱${extraAdultCharge.toFixed(2)}`, 10, 140);
+    doc.text(`Extra Children: ₱${extraChildCharge.toFixed(2)}`, 10, 150);
+    doc.text(`Total Paid: ₱${totalCost.toFixed(2)}`, 10, 160);
 
     // Save the PDF
     doc.save(`Receipt-VACAY-${booking_id}.pdf`);
@@ -74,14 +77,12 @@ const ConfirmationPage = () => {
             <p>{bookingDetails.check_out_date}</p>
           </div>
           <div className={styles["confirm-booking-info"]}>
-            <h3>Guests</h3>
-            <p>
-              {bookingDetails.guests} {bookingDetails.guests > 1 ? "Guests" : "Guest"}
-            </p>
+            <h3>Extra Adults</h3>
+            <p>{bookingDetails.extra_adults}</p>
           </div>
           <div className={styles["confirm-booking-info"]}>
-            <h3>Rooms</h3>
-            <p>1</p>
+            <h3>Extra Children</h3>
+            <p>{bookingDetails.extra_children}</p>
           </div>
         </div>
 
@@ -106,10 +107,10 @@ const ConfirmationPage = () => {
             <strong>Room Rate ({nights} nights):</strong> ₱{(roomRate * nights).toFixed(2)}
           </p>
           <p>
-            <strong>Resort Fee:</strong> ₱{resortFee.toFixed(2)}
+            <strong>Extra Adults:</strong> ₱{extraAdultCharge.toFixed(2)}
           </p>
           <p>
-            <strong>Taxes:</strong> ₱{taxes.toFixed(2)}
+            <strong>Extra Children:</strong> ₱{extraChildCharge.toFixed(2)}
           </p>
           <p className={styles["confirm-total"]}>
             <strong>Total Paid:</strong> ₱{totalCost.toFixed(2)}
@@ -119,7 +120,7 @@ const ConfirmationPage = () => {
         <div className={styles["confirm-actions"]}>
           <button
             className={styles["confirm-view-booking-button"]}
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/profile?tab=Booking History")}
           >
             View Booking Details
           </button>

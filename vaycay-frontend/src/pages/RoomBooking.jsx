@@ -1,8 +1,9 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import { hotelApi } from "../api";
+import axios from "axios";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import styles from "./RoomBooking.module.css";
 
 const RoomBooking = () => {
@@ -10,12 +11,16 @@ const RoomBooking = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [roomDetails, setRoomDetails] = useState(null);
-  const [checkInDate, setCheckInDate] = useState("");
-  const [checkOutDate, setCheckOutDate] = useState("");
-  const [guests, setGuests] = useState(1);
+  const [checkInDate, setCheckInDate] = useState(null);
+  const [checkOutDate, setCheckOutDate] = useState(null);
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [extraAdults, setExtraAdults] = useState(0);
+  const [extraChildren, setExtraChildren] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unavailableDates, setUnavailableDates] = useState([]);
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -28,7 +33,7 @@ const RoomBooking = () => {
             room_id: roomId,
           },
         });
-        
+
         if (response.data?.rooms_by_pk) {
           setRoomDetails(response.data.rooms_by_pk);
         } else {
@@ -42,15 +47,50 @@ const RoomBooking = () => {
       }
     };
 
+    const fetchUnavailableDates = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/rest/getbookingsbyroom", {
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret",
+          },
+          params: {
+            room_id: roomId,
+          },
+        });
+
+        const bookings = response.data.bookings || [];
+        const dates = bookings.flatMap((booking) => {
+          const start = new Date(booking.check_in_date);
+          const end = new Date(booking.check_out_date);
+          const dateRange = [];
+          for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+            dateRange.push(new Date(d).toISOString().split("T")[0]);
+          }
+          return dateRange;
+        });
+
+        setUnavailableDates(dates.map((date) => new Date(date))); // Convert to Date objects
+      } catch (err) {
+        console.error("Error fetching unavailable dates:", err);
+      }
+    };
+
     fetchRoomDetails();
+    fetchUnavailableDates();
   }, [roomId]);
 
   useEffect(() => {
     if (roomDetails && checkInDate && checkOutDate) {
       const nights = (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24);
-      setTotalPrice(nights * roomDetails.price);
+      const basePrice = nights * roomDetails.price;
+
+      // Calculate extra charges
+      const extraAdultCharge = extraAdults * 500 * nights; // Example: ₱500 per extra adult per night
+      const extraChildCharge = extraChildren * 300 * nights; // Example: ₱300 per extra child per night
+
+      setTotalPrice(basePrice + extraAdultCharge + extraChildCharge);
     }
-  }, [roomDetails, checkInDate, checkOutDate]);
+  }, [roomDetails, checkInDate, checkOutDate, extraAdults, extraChildren]);
 
   const handleBookNow = () => {
     if (!checkInDate || !checkOutDate) {
@@ -59,15 +99,12 @@ const RoomBooking = () => {
     }
 
     const today = new Date();
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    if (checkIn < today) {
+    if (checkInDate < today) {
       alert("Check-in date must be in the future.");
       return;
     }
 
-    if (checkOut <= checkIn) {
+    if (checkOutDate <= checkInDate) {
       alert("Check-out date must be after the check-in date.");
       return;
     }
@@ -75,11 +112,14 @@ const RoomBooking = () => {
     const bookingDetails = {
       room_id: parseInt(roomId),
       guest_id: currentUser?.id,
-      check_in_date: checkInDate,
-      check_out_date: checkOutDate,
+      check_in_date: checkInDate.toISOString().split("T")[0],
+      check_out_date: checkOutDate.toISOString().split("T")[0],
       total_amount: totalPrice,
       room_details: roomDetails,
-      guests,
+      adults,
+      children,
+      extra_adults: extraAdults,
+      extra_children: extraChildren,
     };
 
     navigate("/payment", { state: bookingDetails });
@@ -91,7 +131,6 @@ const RoomBooking = () => {
 
   return (
     <div className={styles["roombooking-page"]}>
-      {/* White container with rounded edges */}
       <div className={styles["roombooking-white-container"]}>
         <div className={styles["roombooking-header"]}>
           <div>
@@ -101,6 +140,7 @@ const RoomBooking = () => {
             <p className={styles["roombooking-location"]}>
               📍 {roomDetails.hotel?.hotel_name}, {roomDetails.hotel?.location?.location_name}
             </p>
+            <p className={styles["roombooking-description"]}>{roomDetails.description}</p>
             <div className={styles["roombooking-price"]}>
               PHP {roomDetails.price.toFixed(2)} <span>Per Night</span>
             </div>
@@ -110,44 +150,40 @@ const RoomBooking = () => {
           </button>
         </div>
 
-        <div className={styles["roombooking-images-section"]}>
-          <div className={styles["roombooking-main-image"]}>
-            <img src={roomDetails.image_urls?.[0]} alt="Room" />
-          </div>
-          <div className={styles["roombooking-thumbnail-images"]}>
-            {roomDetails.image_urls?.slice(1, 5).map((url, index) => (
-              <img key={index} src={url} alt={`Thumbnail ${index}`} />
-            ))}
-          </div>
-        </div>
-
         <div className={styles["roombooking-content"]}>
-          <div className={styles["roombooking-roomdetails"]}>
-            <h2>Room Details</h2>
-            <p>{roomDetails.description}</p>
-          </div>
-
           <div className={styles["roombooking-form-container"]}>
             <div className={styles["roombooking-form"]}>
               <h3>Book Your Stay</h3>
               <label>Check In</label>
-              <input
-                type="date"
-                value={checkInDate}
-                onChange={(e) => setCheckInDate(e.target.value)}
+              <ReactDatePicker
+                selected={checkInDate}
+                onChange={(date) => setCheckInDate(date)}
+                minDate={new Date()}
+                excludeDates={unavailableDates}
+                placeholderText="Select a check-in date"
               />
               <label>Check Out</label>
-              <input
-                type="date"
-                value={checkOutDate}
-                onChange={(e) => setCheckOutDate(e.target.value)}
+              <ReactDatePicker
+                selected={checkOutDate}
+                onChange={(date) => setCheckOutDate(date)}
+                minDate={checkInDate || new Date()}
+                excludeDates={unavailableDates}
+                placeholderText="Select a check-out date"
               />
-              <label>Guests</label>
+              
+              <label>Extra Adults</label>
               <input
                 type="number"
-                min="1"
-                value={guests}
-                onChange={(e) => setGuests(parseInt(e.target.value))}
+                min="0"
+                value={extraAdults}
+                onChange={(e) => setExtraAdults(parseInt(e.target.value))}
+              />
+              <label>Extra Children</label>
+              <input
+                type="number"
+                min="0"
+                value={extraChildren}
+                onChange={(e) => setExtraChildren(parseInt(e.target.value))}
               />
               <p className={styles["roombooking-total"]}>
                 Total: PHP {totalPrice.toFixed(2)}
@@ -164,310 +200,3 @@ const RoomBooking = () => {
 };
 
 export default RoomBooking;
-
-
-// import React, { useEffect, useState } from "react";
-// import { useParams, useNavigate } from "react-router-dom";
-// import { useAuth } from "../context/AuthProvider";
-// import { hotelApi } from "../api";
-// import styles from "./RoomBooking.module.css";
-
-// const RoomBooking = () => {
-//   const { roomId } = useParams();
-//   const navigate = useNavigate();
-//   const { currentUser } = useAuth();
-//   const [roomDetails, setRoomDetails] = useState(null);
-//   const [checkInDate, setCheckInDate] = useState("");
-//   const [checkOutDate, setCheckOutDate] = useState("");
-//   const [guests, setGuests] = useState(1);
-//   const [totalPrice, setTotalPrice] = useState(0);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchRoomDetails = async () => {
-//       try {
-//         const response = await hotelApi.get("/getroomdetails", {
-//           params: { room_id: roomId },
-//         });
-
-//         if (response.data?.rooms_by_pk) {
-//           setRoomDetails(response.data.rooms_by_pk);
-//         } else {
-//           throw new Error("Invalid response structure");
-//         }
-//       } catch (err) {
-//         console.error("Error fetching room details:", err);
-//         setError("Failed to fetch room details");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchRoomDetails();
-//   }, [roomId]);
-
-//   useEffect(() => {
-//     if (roomDetails && checkInDate && checkOutDate) {
-//       const nights = (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24);
-//       setTotalPrice(nights * roomDetails.price);
-//     }
-//   }, [roomDetails, checkInDate, checkOutDate]);
-
-//   const handleBookNow = () => {
-//     if (!checkInDate || !checkOutDate) {
-//       alert("Please select check-in and check-out dates.");
-//       return;
-//     }
-
-//     const today = new Date();
-//     const checkIn = new Date(checkInDate);
-//     const checkOut = new Date(checkOutDate);
-
-//     if (checkIn < today) {
-//       alert("Check-in date must be in the future.");
-//       return;
-//     }
-
-//     if (checkOut <= checkIn) {
-//       alert("Check-out date must be after the check-in date.");
-//       return;
-//     }
-
-//     const bookingDetails = {
-//       room_id: parseInt(roomId),
-//       guest_id: currentUser?.id,
-//       check_in_date: checkInDate,
-//       check_out_date: checkOutDate,
-//       total_amount: totalPrice,
-//       room_details: roomDetails,
-//       guests,
-//     };
-
-//     navigate("/payment", { state: bookingDetails });
-//   };
-
-//   if (loading) return <div className={styles["roombooking-loading-spinner"]}></div>;
-//   if (error) return <p className={styles["roombooking-error-message"]}>Error: {error}</p>;
-//   if (!roomDetails) return <div>No room details available.</div>;
-
-//   return (
-//     <div className={styles["roombooking-page"]}>
-//       <div className={styles["roombooking-header"]}>
-//         <div>
-//           <h1 className={styles["roombooking-title"]}>
-//             {roomDetails.room_type?.type_name || "Room"}
-//           </h1>
-//           <p className={styles["roombooking-location"]}>
-//             📍 {roomDetails.hotel?.hotel_name}, {roomDetails.hotel?.location?.location_name}
-//           </p>
-//           <div className={styles["roombooking-price"]}>
-//             PHP {roomDetails.price.toFixed(2)} <span>Per Night</span>
-//           </div>
-//         </div>
-//         <button className={styles["roombooking-booknow-top"]} onClick={handleBookNow}>
-//           Book Now
-//         </button>
-//       </div>
-
-//       <div className={styles["roombooking-images-section"]}>
-//         <div className={styles["roombooking-main-image"]}>
-//           <img src={roomDetails.image_urls?.[0]} alt="Room" />
-//         </div>
-//         <div className={styles["roombooking-thumbnail-images"]}>
-//           {roomDetails.image_urls?.slice(1, 5).map((url, index) => (
-//             <img key={index} src={url} alt={`Thumbnail ${index}`} />
-//           ))}
-//         </div>
-//       </div>
-
-//       <div className={styles["roombooking-content"]}>
-//         <div className={styles["roombooking-roomdetails"]}>
-//           <h2>Room Details</h2>
-//           <p>{roomDetails.description}</p>
-
-//           <div className={styles["roombooking-amenities"]}>
-//             <h3>Room Amenities</h3>
-//             <ul>
-//               {roomDetails.amenities?.map((amenity, index) => (
-//                 <li key={index}>{amenity}</li>
-//               ))}
-//             </ul>
-//           </div>
-//         </div>
-
-//         <div className={styles["roombooking-form-container"]}>
-//           <div className={styles["roombooking-form"]}>
-//             <h3>Book Your Stay</h3>
-//             <label>Check In</label>
-//             <input
-//               type="date"
-//               value={checkInDate}
-//               onChange={(e) => setCheckInDate(e.target.value)}
-//             />
-//             <label>Check Out</label>
-//             <input
-//               type="date"
-//               value={checkOutDate}
-//               onChange={(e) => setCheckOutDate(e.target.value)}
-//             />
-//             <label>Guests</label>
-//             <input
-//               type="number"
-//               min="1"
-//               value={guests}
-//               onChange={(e) => setGuests(parseInt(e.target.value))}
-//             />
-//             <p className={styles["roombooking-total"]}>
-//               Total: PHP {totalPrice.toFixed(2)}
-//             </p>
-//             <button onClick={handleBookNow} className={styles["roombooking-form-button"]}>
-//               Book Now
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default RoomBooking;
-
-
-// // import React, { useEffect, useState } from "react";
-// // import { useParams, useNavigate } from "react-router-dom";
-// // import { useAuth } from "../context/AuthProvider";
-// // import { hotelApi } from "../api";
-// // import styles from "./RoomBooking.module.css"; // Updated import for CSS Modules
-
-// // const RoomBooking = () => {
-// //   const { roomId } = useParams();
-// //   const navigate = useNavigate();
-// //   const { currentUser } = useAuth();
-// //   const [roomDetails, setRoomDetails] = useState(null);
-// //   const [checkInDate, setCheckInDate] = useState("");
-// //   const [checkOutDate, setCheckOutDate] = useState("");
-// //   const [guests, setGuests] = useState(1);
-// //   const [totalPrice, setTotalPrice] = useState(0);
-// //   const [loading, setLoading] = useState(true);
-// //   const [error, setError] = useState(null);
-
-// //   useEffect(() => {
-// //     const fetchRoomDetails = async () => {
-// //       try {
-// //         const response = await hotelApi.get("/getroomdetails", {
-// //           params: { room_id: roomId },
-// //         });
-
-// //         if (response.data?.rooms_by_pk) {
-// //           setRoomDetails(response.data.rooms_by_pk);
-// //         } else {
-// //           throw new Error("Invalid response structure");
-// //         }
-// //       } catch (err) {
-// //         console.error("Error fetching room details:", err);
-// //         setError("Failed to fetch room details");
-// //       } finally {
-// //         setLoading(false);
-// //       }
-// //     };
-
-// //     fetchRoomDetails();
-// //   }, [roomId]);
-
-// //   useEffect(() => {
-// //     if (roomDetails && checkInDate && checkOutDate) {
-// //       const nights =
-// //         (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24);
-// //       setTotalPrice(nights * roomDetails.price);
-// //     }
-// //   }, [roomDetails, checkInDate, checkOutDate]);
-
-// //   const handleBookNow = () => {
-// //     if (!checkInDate || !checkOutDate) {
-// //       alert("Please select check-in and check-out dates.");
-// //       return;
-// //     }
-  
-// //     const today = new Date();
-// //     const checkIn = new Date(checkInDate);
-// //     const checkOut = new Date(checkOutDate);
-  
-// //     if (checkIn < today) {
-// //       alert("Check-in date must be in the future.");
-// //       return;
-// //     }
-  
-// //     if (checkOut <= checkIn) {
-// //       alert("Check-out date must be after the check-in date.");
-// //       return;
-// //     }
-  
-// //     const bookingDetails = {
-// //       room_id: parseInt(roomId),
-// //       guest_id: currentUser?.id,
-// //       check_in_date: checkInDate,
-// //       check_out_date: checkOutDate,
-// //       total_amount: totalPrice,
-// //       room_details: roomDetails,
-// //       guests, // Include the number of guests
-// //     };
-  
-// //     navigate("/payment", { state: bookingDetails });
-// //   };
-
-// //   if (loading) return <div className={styles["roombooking-loading-spinner"]}></div>;
-// //   if (error) return <p className={styles["roombooking-error-message"]}>Error: {error}</p>;
-// //   if (!roomDetails) return <div>No room details available.</div>;
-
-// //   return (
-// //     <div className={styles["roombooking-container"]}>
-// //       <div className={styles["roombooking-details"]}>
-// //         <h1>{roomDetails.room_type?.type_name || "Room"}</h1>
-// //         <p>
-// //           📍 {roomDetails.hotel?.hotel_name},{" "}
-// //           {roomDetails.hotel?.location?.location_name}
-// //         </p>
-// //         <p>PHP {roomDetails.price.toFixed(2)} Per Night</p>
-// //         <div className={styles["roombooking-description"]}>
-// //           <p>{roomDetails.description}</p>
-// //         </div>
-// //         <div className={styles["roombooking-availability"]}>
-// //           <p>
-// //             Status:{" "}
-// //             {roomDetails.availability ? "Available" : "Unavailable"}
-// //           </p>
-// //         </div>
-// //       </div>
-
-// //       <div className={styles["roombooking-form"]}>
-// //         <h3>Book Your Stay</h3>
-// //         <label>Check In</label>
-// //         <input
-// //           type="date"
-// //           value={checkInDate}
-// //           onChange={(e) => setCheckInDate(e.target.value)}
-// //         />
-// //         <label>Check Out</label>
-// //         <input
-// //           type="date"
-// //           value={checkOutDate}
-// //           onChange={(e) => setCheckOutDate(e.target.value)}
-// //         />
-// //         <label>Guests</label>
-// //         <input
-// //           type="number"
-// //           min="1"
-// //           value={guests}
-// //           onChange={(e) => setGuests(parseInt(e.target.value))}
-// //         />
-// //         <p>Total: PHP {totalPrice.toFixed(2)}</p>
-// //         <button onClick={handleBookNow} className={styles["roombooking-form-button"]}>
-// //           Book Now
-// //         </button>
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default RoomBooking;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { hotelApi, authApi } from "../api"; // Import authApi for API calls
 import styles from "./Profile.module.css";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedSection, setSelectedSection] = useState("Profile"); // State to track selected section
   const [profile, setProfile] = useState({
     full_name: "",
@@ -12,8 +13,8 @@ const Profile = () => {
     phone: "",
     address: "",
   });
-  const [bookings, setBookings] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]); // Payments for Transaction History
+  const [bookings, setBookings] = useState([]); // Bookings for Booking History
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -44,7 +45,7 @@ const Profile = () => {
         });
 
         if (profileResponse.data) {
-          const { guests_by_pk, bookings, payments } = profileResponse.data;
+          const { guests_by_pk, payments, bookings } = profileResponse.data;
 
           if (guests_by_pk) {
             setProfile({
@@ -56,17 +57,11 @@ const Profile = () => {
             });
           }
 
-          if (bookings) {
-            // Associate payments with bookings using booking_id
-            const bookingsWithPayments = bookings.map((booking) => ({
-              ...booking,
-              payments: payments.filter((payment) => payment.booking_id === booking.booking_id),
-            }));
-            setBookings(bookingsWithPayments);
-          }
-
-          // Set transactions if payments exist
+          // Set transactions to payments
           setTransactions(payments || []);
+
+          // Set bookings
+          setBookings(bookings || []);
         } else {
           throw new Error("Invalid profile response structure");
         }
@@ -76,19 +71,22 @@ const Profile = () => {
         console.error("Error fetching profile data:", err.response?.data || err.message || err);
 
         // Gracefully handle missing fields
-        if (err.response?.data?.code === "validation-failed") {
-          setError("Some data could not be loaded, but the rest is displayed.");
-          setTransactions([]); // Fallback to empty transactions
-        } else {
-          setError("Failed to fetch profile data. Please try again.");
-        }
-
+        setError("Failed to fetch profile data. Please try again.");
         setLoading(false);
       }
     };
 
     fetchProfileData();
   }, [navigate]);
+
+  useEffect(() => {
+    // Check if a specific tab is passed in the query parameters
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+    if (tab) {
+      setSelectedSection(tab);
+    }
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -158,12 +156,12 @@ const Profile = () => {
                     Profile
                   </button>
                   <button
-                    onClick={() => setSelectedSection("Bookings")}
+                    onClick={() => setSelectedSection("Booking History")}
                     className={`block py-2 px-4 ${
-                      selectedSection === "Bookings" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
+                      selectedSection === "Booking History" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
                     } rounded-md font-medium`}
                   >
-                    Bookings
+                    Booking History
                   </button>
                   <button
                     onClick={() => setSelectedSection("Transaction History")}
@@ -199,20 +197,7 @@ const Profile = () => {
             {selectedSection === "Profile" && (
               <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Profile Information</h1>
-                    <button
-                      onClick={() => navigate("/edit_profile")}
-                      className="flex items-center justify-center"
-                    >
-                      <img
-                        src="/src/assets/edit.png"
-                        alt="Edit Profile"
-                        className="h-6 w-6 cursor-pointer hover:opacity-80"
-                      />
-                    </button>
-                  </div>
-                  
+                  <h1 className="text-2xl font-bold text-gray-800">Profile Information</h1>
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
@@ -235,36 +220,21 @@ const Profile = () => {
               </div>
             )}
 
-            {selectedSection === "Bookings" && (
+            {selectedSection === "Booking History" && (
               <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4">Bookings</h2>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Booking History</h2>
                   {bookings.length === 0 ? (
                     <p>No bookings found.</p>
                   ) : (
                     <ul className="space-y-4">
                       {bookings.map((booking) => (
                         <li key={booking.booking_id} className="border-b pb-4">
+                          <p>Booking ID: {booking.booking_id}</p>
                           <p>Check-In: {booking.check_in_date}</p>
                           <p>Check-Out: {booking.check_out_date}</p>
-                          <p>Status: {booking.status}</p>
                           <p>Total Amount: ₱{booking.total_amount}</p>
-                          {booking.payments && booking.payments.length > 0 && (
-                            <div className="mt-4">
-                              <h3 className="text-sm font-medium text-gray-500">Payments</h3>
-                              <ul className="space-y-2">
-                                {booking.payments.map((payment) => (
-                                  <li key={payment.payment_id}>
-                                    <p>Payment ID: {payment.payment_id}</p>
-                                    <p>Amount: ₱{payment.amount}</p>
-                                    <p>Date: {payment.payment_date}</p>
-                                    <p>Status: {payment.payment_status}</p>
-                                    <p>Method: {payment.payment_method}</p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                          <p>Status: {booking.status}</p>
                         </li>
                       ))}
                     </ul>
@@ -281,23 +251,20 @@ const Profile = () => {
                     <p>No transactions found.</p>
                   ) : (
                     <ul className="space-y-4">
-                      {transactions
-                        .filter((transaction) => transaction.guest_id === parseInt(localStorage.getItem("userId")))
-                        .map((transaction) => (
-                          <li key={transaction.payment_id} className="border-b pb-4">
-                            <p>Payment ID: {transaction.payment_id}</p>
-                            <p>Amount: ₱{transaction.amount}</p>
-                            <p>Date: {transaction.payment_date}</p>
-                            <p>Status: {transaction.payment_status}</p>
-                            <p>Method: {transaction.payment_method}</p>
-                          </li>
-                        ))}
+                      {transactions.map((transaction) => (
+                        <li key={transaction.payment_id} className="border-b pb-4">
+                          <p>Payment ID: {transaction.payment_id}</p>
+                          <p>Amount: ₱{transaction.amount}</p>
+                          <p>Date: {transaction.payment_date}</p>
+                          <p>Status: {transaction.payment_status}</p>
+                          <p>Method: {transaction.payment_method}</p>
+                        </li>
+                      ))}
                     </ul>
                   )}
                 </div>
               </div>
             )}
-
 
             {selectedSection === "Change Password" && (
               <div className="bg-white shadow rounded-lg overflow-hidden">
