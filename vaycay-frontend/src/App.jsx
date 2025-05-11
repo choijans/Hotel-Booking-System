@@ -36,6 +36,9 @@ import EditRooms from "./pages/admin/editrooms";
 import Settings from "./pages/admin/Settings";
 import RoomByType from "./pages/admin/roomByType"; 
 import EditRoomType from "./pages/admin/editRoomType";
+import EditPayment from "./pages/admin/editPayment";
+import EditBooking from "./pages/admin/editBooking";
+import AddBooking from "./pages/admin/addBooking";
 
 // Apollo HTTP link for queries/mutations
 const httpLink = new HttpLink({
@@ -108,9 +111,12 @@ function App() {
               <Route path="/admin/hotels/addhotel" element={<AddHotel />} />
               <Route path="/admin/hotels/:hotel_id/addroom" element={<AddRooms />} />
               <Route path="/admin/hotels/:hotel_id/addroomtype" element={<AddRoomType />} />
+              <Route path="/admin/hotels/:hotel_id/addbooking" element={<AddBooking />} />
               <Route path="/admin/hotels/:hotel_id/rooms/:room_id/edit" element={<EditRooms />} />
               <Route path="/admin/hotels/:hotel_id/roomtypes/:type_id/rooms" element={<RoomByType />} />
               <Route path="/admin/hotels/:hotel_id/roomtypes/:type_id/edit" element={<EditRoomType />} />
+              <Route path="/admin/hotels/:hotel_id/payments/:payment_id/edit" element={<EditPayment />} />
+              <Route path="/admin/hotels/:hotel_id/bookings/:booking_id/edit" element={<EditBooking />} />
               <Route path="/admin/settings" element={<Settings />} />
             </Route>
 

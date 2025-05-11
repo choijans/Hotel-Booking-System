@@ -10,12 +10,14 @@ const HotelDetails = () => {
   const [hotelData, setHotelData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [roomTypeToDelete, setRoomTypeToDelete] = useState(null); // State to track the room type to delete
+  const [roomTypeToDelete, setRoomTypeToDelete] = useState(null); 
   const [showDeleteRoomTypeConfirmation, setShowDeleteRoomTypeConfirmation] = useState(false); 
   const [activeTab, setActiveTab] = useState("rooms");
   const [bookingToDelete, setBookingToDelete] = useState(null);
   const [showDeleteBookingConfirmation, setShowDeleteBookingConfirmation] = useState(false);
-  const [roomTypes, setRoomTypes] = useState([]); // State to store room types
+  const [roomTypes, setRoomTypes] = useState([]); 
+  const [paymentToDelete, setPaymentToDelete] = useState(null);
+  const [showDeletePaymentConfirmation, setShowDeletePaymentConfirmation] = useState(false);
 
   useEffect(() => {
     const fetchHotelData = async () => {
@@ -27,10 +29,25 @@ const HotelDetails = () => {
           },
         });
 
+        const bookingIds = response.data.bookings.map((booking) => booking.booking_id); // Extract booking IDs
+
+        // Fetch payments using the booking IDs
+        const paymentsResponse = await axios.post(
+          "http://localhost:8080/api/rest/getpayments",
+          { booking_ids: bookingIds }, // Pass booking IDs dynamically
+          {
+            headers: {
+              "x-hasura-admin-secret": "supersecureadminsecret",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
         console.log("API Response:", response.data); // Log the API response
         setHotelData({
           ...response.data.hotels_by_pk,
           bookings: response.data.bookings, // Include bookings in the state
+          payments: paymentsResponse.data.payments,
         });
         setLoading(false);
       } catch (err) {
@@ -152,6 +169,44 @@ const HotelDetails = () => {
     }
   };
 
+  const handleDeletePayment = (payment_id) => {
+    setPaymentToDelete(payment_id);
+    setShowDeletePaymentConfirmation(true);
+  };
+  
+  const confirmDeletePayment = async () => {
+    try {
+      await axios.request({
+        method: "DELETE",
+        url: "http://localhost:8080/api/rest/deletepayment", // REST API endpoint for deleting payment
+        data: { payment_id: paymentToDelete },
+        headers: {
+          "x-hasura-admin-secret": "supersecureadminsecret", // Replace with your actual admin secret
+          "Content-Type": "application/json",
+        },
+      });
+  
+      // Refresh the hotel data after deletion
+      const response = await axios.get("http://localhost:8080/api/rest/gethoteldata", {
+        params: { hotel_id },
+        headers: {
+          "x-hasura-admin-secret": "supersecureadminsecret",
+        },
+      });
+  
+      setHotelData({
+        ...response.data.hotels_by_pk,
+        payments: response.data.payments, // Update payments in the state
+      });
+      setShowDeletePaymentConfirmation(false);
+      setPaymentToDelete(null);
+      alert("Payment deleted successfully.");
+    } catch (err) {
+      console.error("Error deleting payment:", err.response?.data || err.message);
+      alert("Failed to delete the payment. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen p-8 bg-FFFDF7">
       <button
@@ -201,6 +256,14 @@ const HotelDetails = () => {
                 onClick={() => setActiveTab("bookings")}
               >
                 Bookings
+              </button>
+              <button
+                className={`px-4 py-2 font-medium ${
+                  activeTab === "payments" ? "border-b-2 border-teal-600 text-teal-600" : "text-gray-600"
+                }`}
+                onClick={() => setActiveTab("payments")}
+              >
+                Payments
               </button>
             </div>
 
@@ -286,7 +349,20 @@ const HotelDetails = () => {
 
             {activeTab === "bookings" && (
               <div className="mt-4">
-                <h2 className="text-xl font-bold">Bookings</h2>
+                
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold">Bookings</h2>
+                  <div className="flex space-x-4">
+                    {/* Add New Room Button */}
+                    <button
+                      onClick={() => navigate(`/admin/hotels/${hotel_id}/addbooking`)}
+                      className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700"
+                    >
+                      Add Booking
+                    </button>
+                  </div>
+                </div>
+                
                 <table className="w-full bg-white shadow-md rounded-lg mt-4">
                   <thead>
                     <tr className="bg-gray-100">
@@ -312,11 +388,27 @@ const HotelDetails = () => {
                           <td className="px-4 py-2">{booking.status}</td>
                           <td className="px-4 py-2">₱{booking.total_amount}</td>
                           <td className="px-4 py-2">
+                            {/* Edit Booking Button */}
+                            <button
+                              onClick={() => navigate(`/admin/hotels/${hotel_id}/bookings/${booking.booking_id}/edit`)}
+                              className="mr-4"
+                            >
+                              <img
+                                src="/src/assets/edit.png"
+                                alt="Edit"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
+                            </button>
+
+                            {/* Delete Booking Button */}
                             <button
                               onClick={() => handleDeleteBooking(booking.booking_id)}
-                              className="flex items-center text-red-600 hover:underline"
                             >
-                              Delete
+                              <img
+                                src="/src/assets/delete.png"
+                                alt="Delete"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
                             </button>
                           </td>
                         </tr>
@@ -332,7 +424,79 @@ const HotelDetails = () => {
                 </table>
               </div>
             )}
+
+            {activeTab === "payments" && (
+              <div className="mt-4">
+                <h2 className="text-xl font-bold">Payments</h2>
+                <table className="w-full bg-white shadow-md rounded-lg mt-4">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-2 text-left">Payment ID</th>
+                      <th className="px-4 py-2 text-left">Amount</th>
+                      <th className="px-4 py-2 text-left">Date</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                      <th className="px-4 py-2 text-left">Method</th>
+                      <th className="px-4 py-2 text-left">Booking ID</th>
+                      <th className="px-4 py-2 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hotelData?.payments?.length > 0 ? (
+                      hotelData.payments.map((payment) => (
+                        <tr key={payment.payment_id}>
+                          <td className="px-4 py-2">{payment.payment_id}</td>
+                          <td className="px-4 py-2">₱{payment.amount}</td>
+                          <td className="px-4 py-2">
+                            {new Intl.DateTimeFormat("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }).format(new Date(payment.payment_date))}
+                          </td>
+                          <td className="px-4 py-2">{payment.payment_status}</td>
+                          <td className="px-4 py-2">{payment.payment_method}</td>
+                          <td className="px-4 py-2">{payment.booking_id}</td>
+                          <td className="px-4 py-2">
+                            {/* Edit Payment Button */}
+                            <button
+                              onClick={() => navigate(`/admin/hotels/${hotel_id}/payments/${payment.payment_id}/edit`)}
+                              className="mr-4"
+                            >
+                              <img
+                                src="/src/assets/edit.png"
+                                alt="Edit"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
+                            </button>
+
+                            {/* Delete Payment Button */}
+                            <button
+                              onClick={() => handleDeletePayment(payment.payment_id)}
+                            >
+                              <img
+                                src="/src/assets/delete.png"
+                                alt="Delete"
+                                className="w-6 h-6 hover:opacity-80"
+                              />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
+                          No payments found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
+
       
           {showDeleteRoomTypeConfirmation && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -358,29 +522,53 @@ const HotelDetails = () => {
             </div>
           )}
 
-            {showDeleteBookingConfirmation && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg shadow-lg">
-                  <p className="text-lg font-medium mb-4">
-                    Are you sure you want to delete this booking?
-                  </p>
-                  <div className="flex justify-end space-x-4">
-                    <button
-                      onClick={() => setShowDeleteBookingConfirmation(false)}
-                      className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmDeleteBooking}
-                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
+          {showDeleteBookingConfirmation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <p className="text-lg font-medium mb-4">
+                  Are you sure you want to delete this booking?
+                </p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowDeleteBookingConfirmation(false)}
+                    className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteBooking}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
+          {showDeletePaymentConfirmation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <p className="text-lg font-medium mb-4">
+                  Are you sure you want to delete this payment?
+                </p>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowDeletePaymentConfirmation(false)}
+                    className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeletePayment}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

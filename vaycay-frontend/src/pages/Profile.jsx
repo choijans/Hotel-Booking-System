@@ -153,7 +153,7 @@ const Profile = () => {
                       selectedSection === "Profile" ? "bg-teal-100 text-teal-800" : "text-gray-700 hover:bg-gray-100"
                     } rounded-md font-medium`}
                   >
-                    Profile
+                    Profile Information
                   </button>
                   <button
                     onClick={() => setSelectedSection("Booking History")}
@@ -197,7 +197,7 @@ const Profile = () => {
             {selectedSection === "Profile" && (
               <div className="bg-white shadow rounded-lg overflow-hidden">
                 <div className="p-6">
-                  <h1 className="text-2xl font-bold text-gray-800">Profile Information</h1>
+                  <h1 className="text-2xl font-bold text-gray-800 pb-4">Profile Information</h1>
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
@@ -255,7 +255,16 @@ const Profile = () => {
                         <li key={transaction.payment_id} className="border-b pb-4">
                           <p>Payment ID: {transaction.payment_id}</p>
                           <p>Amount: ₱{transaction.amount}</p>
-                          <p>Date: {transaction.payment_date}</p>
+                          <p>
+                            Date:{" "}
+                            {new Intl.DateTimeFormat("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }).format(new Date(transaction.payment_date))}
+                          </p>
                           <p>Status: {transaction.payment_status}</p>
                           <p>Method: {transaction.payment_method}</p>
                         </li>

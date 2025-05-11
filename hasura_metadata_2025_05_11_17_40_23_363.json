@@ -1,5 +1,5 @@
 {
-  "resource_version": 56,
+  "resource_version": 67,
   "metadata": {
     "version": 3,
     "sources": [
@@ -656,6 +656,34 @@
             {
               "name": "AddRoomType",
               "query": "mutation AddRoomType($type_name: String!, $description: String!, $hotel_id: Int!) {\r\n  insert_room_types_one(\r\n    object: { type_name: $type_name, description: $description, hotel_id: $hotel_id },\r\n    on_conflict: {\r\n      constraint: room_types_type_name_key,  \r\n      update_columns: [description]\r\n    }\r\n  ) {\r\n    type_id\r\n    type_name\r\n    description\r\n    hotel_id\r\n  }\r\n}"
+            },
+            {
+              "name": "GetPayments",
+              "query": "query GetPayments($booking_ids: [Int!]!) {\r\n  payments(where: { booking_id: { _in: $booking_ids } }) {\r\n    payment_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n    booking_id\r\n  }\r\n}"
+            },
+            {
+              "name": "DeletePayment",
+              "query": "mutation DeletePayment($payment_id: Int!) {\r\n  delete_payments_by_pk(payment_id: $payment_id) {\r\n    payment_id\r\n  }\r\n}"
+            },
+            {
+              "name": "GetPaymentById",
+              "query": "query GetPaymentById($payment_id: Int!) {\r\n  payments_by_pk(payment_id: $payment_id) {\r\n    payment_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n    booking_id\r\n  }\r\n}"
+            },
+            {
+              "name": "UpdatePayment",
+              "query": "mutation UpdatePayment($payment_id: Int!, $amount: numeric!, $payment_status: String!, $payment_method: String!) {\r\n  update_payments_by_pk(\r\n    pk_columns: { payment_id: $payment_id },\r\n    _set: {\r\n      amount: $amount,\r\n      payment_status: $payment_status,\r\n      payment_method: $payment_method\r\n    }\r\n  ) {\r\n    payment_id\r\n    amount\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
+            },
+            {
+              "name": "GetBookingById",
+              "query": "query GetBookingById($booking_id: Int!) {\r\n  bookings_by_pk(booking_id: $booking_id) {\r\n    booking_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n  }\r\n}"
+            },
+            {
+              "name": "UpdateBooking",
+              "query": "mutation UpdateBooking(\r\n  $booking_id: Int!,\r\n  $room_id: Int!,\r\n  $check_in_date: date!,\r\n  $check_out_date: date!,\r\n  $status: String!,\r\n  $total_amount: numeric!\r\n) {\r\n  update_bookings_by_pk(\r\n    pk_columns: { booking_id: $booking_id },\r\n    _set: {\r\n      room_id: $room_id,\r\n      check_in_date: $check_in_date,\r\n      check_out_date: $check_out_date,\r\n      status: $status,\r\n      total_amount: $total_amount\r\n    }\r\n  ) {\r\n    booking_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n  }\r\n}"
+            },
+            {
+              "name": "GetAvailableRooms",
+              "query": "query GetAvailableRooms($hotel_id: Int!) {\r\n  rooms(where: { hotel_id: { _eq: $hotel_id }, availability: { _eq: true } }) {\r\n    room_id\r\n    room_number\r\n  }\r\n}"
             }
           ]
         }
@@ -759,6 +787,20 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "DeletePayment"
+          }
+        },
+        "methods": [
+          "DELETE"
+        ],
+        "name": "DeletePayment",
+        "url": "deletepayment"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "DeleteRoomType"
           }
         },
@@ -823,6 +865,34 @@
         ],
         "name": "GetAllUsers",
         "url": "getallusers"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetAvailableRooms"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetAvailableRooms",
+        "url": "getavailablerooms"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetBookingById"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetBookingById",
+        "url": "getbookingbyid"
       },
       {
         "comment": "",
@@ -927,6 +997,34 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "GetPaymentById"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GetPaymentById",
+        "url": "getpaymentbyid"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GetPayments"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "GetPayments",
+        "url": "getpayments"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "GetRoomDetails"
           }
         },
@@ -1011,6 +1109,20 @@
         "definition": {
           "query": {
             "collection_name": "allowed-queries",
+            "query_name": "UpdateBooking"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "UpdateBooking",
+        "url": "updatebooking"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
             "query_name": "UpdateGuestProfile"
           }
         },
@@ -1033,6 +1145,20 @@
         ],
         "name": "UpdateHotelDetails",
         "url": "updatehoteldetails"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "UpdatePayment"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "UpdatePayment",
+        "url": "updatepayment"
       },
       {
         "comment": "",
