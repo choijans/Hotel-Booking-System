@@ -2,6 +2,54 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./HotelRooms.module.css";
+import { motion } from "framer-motion";
+
+const images = [
+  "url('/src/assets/leftbg.jpg')",
+  "url('/src/assets/bgbg.jpg')",
+];
+
+function CrossfadeBackground() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="absolute top-0 left-0 w-full h-[440px] pointer-events-none"
+      style={{
+        borderBottomLeftRadius: "25px",
+        borderBottomRightRadius: "25px",
+        boxShadow: "0 2px 14px rgba(0, 0, 0, 0.3)",
+        zIndex: -1,
+      }}
+    >
+      {images.map((bg, index) => (
+        <div
+          key={index}
+          className="absolute top-0 left-0 w-full h-full transition-opacity duration-1000"
+          style={{
+            backgroundImage: bg,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            borderBottomLeftRadius: "25px",
+            borderBottomRightRadius: "25px",
+            opacity: index === currentIndex ? 1 : 0,
+            transition: "opacity 1s ease-in-out",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 
 const HotelRooms = () => {
   const { hotelId } = useParams();
@@ -168,124 +216,119 @@ const HotelRooms = () => {
 
   return (
     <>
-      <div
-        className="absolute top-0 left-0 w-full z-[-1]"
-        style={{
-          height: '440px',
-          backgroundImage: `url('/src/assets/leftbg.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderBottomLeftRadius: '25px',
-          borderBottomRightRadius: '25px',
-          boxShadow: '0 2px 14px rgba(0, 0, 0, 0.3)',
-        }}
-      ></div>
-
-      <div className={styles["hotelroom-search-section-container"]}>
-        <div className={styles["hotelroom-search-section"]}>
-          <h1 className="text-2xl font-bold" style={{ color: '#10716D' }}>Filter Rooms</h1>
-          <div className={styles["hotelroom-search-fields"]}>
-            <div className={styles["hotelroom-date-field"]}>
-              <label>Check In</label>
-              <input
-                type="date"
-                value={searchParams.checkIn}
-                onChange={(e) =>
-                  setSearchParams({ ...searchParams, checkIn: e.target.value })
-                }
-              />
-            </div>
-
-            <div className={styles["hotelroom-date-field"]}>
-              <label>Check Out</label>
-              <input
-                type="date"
-                value={searchParams.checkOut}
-                onChange={(e) =>
-                  setSearchParams({ ...searchParams, checkOut: e.target.value })
-                }
-              />
-            </div>
-
-            <div className={styles["hotelroom-number-field"]}>
-              <label>Room Type</label>
-              <select
-                value={selectedRoomType}
-                onChange={(e) => setSelectedRoomType(e.target.value)}
-                className={styles["hotelroom-sort-dropdown"]}
-              >
-                <option value="">All Room Types</option>
-                {roomTypes.map((type) => (
-                  <option key={type.type_id} value={type.type_name}>
-                    {type.type_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles["hotelroom-filters-section"]}>
-        <div className={styles["hotelroom-sort-options"]}>
-          <span className={styles["hotelroom-sort-label"]}>Sort by:</span>
-          <select
-            className={styles["hotelroom-sort-dropdown"]}
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="price-asc">Price (Low to High)</option>
-            <option value="price-desc">Price (High to Low)</option>
-          </select>
-        </div>
-      </div>
-
-      <div className={styles["hotelroom-rooms-list"]}>
-        <h2>Available Rooms</h2>
-
-        {filteredRooms.length === 0 ? (
-          <div className={styles["hotelroom-no-rooms"]}>
-            <p>No rooms match your search criteria. Try different dates or filters.</p>
-          </div>
-        ) : (
-          <div className={styles["hotelroom-room-cards-container"]}>
-            {filteredRooms.map((room) => (
-              <div key={room.room_id} className={styles["hotelroom-room-card"]}>
-                <div className={styles["hotelroom-room-image"]}>
-                  <img
-                    src={`/src/assets/admin_pics/hotel${(room.room_id % 3) + 1}.jpg`}
-                    alt={room.room_name}
-                  />
-                </div>
-                <div className={styles["hotelroom-room-details"]}>
-                  <h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
-                  <p className={styles["hotelroom-room-type"]}>
-                    <strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}
-                  </p>
-                  <p className={styles["hotelroom-room-price"]}>
-                    <strong>Price:</strong> PHP {room.price.toLocaleString()}
-                  </p>
-                  <span
-                    className={`${styles["hotelroom-room-availability"]} ${
-                      room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]
-                    }`}
-                  >
-                    {room.availability ? "Available" : "Unavailable"}
-                  </span>
-                  <button
-                    className={styles["hotelroom-book-now-button"]}
-                    onClick={() => handleBookNow(room.room_id)}
-                    disabled={!room.availability}
-                  >
-                    {room.availability ? "Book Now" : "Not Available"}
-                  </button>
-                </div>
+      <CrossfadeBackground />
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className={styles["hotelroom-search-section-container"]}>
+          <div className={styles["hotelroom-search-section"]}>
+            <h1 className="text-2xl font-bold" style={{ color: '#10716D' }}>Filter Rooms</h1>
+            <div className={styles["hotelroom-search-fields"]}>
+              <div className={styles["hotelroom-date-field"]}>
+                <label>Check In</label>
+                <input
+                  type="date"
+                  value={searchParams.checkIn}
+                  onChange={(e) =>
+                    setSearchParams({ ...searchParams, checkIn: e.target.value })
+                  }
+                />
               </div>
-            ))}
+
+              <div className={styles["hotelroom-date-field"]}>
+                <label>Check Out</label>
+                <input
+                  type="date"
+                  value={searchParams.checkOut}
+                  onChange={(e) =>
+                    setSearchParams({ ...searchParams, checkOut: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className={styles["hotelroom-number-field"]}>
+                <label>Room Type</label>
+                <select
+                  value={selectedRoomType}
+                  onChange={(e) => setSelectedRoomType(e.target.value)}
+                  className={styles["hotelroom-sort-dropdown"]}
+                >
+                  <option value="">All Room Types</option>
+                  {roomTypes.map((type) => (
+                    <option key={type.type_id} value={type.type_name}>
+                      {type.type_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+
+        <div className={styles["hotelroom-filters-section"]}>
+          <div className={styles["hotelroom-sort-options"]}>
+            <span className={styles["hotelroom-sort-label"]}>Sort by:</span>
+            <select
+              className={styles["hotelroom-sort-dropdownn"]}
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+            </select>
+          </div>
+        </div>
+
+        <div className={styles["hotelroom-rooms-list"]}>
+          <h2>Available Rooms</h2>
+
+          {filteredRooms.length === 0 ? (
+            <div className={styles["hotelroom-no-rooms"]}>
+              <p>No rooms match your search criteria. Try different dates or filters.</p>
+            </div>
+          ) : (
+            <div className={styles["hotelroom-room-cards-container"]}>
+              {filteredRooms.map((room) => (
+                <div key={room.room_id} className={styles["hotelroom-room-card"]}>
+                  <div className={styles["hotelroom-room-image"]}>
+                    <img
+                      src={`/src/assets/admin_pics/hotel${(room.room_id % 3) + 1}.jpg`}
+                      alt={room.room_name}
+                    />
+                  </div>
+                  <div className={styles["hotelroom-room-details"]}>
+                    {/*<h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
+                        removed room number*/}
+                    <p className={styles["hotelroom-room-type"]}>
+                      <strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}
+                    </p>
+                    <p className={styles["hotelroom-room-price"]}>
+                      <strong>Price:</strong> PHP {room.price.toLocaleString()}
+                    </p>
+                    <span
+                      className={`${styles["hotelroom-room-availability"]} ${
+                        room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]
+                      }`}
+                    >
+                      {room.availability ? "Available" : "Unavailable"}
+                    </span>
+                    <button
+                      className={styles["hotelroom-book-now-button"]}
+                      onClick={() => handleBookNow(room.room_id)}
+                      disabled={!room.availability}
+                    >
+                      {room.availability ? "Book Now" : "Not Available"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
     </>
   );
 };
