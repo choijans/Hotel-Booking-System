@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./PaymentScreen.module.css";
+import { motion } from "framer-motion";
 
 // Import card images
 import visaImage from "../assets/visa.png";
@@ -129,107 +130,156 @@ const PaymentScreen = () => {
   };
 
   return (
-    <div className={styles["payment-page-wrapper"]}>
-      <div className={styles["payment-header"]}>
-        <h1>Review Your Booking</h1>
-      </div>
-
-      <div className={styles["payment-container"]}>
-        {/* Room Details Section */}
-        <div className={styles["booking-section"]}>
-          <h2>Room Details</h2>
-          <div className={styles["room-details"]}>
-            <div className={styles["room-image"]}>
-              <img
-                src="https://via.placeholder.com/300x200"
-                alt={bookingDetails.room_details.room_type?.type_name || "Room"}
-              />
-            </div>
-            <div className={styles["room-info"]}>
-              <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
-              <p className={styles["hotel-location"]}>
-                {bookingDetails.room_details.hotel?.hotel_name},{" "}
-                {bookingDetails.room_details.hotel?.location?.location_name}
-              </p>
-              <p className={styles["room-description"]}>{bookingDetails.room_details.description}</p>
-            </div>
-          </div>
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
+        transition={{ duration: 0.5 }}
+      >
+      <div className={styles["payment-page-wrapper"]}>
+        <div className={styles["payment-header"]}>
+          <h1>Review Your Booking</h1>
         </div>
 
-        {/* Payment Details Section */}
-        <div className={styles["payment-section"]}>
-          <h2>Payment Details</h2>
-
-          <div className={styles["payment-form"]}>
-            <div className={styles["form-group"]}>
-              <label>Card Number</label>
-              <input
-                type="text"
-                value={cardNumber}
-                onChange={handleCardNumberChange}
-                placeholder="1234 5678 9012 3456"
-                maxLength="19" // Includes spaces
-                className={styles["card-input"]}
-              />
-              {cardType && (
+        <div className={styles["payment-container"]}>
+          {/* Room Details Section */}
+          <div className={styles["booking-section"]}>
+            <h2>Room Details</h2>
+            <div className={styles["room-details"]}>
+              <div className={styles["room-image"]}>
                 <img
-                  src={getCardImage()}
-                  alt={cardType}
-                  className={styles["card-image"]}
+                  src="/src/assets/admin_pics/hotel1.jpg"
+                  alt={bookingDetails.room_details.room_type?.type_name || "Room"}
                 />
-              )}
+              </div>
+              <div className={styles["room-info"]}>
+                <h3>{bookingDetails.room_details.room_type?.type_name || "Room"}</h3>
+                <p className={styles["hotel-location"]}>
+                  📍
+                  {bookingDetails.room_details.hotel?.hotel_name},{" "}
+                  {bookingDetails.room_details.hotel?.location?.location_name}
+                </p>
+                <p className={styles["room-description"]}>{bookingDetails.room_details.description}</p>
+              </div>
             </div>
-
-            <div className={styles["form-group"]}>
-              <label>Expiry Date (MM/YY)</label>
-              <input
-                type="text"
-                value={expiryDate}
-                onChange={handleExpiryDateChange}
-                placeholder="MM/YY"
-                maxLength="5"
-                className={styles["date-input"]}
-              />
-            </div>
-
-            <div className={styles["form-group"]}>
-              <label>CVV</label>
-              <input
-                type="text"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-                placeholder="123"
-                maxLength="3"
-                className={styles["cvv-input"]}
-              />
+            <hr className={styles.divider} />
+            <h2>Booking Summary</h2>
+            <div className={styles["booking-summary"]}>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Check-in:</span>
+                <span className={styles["summary-value"]}>
+                  {bookingDetails.check_in_date || "N/A"}
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Check-out:</span>
+                <span className={styles["summary-value"]}>
+                  {bookingDetails.check_out_date || "N/A"}
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Guests:</span>
+                <span className={styles["summary-value"]}>
+                  {bookingDetails.adults || 2} Adults, {bookingDetails.children || 1} Children
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Room Rate:</span>
+                <span className={styles["summary-value"]}>
+                  ₱{bookingDetails.room_details?.price?.toFixed(2) || "0.00"}
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Taxes & Fees:</span>
+                <span className={styles["summary-value"]}>
+                  ₱{(bookingDetails.total_amount * 0.12).toFixed(2)}
+                </span>
+              </div>
+              <div className={`${styles["summary-item"]} ${styles["summary-total"]}`}>
+                <span className={styles["summary-label-total"]}>Total:</span>
+                <span className={styles["summary-value-total"]}>
+                  ₱{bookingDetails.total_amount?.toFixed(2) || "0.00"}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className={styles["terms-container"]}>
-            <label htmlFor="terms" className={styles["checkbox-label"]}>
-              <input
-                type="checkbox"
-                id="terms"
-                checked={isTermsChecked}
-                onChange={(e) => setIsTermsChecked(e.target.checked)}
-              />
-              <span>
-                I agree to the <a href="/terms">Terms and Conditions</a>{" "} and
-                acknowledge that my payment will be processed now.
-              </span>
-            </label>
-          </div>
+          
+          <div className={styles["payment-section"]}>
+            <h2>Payment Details</h2>
 
-          <button
-            className={styles["confirm-button"]}
-            onClick={handlePayment}
-            disabled={!isTermsChecked || isProcessing}
-          >
-            {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
-          </button>
+            <div className={styles["payment-form"]}>
+              <div className={styles["form-group"]}>
+                <label>Card Number</label>
+                <input
+                  type="text"
+                  value={cardNumber}
+                  onChange={handleCardNumberChange}
+                  placeholder="1234 5678 9012 3456"
+                  maxLength="19" // Includes spaces
+                  className={styles["card-input"]}
+                />
+                {cardType && (
+                  <img
+                    src={getCardImage()}
+                    alt={cardType}
+                    className={styles["card-image"]}
+                  />
+                )}
+              </div>
+
+              <div className={styles["form-group"]}>
+                <label>Expiry Date (MM/YY)</label>
+                <input
+                  type="text"
+                  value={expiryDate}
+                  onChange={handleExpiryDateChange}
+                  placeholder="MM/YY"
+                  maxLength="5"
+                  className={styles["date-input"]}
+                />
+              </div>
+
+              <div className={styles["form-group"]}>
+                <label>CVV</label>
+                <input
+                  type="text"
+                  value={cvv}
+                  onChange={(e) => setCvv(e.target.value)}
+                  placeholder="123"
+                  maxLength="3"
+                  className={styles["cvv-input"]}
+                />
+              </div>
+            </div>
+
+            <div className={styles["terms-container"]}>
+              <label htmlFor="terms" className={styles["checkbox-label"]}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={isTermsChecked}
+                  onChange={(e) => setIsTermsChecked(e.target.checked)}
+                />
+                <span>
+                  I agree to the <a href="/terms">Terms and Conditions</a>,{" "}
+                  <a href="/cancellation-policy">Cancellation Policy</a>, and
+                  acknowledge that my payment will be processed now.
+                </span>
+              </label>
+            </div>
+
+            <button
+              className={styles["confirm-button"]}
+              onClick={handlePayment}
+              disabled={!isTermsChecked || isProcessing}
+            >
+              {isProcessing ? "Processing..." : `Confirm and Pay ₱${bookingDetails.total_amount.toFixed(2)}`}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
