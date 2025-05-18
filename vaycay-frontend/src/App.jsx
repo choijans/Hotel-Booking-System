@@ -23,6 +23,7 @@ import Contact from "./pages/Contact";
 import PaymentScreen from "./pages/PaymentScreen";
 import ConfirmationPage from "./pages/ConfirmationPage";
 import EditProfile from "./pages/EditProfile";
+import TermsAndConditions from "./pages/termsAndConditions";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Users from "./pages/admin/users";
@@ -93,6 +94,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/guest_profile" element={<GuestProfile />} />
               <Route path="/edit_profile" element={<EditProfile />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
             </Route>
 
             {/* Admin routes */}

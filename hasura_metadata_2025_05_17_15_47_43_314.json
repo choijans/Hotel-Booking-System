@@ -1,5 +1,5 @@
 {
-  "resource_version": 67,
+  "resource_version": 114,
   "metadata": {
     "version": 3,
     "sources": [
@@ -355,6 +355,28 @@
                 },
                 "comment": ""
               }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "payment_status",
+                    "status",
+                    "check_in_date",
+                    "check_out_date",
+                    "booking_id",
+                    "guest_id",
+                    "room_id",
+                    "total_amount",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "check": {}
+                },
+                "comment": ""
+              }
             ]
           },
           {
@@ -566,10 +588,6 @@
               "query": "mutation MyMutation($address1: String = \"\", $birthdate1: date = \"\", $contact_info1: jsonb = \"\", $full_name: String = \"\", $guest_id: Int!) {\r\n  insert_guests_one(object: {address: $address1, birthdate: $birthdate1, contact_info: $contact_info1, full_name: $full_name, guest_id: $guest_id}) {\r\n    address\r\n    birthdate\r\n    contact_info\r\n    full_name\r\n    guest_id\r\n  }\r\n}"
             },
             {
-              "name": "GetAllBookings",
-              "query": "query MyQuery {\r\n  bookings {\r\n    booking_id\r\n    room {\r\n      description\r\n      hotel {\r\n        hotel_name\r\n      }\r\n      price\r\n    }\r\n    check_in_date\r\n    check_out_date\r\n    guest_id\r\n    payment_status\r\n    total_amount\r\n  }\r\n}"
-            },
-            {
               "name": "GetGuestBookings",
               "query": "query GetGuestBookings($guest_id: Int!) {\r\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\r\n    booking_id\r\n    room_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    payment_status\r\n  }\r\n}"
             },
@@ -584,10 +602,6 @@
             {
               "name": "GetGuestTransactions",
               "query": "query GetGuestTransactions($guest_id: Int!) {\r\n  payments(where: {guest_id: {_eq: $guest_id}}) {\r\n    payment_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
-            },
-            {
-              "name": "GetGuestDetails",
-              "query": "query GetGuestDetails($guest_id: Int!) {\r\n  guests_by_pk(guest_id: $guest_id) {\r\n    guest_id\r\n    full_name\r\n    address\r\n    birthdate\r\n    contact_info\r\n  }\r\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\r\n    booking_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n  }\r\n  payments {\r\n    payment_id\r\n    booking_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
             },
             {
               "name": "GetAllHotels",
@@ -684,6 +698,14 @@
             {
               "name": "GetAvailableRooms",
               "query": "query GetAvailableRooms($hotel_id: Int!) {\r\n  rooms(where: { hotel_id: { _eq: $hotel_id }, availability: { _eq: true } }) {\r\n    room_id\r\n    room_number\r\n  }\r\n}"
+            },
+            {
+              "name": "GetAllBookings",
+              "query": "query MyQuery {\r\n  bookings {\r\n    booking_id\r\n    room {\r\n      room_id\r\n      description\r\n      hotel {\r\n        hotel_name\r\n      }\r\n      price\r\n    }\r\n    check_in_date\r\n    check_out_date\r\n    guest_id\r\n    payment_status\r\n    total_amount\r\n  }\r\n}"
+            },
+            {
+              "name": "GetGuestDetails",
+              "query": "query GetGuestDetails($guest_id: Int!) {\r\n  guests_by_pk(guest_id: $guest_id) {\r\n    guest_id\r\n    full_name\r\n    address\r\n    birthdate\r\n    contact_info\r\n  }\r\n  bookings(where: { guest_id: { _eq: $guest_id } }) {\r\n    booking_id\r\n    check_in_date\r\n    check_out_date\r\n    status\r\n    total_amount\r\n    room {\r\n      room_id\r\n    }\r\n  }\r\n  payments {\r\n    payment_id\r\n    booking_id\r\n    amount\r\n    payment_date\r\n    payment_status\r\n    payment_method\r\n  }\r\n}"
             }
           ]
         }
