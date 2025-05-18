@@ -214,8 +214,7 @@ const PaymentScreen = () => {
                 onChange={(e) => setIsTermsChecked(e.target.checked)}
               />
               <span>
-                I agree to the <a href="/terms">Terms and Conditions</a>,{" "}
-                <a href="/cancellation-policy">Cancellation Policy</a>, and
+                I agree to the <a href="/terms">Terms and Conditions</a>{" "} and
                 acknowledge that my payment will be processed now.
               </span>
             </label>
