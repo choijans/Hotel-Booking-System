@@ -53,6 +53,9 @@ fi
 # Start backend services
 start_backend_services
 
+echo "Starting frontend development server..."
+(cd "$FRONTEND_DIR" && npm run dev) &
+
 echo "=============================================="
 echo "All services are running!"
 echo "Press Ctrl+C to stop all services"
