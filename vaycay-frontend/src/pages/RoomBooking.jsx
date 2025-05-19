@@ -113,20 +113,28 @@
       const bookingDetails = {
         room_id: parseInt(roomId),
         guest_id: currentUser?.id,
-        check_in_date: checkInDate.toISOString().split("T")[0],
-        check_out_date: checkOutDate.toISOString().split("T")[0],
+        check_in_date: formatDateForDisplay(checkInDate),
+        check_out_date: formatDateForDisplay(checkOutDate),
         total_amount: totalPrice,
         room_details: roomDetails,
-        adults,
-        children,
+        adults: adults + extraAdults, // Combine base and extra
+        children: children + extraChildren, // Combine base and extra
+        base_adults: adults,
+        base_children: children,
         extra_adults: extraAdults,
         extra_children: extraChildren,
+        nightly_rate: roomDetails.price, // Explicitly pass the base rate
       };
 
       navigate("/payment", { state: bookingDetails });
     };
 
-    
+    const formatDateForDisplay = (date) => {
+      if (!date) return "";
+      const d = new Date(date);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
     const [popupImage, setPopupImage] = useState(null);
     const scrollRef = useRef(null);
       let animationFrameId = null;

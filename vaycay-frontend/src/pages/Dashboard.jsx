@@ -29,19 +29,11 @@ const Dashboard = () => {
   }, [currentUser]);
 
   const handleContact = () => {
-    if (currentUser) {
-      navigate("/contactUs"); // Redirect for authorized users
-    } else {
-      navigate("/contact"); // Redirect for guest users
-    }
+    navigate("/contact"); 
   };
 
   const handleAboutUs = () => {
-    if (currentUser) {
-      navigate("/aboutUs"); // Redirect for authorized users
-    } else {
-      navigate("/about"); // Redirect for guest users
-    }
+    navigate("/about"); 
   };
 
   return (
