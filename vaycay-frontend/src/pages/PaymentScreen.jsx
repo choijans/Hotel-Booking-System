@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./PaymentScreen.module.css";
 import { motion } from "framer-motion";
@@ -20,6 +20,49 @@ const PaymentScreen = () => {
   const [cardType, setCardType] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTermsChecked, setIsTermsChecked] = useState(false);
+  const [isBookingExists, setIsBookingExists] = useState(false);
+  const [error, setError] = useState("");
+
+  // Check if booking already exists
+  useEffect(() => {
+    const checkExistingBooking = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/rest/getbookingsbyroom", {
+          headers: {
+            "x-hasura-admin-secret": "supersecureadminsecret",
+          },
+          params: {
+            room_id: bookingDetails.room_id,
+          },
+        });
+
+        const bookings = response.data.bookings || [];
+        const existingBooking = bookings.find(booking => {
+          const bookingStart = new Date(booking.check_in_date);
+          const bookingEnd = new Date(booking.check_out_date);
+          const newStart = new Date(bookingDetails.check_in_date);
+          const newEnd = new Date(bookingDetails.check_out_date);
+
+          // Check if dates overlap
+          return (
+            (newStart >= bookingStart && newStart < bookingEnd) ||
+            (newEnd > bookingStart && newEnd <= bookingEnd) ||
+            (newStart <= bookingStart && newEnd >= bookingEnd)
+          );
+        });
+
+        if (existingBooking) {
+          setIsBookingExists(true);
+          setError("This room is already booked for the selected dates. Please choose different dates.");
+        }
+      } catch (err) {
+        console.error("Error checking existing bookings:", err);
+        setError("Failed to verify booking availability. Please try again.");
+      }
+    };
+
+    checkExistingBooking();
+  }, [bookingDetails]);
 
   const handleCardNumberChange = (e) => {
     let value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
@@ -61,7 +104,7 @@ const PaymentScreen = () => {
   };
 
   const handlePayment = async () => {
-    if (isProcessing) return;
+    if (isProcessing || isBookingExists) return;
 
     if (!cardNumber || cardNumber.replace(/\s/g, "").length < 16) {
       alert("Invalid card number.");
@@ -72,6 +115,13 @@ const PaymentScreen = () => {
       return;
     }
     const [expMonth, expYear] = expiryDate.split("/").map(Number);
+    
+    // Validate month is between 1 and 12
+    if (expMonth < 1 || expMonth > 12) {
+      alert("Invalid month. Month must be between 01 and 12.");
+      return;
+    }
+
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100; // Get last two digits
     const currentMonth = currentDate.getMonth() + 1;
@@ -90,6 +140,34 @@ const PaymentScreen = () => {
 
     setIsProcessing(true);
     try {
+      // Double check if booking still exists before proceeding
+      const checkResponse = await axios.get("http://localhost:8080/api/rest/getbookingsbyroom", {
+        headers: {
+          "x-hasura-admin-secret": "supersecureadminsecret",
+        },
+        params: {
+          room_id: bookingDetails.room_id,
+        },
+      });
+
+      const bookings = checkResponse.data.bookings || [];
+      const existingBooking = bookings.find(booking => {
+        const bookingStart = new Date(booking.check_in_date);
+        const bookingEnd = new Date(booking.check_out_date);
+        const newStart = new Date(bookingDetails.check_in_date);
+        const newEnd = new Date(bookingDetails.check_out_date);
+
+        return (
+          (newStart >= bookingStart && newStart < bookingEnd) ||
+          (newEnd > bookingStart && newEnd <= bookingEnd) ||
+          (newStart <= bookingStart && newEnd >= bookingEnd)
+        );
+      });
+
+      if (existingBooking) {
+        throw new Error("This room has just been booked by another user. Please choose different dates.");
+      }
+
       // Step 1: Insert Booking
       const bookingPayload = {
         room_id: bookingDetails.room_id,
@@ -123,7 +201,7 @@ const PaymentScreen = () => {
       });
     } catch (err) {
       console.error("Booking failed:", err);
-      alert("Booking failed. Please try again.");
+      alert(err.message || "Booking failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -140,6 +218,12 @@ const PaymentScreen = () => {
         <div className={styles["payment-header"]}>
           <h1>Review Your Booking</h1>
         </div>
+
+        {error && (
+          <div className={styles["error-message"]}>
+            {error}
+          </div>
+        )}
 
         <div className={styles["payment-container"]}>
           {/* Room Details Section */}
@@ -277,9 +361,9 @@ const PaymentScreen = () => {
             <button
               className={styles["confirm-button"]}
               onClick={handlePayment}
-              disabled={!isTermsChecked || isProcessing}
+              disabled={!isTermsChecked || isProcessing || isBookingExists}
             >
-              {isProcessing ? "Processing..." : `Confirm and Pay ₱${(bookingDetails.total_amount*1.12).toFixed(2)}`}
+              {isProcessing ? "Processing..." : isBookingExists ? "Room Already Booked" : `Confirm and Pay ₱${(bookingDetails.total_amount*1.12).toFixed(2)}`}
             </button>
           </div>
         </div>

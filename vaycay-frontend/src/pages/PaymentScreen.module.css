@@ -321,3 +321,14 @@
   margin-bottom: 0;
 }
 
+.error-message {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
