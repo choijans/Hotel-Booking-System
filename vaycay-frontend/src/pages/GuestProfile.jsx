@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GuestProfile.module.css"; // Updated import for CSS Modules
+import { motion } from 'framer-motion';
 
 const GuestProfile = () => {
   const navigate = useNavigate();
@@ -85,79 +86,87 @@ const GuestProfile = () => {
   };
 
   return (
-    <div className={styles["guest-profile-container"]}>
-      <div className={styles["guest-profile-card"]}>
-        <h2>Complete Your Profile</h2>
-        <p className={styles["guest-subtitle"]}>Please provide your personal details to continue</p>
+    <motion.div
+      className="min-h-screen bg-gray-50"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className={styles["guest-profile-container"]}>
+        <div className={styles["guest-profile-card"]}>
+          <h2>Complete Your Profile</h2>
+          <p className={styles["guest-subtitle"]}>Please provide your personal details to continue</p>
 
-        {serverError && <div className={styles["guest-server-error"]}>{serverError}</div>}
+          {serverError && <div className={styles["guest-server-error"]}>{serverError}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className={`${styles["guest-form-group"]} ${errors.full_name ? styles["guest-error"] : ""}`}>
-            <label htmlFor="full_name">Full Name *</label>
-            <input
-              type="text"
-              id="full_name"
-              name="full_name"
-              value={formData.full_name}
-              onChange={handleChange}
-              placeholder="Full Name"
-            />
-            {errors.full_name && <span className={styles["guest-error-message"]}>{errors.full_name}</span>}
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className={`${styles["guest-form-group"]} ${errors.full_name ? styles["guest-error"] : ""}`}>
+              <label htmlFor="full_name">Full Name *</label>
+              <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                placeholder="Full Name"
+              />
+              {errors.full_name && <span className={styles["guest-error-message"]}>{errors.full_name}</span>}
+            </div>
 
-          <div className={styles["guest-form-group"]}>
-            <label htmlFor="birthdate">Birthdate</label>
-            <input
-              type="date"
-              id="birthdate"
-              name="birthdate"
-              value={formData.birthdate}
-              onChange={handleChange}
-              max={new Date().toISOString().split("T")[0]}
-            />
-          </div>
+            <div className={styles["guest-form-group"]}>
+              <label htmlFor="birthdate">Birthdate</label>
+              <input
+                type="date"
+                id="birthdate"
+                name="birthdate"
+                value={formData.birthdate}
+                onChange={handleChange}
+                max={new Date().toISOString().split("T")[0]}
+              />
+            </div>
 
-          <div className={`${styles["guest-form-group"]} ${errors.contact_info ? styles["guest-error"] : ""}`}>
-            <label htmlFor="contact_info">Contact Info *</label>
-            <input
-              type="text"
-              id="contact_info"
-              name="contact_info"
-              value={formData.contact_info}
-              onChange={handleChange}
-              placeholder="@"
-            />
-            {errors.contact_info && (
-              <span className={styles["guest-error-message"]}>{errors.contact_info}</span>
-            )}
-          </div>
+            <div className={`${styles["guest-form-group"]} ${errors.contact_info ? styles["guest-error"] : ""}`}>
+              <label htmlFor="contact_info">Contact Info *</label>
+              <input
+                type="text"
+                id="contact_info"
+                name="contact_info"
+                value={formData.contact_info}
+                onChange={handleChange}
+                placeholder="@"
+              />
+              {errors.contact_info && (
+                <span className={styles["guest-error-message"]}>{errors.contact_info}</span>
+              )}
+            </div>
 
-          <div className={`${styles["guest-form-group"]} ${errors.address ? styles["guest-error"] : ""}`}>
-            <label htmlFor="address">Address *</label>
-            <textarea
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              placeholder="123 Main St, Cebu City, Philippines"
-            />
-            {errors.address && <span className={styles["guest-error-message"]}>{errors.address}</span>}
-          </div>
+            <div className={`${styles["guest-form-group"]} ${errors.address ? styles["guest-error"] : ""}`}>
+              <label htmlFor="address">Address *</label>
+              <textarea
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                rows="3"
+                placeholder="123 Main St, Cebu City, Philippines"
+              />
+              {errors.address && <span className={styles["guest-error-message"]}>{errors.address}</span>}
+            </div>
 
-          <button type="submit" className={styles["guest-submit-btn"]} disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <span className={styles["guest-spinner"]}></span> Saving...
-              </>
-            ) : (
-              "Complete Profile"
-            )}
-          </button>
-        </form>
+            <button type="submit" className={styles["guest-submit-btn"]} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <span className={styles["guest-spinner"]}></span> Saving...
+                </>
+              ) : (
+                "Complete Profile"
+              )}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
