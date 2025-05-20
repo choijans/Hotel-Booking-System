@@ -72,6 +72,13 @@ const PaymentScreen = () => {
       return;
     }
     const [expMonth, expYear] = expiryDate.split("/").map(Number);
+    
+    // Validate month is between 1 and 12
+    if (expMonth < 1 || expMonth > 12) {
+      alert("Invalid month. Month must be between 01 and 12.");
+      return;
+    }
+
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear() % 100; // Get last two digits
     const currentMonth = currentDate.getMonth() + 1;
@@ -168,12 +175,17 @@ const PaymentScreen = () => {
               <div className={styles["summary-item"]}>
                 <span className={styles["summary-label"]}>Check-in:</span>
                 <span className={styles["summary-value"]}>
+<<<<<<< Updated upstream
                   {bookingDetails.check_in_date || "N/A"}
+=======
+                  {new Date(bookingDetails.check_in_date).toLocaleDateString()}
+>>>>>>> Stashed changes
                 </span>
               </div>
               <div className={styles["summary-item"]}>
                 <span className={styles["summary-label"]}>Check-out:</span>
                 <span className={styles["summary-value"]}>
+<<<<<<< Updated upstream
                   {bookingDetails.check_out_date || "N/A"}
                 </span>
               </div>
@@ -181,16 +193,39 @@ const PaymentScreen = () => {
                 <span className={styles["summary-label"]}>Guests:</span>
                 <span className={styles["summary-value"]}>
                   {bookingDetails.adults || 2} Adults, {bookingDetails.children || 1} Children
+=======
+                  {new Date(bookingDetails.check_out_date).toLocaleDateString()}
+>>>>>>> Stashed changes
                 </span>
               </div>
               <div className={styles["summary-item"]}>
                 <span className={styles["summary-label"]}>Room Rate:</span>
                 <span className={styles["summary-value"]}>
+<<<<<<< Updated upstream
                   ₱{bookingDetails.room_details?.price?.toFixed(2) || "0.00"}
                 </span>
               </div>
               <div className={styles["summary-item"]}>
                 <span className={styles["summary-label"]}>Taxes & Fees:</span>
+=======
+                  ₱{bookingDetails.nightly_rate?.toFixed(2)}
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Extra Adults:</span>
+                <span className={styles["summary-value"]}>
+                  {bookingDetails.extra_adults} × ₱500
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Extra Children:</span>
+                <span className={styles["summary-value"]}>
+                  {bookingDetails.extra_children} × ₱300
+                </span>
+              </div>
+              <div className={styles["summary-item"]}>
+                <span className={styles["summary-label"]}>Taxes & Fees (12%):</span>
+>>>>>>> Stashed changes
                 <span className={styles["summary-value"]}>
                   ₱{(bookingDetails.total_amount * 0.12).toFixed(2)}
                 </span>
@@ -198,7 +233,11 @@ const PaymentScreen = () => {
               <div className={`${styles["summary-item"]} ${styles["summary-total"]}`}>
                 <span className={styles["summary-label-total"]}>Total:</span>
                 <span className={styles["summary-value-total"]}>
+<<<<<<< Updated upstream
                   ₱{bookingDetails.total_amount?.toFixed(2) || "0.00"}
+=======
+                ₱{(bookingDetails.total_amount * 1.12).toFixed(2)}
+>>>>>>> Stashed changes
                 </span>
               </div>
             </div>

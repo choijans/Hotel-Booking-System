@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { hotelApi, authApi } from "../api"; // Import authApi for API calls
 import styles from "./Profile.module.css";
+import { motion } from 'framer-motion';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -192,7 +193,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-10 px-4 sm:px-6 lg:px-8">
+    <motion.div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-10 px-4 sm:px-6 lg:px-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sidebar */}
@@ -226,7 +233,13 @@ const Profile = () => {
           {/* Main Content */}
           <main className="col-span-2">
             {selectedSection === "Profile" && (
-              <section className="bg-white shadow-md rounded-2xl p-6">
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white shadow-md rounded-2xl p-6"
+              >
                 <h1 className="text-2xl font-semibold text-gray-900 mb-4">Profile Information</h1>
                 <div className="space-y-5">
                   {[
@@ -241,127 +254,143 @@ const Profile = () => {
                     </div>
                   ))}
                 </div>
-              </section>
+              </motion.section>
             )}
   
-  {selectedSection === "Booking History" && (
-  <div className="bg-white shadow rounded-lg overflow-hidden">
-    <div className="p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Booking History</h2>
-      {bookings.length === 0 ? (
-        <p className="text-gray-600">No bookings found.</p>
-      ) : (
-        <div className="space-y-6">
-          {bookings.map((booking) => (
-            <div
-              key={booking.booking_id}
-              className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow bg-gray-50"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-lg font-semibold text-gray-800">Booking #{booking.booking_id}</div>
-                <span
-                  className={`text-sm font-medium px-2 py-1 rounded ${
-                    booking.status === "Pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : booking.status === "Confirmed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {booking.status}
-                </span>
-              </div>
+            {selectedSection === "Booking History" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white shadow rounded-lg overflow-hidden"
+              >
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Booking History</h2>
+                  {bookings.length === 0 ? (
+                    <p className="text-gray-600">No bookings found.</p>
+                  ) : (
+                    <div className="space-y-6">
+                      {bookings.map((booking) => (
+                        <div
+                          key={booking.booking_id}
+                          className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow bg-gray-50"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <div className="text-lg font-semibold text-gray-800">Booking #{booking.booking_id}</div>
+                            <span
+                              className={`text-sm font-medium px-2 py-1 rounded ${
+                                booking.status === "Pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : booking.status === "Confirmed"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {booking.status}
+                            </span>
+                          </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                  <span className="font-medium">Check-In:</span>{" "}
-                  {new Date(booking.check_in_date).toLocaleDateString()}
-                </div>
-                <div>
-                  <span className="font-medium">Check-Out:</span>{" "}
-                  {new Date(booking.check_out_date).toLocaleDateString()}
-                </div>
-                <div>
-                  <span className="font-medium">Total Amount:</span> ₱{booking.total_amount.toFixed(2)}
-                </div>
-              </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div>
+                              <span className="font-medium">Check-In:</span>{" "}
+                              {new Date(booking.check_in_date).toLocaleDateString()}
+                            </div>
+                            <div>
+                              <span className="font-medium">Check-Out:</span>{" "}
+                              {new Date(booking.check_out_date).toLocaleDateString()}
+                            </div>
+                            <div>
+                              <span className="font-medium">Total Amount:</span> ₱{booking.total_amount.toFixed(2)}
+                            </div>
+                          </div>
 
-              {booking.status === "Pending" && (
-                <div className="mt-4 text-right">
-                  <button
-                    onClick={() => handleCancelBooking(booking)}
-                    className="bg-red-600 text-white py-1.5 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition"
-                  >
-                    Cancel Booking
-                  </button>
+                          {booking.status === "Pending" && (
+                            <div className="mt-4 text-right">
+                              <button
+                                onClick={() => handleCancelBooking(booking)}
+                                className="bg-red-600 text-white py-1.5 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition"
+                              >
+                                Cancel Booking
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
+              </motion.div>
+            )}
   
-{selectedSection === "Transaction History" && (
-  <section className="bg-white shadow-md rounded-2xl p-6">
-    <h2 className="text-2xl font-semibold text-gray-900 mb-6">Transaction History</h2>
-    {transactions.length === 0 ? (
-      <p className="text-gray-600">No transactions found.</p>
-    ) : (
-      <ul className="space-y-4">
-        {transactions.map((t) => (
-          <li
-            key={t.payment_id}
-            className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm text-gray-700">
-              <p>
-                <span className="font-semibold text-gray-800">Payment ID:</span> {t.payment_id}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-800">Amount:</span> ₱{t.amount}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-800">Date:</span>{" "}
-                {new Intl.DateTimeFormat("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }).format(new Date(t.payment_date))}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-800">Method:</span> {t.payment_method}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-800">Status:</span>{" "}
-                <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                    t.payment_status === "Complete"
-                      ? "bg-green-100 text-green-700"
-                      : t.payment_status === "Failed"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {t.payment_status}
-                </span>
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
-    )}
-  </section>
-)}
-
+            {selectedSection === "Transaction History" && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white shadow-md rounded-2xl p-6"
+              >
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Transaction History</h2>
+                {transactions.length === 0 ? (
+                  <p className="text-gray-600">No transactions found.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {transactions.map((t) => (
+                      <li
+                        key={t.payment_id}
+                        className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm text-gray-700">
+                          <p>
+                            <span className="font-semibold text-gray-800">Payment ID:</span> {t.payment_id}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-gray-800">Amount:</span> ₱{t.amount}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-gray-800">Date:</span>{" "}
+                            {new Intl.DateTimeFormat("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }).format(new Date(t.payment_date))}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-gray-800">Method:</span> {t.payment_method}
+                          </p>
+                          <p>
+                            <span className="font-semibold text-gray-800">Status:</span>{" "}
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                                t.payment_status === "Complete"
+                                  ? "bg-green-100 text-green-700"
+                                  : t.payment_status === "Failed"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}
+                            >
+                              {t.payment_status}
+                            </span>
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </motion.section>
+            )}
   
             {selectedSection === "Change Password" && (
-              <section className="bg-white shadow-md rounded-2xl p-6">
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white shadow-md rounded-2xl p-6"
+              >
                 <h1 className="text-2xl font-semibold text-gray-900 mb-6">Change Password</h1>
                 <form onSubmit={handleChangePassword} className="space-y-5">
                   {[
@@ -393,11 +422,17 @@ const Profile = () => {
                     {passwordLoading ? "Changing..." : "Change Password"}
                   </button>
                 </form>
-              </section>
+              </motion.section>
             )}
   
             {selectedSection === "Logout" && (
-              <section className="bg-white shadow-md rounded-2xl p-6 mt-6">
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white shadow-md rounded-2xl p-6 mt-6"
+              >
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Logout</h2>
                 <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
                 <button
@@ -406,12 +441,12 @@ const Profile = () => {
                 >
                   Confirm Logout
                 </button>
-              </section>
+              </motion.section>
             )}
           </main>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 export default Profile;  

@@ -1,6 +1,14 @@
+import { motion } from 'framer-motion';
+
 const AboutUs = () => {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <motion.div
+        className="min-h-screen bg-gray-50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+      >
         {/* Hero Section */}
         <div className="py-12 pl-12 pr-4 sm:pl-16 sm:pr-6 lg:pl-24 lg:pr-8 bg-beige-600 text-left">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Your Hotel.</h1>
@@ -169,7 +177,7 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   };
   

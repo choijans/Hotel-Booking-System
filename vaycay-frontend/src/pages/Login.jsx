@@ -2,6 +2,7 @@ import { useState } from "react";
 import { authApi, setAuthToken } from "../api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -41,73 +42,80 @@ const Login = () => {
       className="min-h-screen bg-center bg-no-repeat"
       style={{
         backgroundImage: `url('/src/assets/bgbg.jpg')`,
-        backgroundSize: "100%", // Adjust percentage as needed
+        backgroundSize: "100%",
       }}
     >
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="flex justify-center">
-              <img className="h-16 w-auto" src="/src/assets/logo.png" />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <div className="text-center mb-8">
+              <div className="flex justify-center">
+                <img className="h-16 w-auto" src="/src/assets/logo.png" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-800 mt-2">Login</h2>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mt-2">Login</h2>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-center">
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-teal-600 hover:text-blue-500"
+                >
+                  Forgot Password?
+                </a>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600"
+              >
+                LOGIN
+              </button>
+
+              {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+
+              <div className="text-center text-sm text-gray-600">
+                Don't have an account?{" "}
+                <a
+                  href="/register"
+                  className="font-medium text-teal-600 hover:text-blue-500"
+                >
+                  Sign Up
+                </a>
+              </div>
+            </form>
           </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <input
-                type="text"
-                id="username"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            <div className="flex items-center justify-center">
-              <a
-                href="/forgot-password"
-                className="text-sm text-teal-600 hover:text-blue-500"
-              >
-                Forgot Password?
-              </a>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600"
-            >
-              LOGIN
-            </button>
-
-            {error && <p className="text-sm text-red-600 text-center">{error}</p>}
-
-            <div className="text-center text-sm text-gray-600">
-              Don't have an account?{" "}
-              <a
-                href="/register"
-                className="font-medium text-teal-600 hover:text-blue-500"
-              >
-                Sign Up
-              </a>
-            </div>
-          </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
