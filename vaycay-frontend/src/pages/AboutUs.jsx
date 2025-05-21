@@ -82,33 +82,33 @@ const AboutUs = () => {
                     {[
                     {
                         name: "Jansen Choi Kai Xuan",
-                        role: "WALA",
-                        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                        img: "/team/miyama.jpg",
-                    },
-                    {
-                        name: "Jose Rafael Achilles Delgado",
-                        role: "Main Yuvan",
-                        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                        img: "/team/pontamyasi.jpg",
+                        role: "Project Manager",
+                        bio: "A results-driven leader with a sharp eye for detail, Jansen ensures smooth project execution and seamless coordination. He brings clarity, structure, and motivation to every phase of development.",
+                        img: "/src/assets/team/jansen.jpg",
                     },
                     {
                         name: "Josh Edward Q. Lui",
-                        role: "Main Fitness Tool Player",
-                        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                        img: "/team/sodja.jpg",
+                        role: "Backend Developer",
+                        bio: "Josh specializes in building robust backend systems and APIs. Known for his logical approach and clean code, he ensures the performance and security of every application he works on.",
+                        img: "/src/assets/team/josh.jpg",
+                    },
+                    {
+                        name: "Jeskha Samantha Derama",
+                        role: "Frontend Developer",
+                        bio: "Jeskha translates designs into dynamic, responsive user interfaces. She is passionate about clean code, interactive design, and creating smooth digital experiences for end-users.",
+                        img: "/src/assets/team/summi.jpg",
+                    },
+                    {
+                        name: "Jose Rafael Achilles Delgado",
+                        role: "UI/UX Developer",
+                        bio: "With a keen sense of design and user psychology, Jose crafts intuitive and engaging interfaces. He focuses on creating seamless experiences that align with user needs and project goals.",
+                        img: "/src/assets/team/jio.jpeg",
                     },
                     {
                         name: "Marie Louise Ty",
-                        role: "Main Fitness Tool Player",
-                        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                        img: "/team/sodja.jpg",
-                    },
-                    {
-                        name: "Samantha Jeskha Derama",
-                        role: "Main Fitness Tool Player",
-                        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-                        img: "/team/sodja.jpg",
+                        role: "UI/UX Developer",
+                        bio: "Marie Louise brings creativity and functionality together through her user-centered designs. Marie focuses on accessibility, aesthetic coherence, and practical usability across all platforms.",
+                        img: "/src/assets/team/maya.jpg",
                     },
                     ].map((member, index) => (
                         <div
