@@ -73,8 +73,9 @@ const Dashboard = () => {
           {/* Buttons */}
           <div className="flex space-x-4">
             <button 
+              onClick={() => navigate("/hotels")}
               className="bg-teal-600 text-white px-8 py-4 rounded-md text-base font-medium hover:bg-teal-700">
-              Explore Rooms
+              Explore Hotels
             </button>
             <button 
               onClick={handleAboutUs}
@@ -144,8 +145,10 @@ const Dashboard = () => {
                 accommodations through Vacay. Sign up today and<br />
                 get ₱300 off your first booking!
               </p>
-              <button className="bg-white text-teal-600 px-8 py-4 rounded-md text-lg font-medium hover:bg-gray-100">
-                Explore Rooms
+              <button
+                className="bg-white text-teal-600 px-8 py-4 rounded-md text-lg font-medium hover:bg-gray-100"
+                onClick={() => navigate("/hotels")}>
+                Explore Hotels
               </button>
             </div>
           </div>
