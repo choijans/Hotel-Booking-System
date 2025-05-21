@@ -106,18 +106,23 @@
 .hotelroom-room-type {
   font-size: 15px;
   color: #555;
-  margin-bottom: 12px;
 }
 
-.hotelroom-room-type strong,
+.hotelroom-room-type strong {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
 .hotelroom-room-price strong {
   color: #333;
+  font-size: 14 px;
 }
 
 .hotelroom-room-price {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 15px;
   color: red;
 }
 
@@ -145,11 +150,12 @@
 }
 
 .hotelroom-book-now-button {
-  background: #219995;
+  background: #1a9f96;
   color: #fff;
   border: none;
+  height: 45px;
   padding: 12px 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;

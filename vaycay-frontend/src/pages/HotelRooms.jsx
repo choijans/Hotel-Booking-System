@@ -303,18 +303,18 @@ const HotelRooms = () => {
                     {/*<h3 className={styles["hotelroom-room-name"]}>Room {room.room_number}</h3>
                         removed room number*/}
                     <p className={styles["hotelroom-room-type"]}>
-                      <strong>Type:</strong> {room.room_type?.type_name || "Standard Room"}
+                      <strong>{room.room_type?.type_name || "Standard Room"}</strong>
                     </p>
                     <p className={styles["hotelroom-room-price"]}>
                       <strong>Price:</strong> PHP {room.price.toLocaleString()}
                     </p>
-                    <span
+                    {/* <span
                       className={`${styles["hotelroom-room-availability"]} ${
                         room.availability ? styles["hotelroom-available"] : styles["hotelroom-unavailable"]
                       }`}
                     >
                       {room.availability ? "Available" : "Unavailable"}
-                    </span>
+                    </span> */}
                     <button
                       className={styles["hotelroom-book-now-button"]}
                       onClick={() => handleBookNow(room.room_id)}
