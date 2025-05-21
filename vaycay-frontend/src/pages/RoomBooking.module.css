@@ -147,6 +147,8 @@
   font-size: 1rem;
   background-color: #fff;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 .roombooking-form input:focus {
@@ -214,4 +216,14 @@
   .roombooking-price {
     font-size: 1.5rem;
   }
+}
+
+/* Add styles for the date picker calendar */
+:global(.react-datepicker-popper) {
+  z-index: 2 !important;
+}
+
+/* Ensure the image popup has a higher z-index */
+.popup-overlay {
+  z-index: 9999 !important;
 }
